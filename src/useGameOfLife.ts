@@ -1,12 +1,12 @@
-import { createEffect, onMount } from "solid-js";
+import { createEffect, createSignal, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
-import { cellColor, randomChoice } from "./helpers";
+import { cellColor, randomChoice, screenChange } from "./helpers";
 import { CELL_WIDTH } from "./data";
 import type { Store } from "solid-js/store";
 import type { Accessor } from "solid-js";
 
 const buildCell = (...args: BuildCellParams): Cell => {
-  const [mode, x, y, width, isAlive = false] = args;
+  const [mode, x, y, width, isAlive] = args;
   let alive = isAlive;
   if (mode === "random") alive = randomChoice();
   if (mode === "inherit") alive = isAlive;
@@ -15,18 +15,21 @@ const buildCell = (...args: BuildCellParams): Cell => {
     x,
     y,
     width,
-    isAlive: alive,
+    isAlive: alive || false,
   };
 };
 
 export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<CanvasRenderingContext2D | undefined>) {
+  const [rowChange, setRowChange] = createStore({});
+  const [colChange, setColChange] = createStore({});
+
   const [board, setBoard] = createStore({
     grid: [] as GridType,
     generation: 0,
 
     /**
      * Build grid (no drawing, no setter)
-     * @param  mode : "random" | "inherit"
+     * @param mode : "random" | "inherit"
      * @returns newGrid : GridType
      */
     build: (mode: BuildCellMode) => {
@@ -34,6 +37,7 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
         Array.from({ length: screen.nCol() }, (_, j) => {
           const x = i * CELL_WIDTH;
           const y = j * CELL_WIDTH;
+
           return mode === "inherit"
             ? buildCell(mode, x, y, CELL_WIDTH, board.grid[i][j].isAlive)
             : buildCell(mode, x, y, CELL_WIDTH);
@@ -42,6 +46,9 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
       return newGrid;
     },
 
+    /**
+     * Reset canvas
+     */
     reset: () => {
       setBoard("grid", board.build("random"));
       setBoard("generation", 0);
@@ -49,20 +56,45 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
     },
 
     resize: () => {
-      createEffect((prev: number | undefined) => {
-        console.log("prev", prev);
-        console.log("screen.width", screen.width);
+      createEffect<[number, number]>(
+        (prev) => {
+          const size = [screen.width, screen.height];
+          if (prev[0] === size[0] && prev[1] === size[1]) return prev;
 
-        if (prev === screen.width || !prev) return screen.width;
-        // increasing screen
-        if (prev < screen.width) {
-        }
-        // decreasing screen
-        if (prev > screen.width) {
-        }
+          const widthChange = screenChange(prev[0], size[0]);
+          const heightChange = screenChange(prev[1], size[1]);
 
-        return screen.width;
-      }, screen.width);
+          /** width */
+          switch (widthChange) {
+            case "decrease":
+              console.log("width decrease");
+              break;
+            case "increase":
+              console.log("width increase");
+              break;
+            case "no change":
+              break;
+          }
+
+          /** height */
+          switch (heightChange) {
+            case "decrease":
+              console.log("height decrease");
+              break;
+            case "increase":
+              console.log("height increase");
+              break;
+            case "no change":
+              break;
+          }
+
+          setBoard("grid", board.build("inherit"));
+          board.draw();
+
+          return [screen.width, screen.height];
+        },
+        [screen.width, screen.height]
+      );
     },
 
     /**
