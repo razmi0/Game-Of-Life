@@ -42,6 +42,29 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
       return newGrid;
     },
 
+    reset: () => {
+      setBoard("grid", board.build("random"));
+      setBoard("generation", 0);
+      board.draw();
+    },
+
+    resize: () => {
+      createEffect((prev: number | undefined) => {
+        console.log("prev", prev);
+        console.log("screen.width", screen.width);
+
+        if (prev === screen.width || !prev) return screen.width;
+        // increasing screen
+        if (prev < screen.width) {
+        }
+        // decreasing screen
+        if (prev > screen.width) {
+        }
+
+        return screen.width;
+      }, screen.width);
+    },
+
     /**
      * Draws the grid on the canvas
      * @returns void
@@ -81,7 +104,7 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
      * Counts the number of alive neighbors
      * @param row : number
      * @param col : number
-     * @returns
+     * @returns number
      */
     countAliveNeighbors: (row: number, col: number) => {
       let aliveNeighbors = 0;
@@ -103,7 +126,7 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
      * Applies the rules of the game
      * @param cell : Cell
      * @param count  : number
-     * @returns
+     * @returns boolean
      */
     judgement: (cell: Cell, count: number) => {
       let alive = cell.isAlive;
@@ -133,9 +156,8 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
 
   onMount(() => {
     setBoard("grid", board.build("random"));
+    board.resize();
   });
-
-  createEffect(() => console.log(screen.width));
 
   return board as Store<GridStoreState>;
 }

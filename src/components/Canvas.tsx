@@ -18,7 +18,7 @@ const Canvas: VoidComponent<CanvasProps> = (props) => {
 
   return (
     <CanvasWrapper>
-      <ControlGroup clock={clock} />
+      <ControlGroup clock={clock} reset={board.reset} />
       <canvas class="bg-slate-500" width={props.screen.width} height={props.screen.height} ref={canvas}></canvas>
     </CanvasWrapper>
   );

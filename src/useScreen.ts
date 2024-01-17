@@ -13,7 +13,6 @@ export default function useScreen() {
     updateScreen: () => {
       setScreen("width", window.innerWidth);
       setScreen("height", window.innerHeight);
-      console.log("New nbr of cells", screen.nCell());
     },
   }) as readonly [Store<ScreenStoreState>, SetStoreFunction<ScreenStoreState>];
 

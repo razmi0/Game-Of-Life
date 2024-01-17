@@ -24,6 +24,7 @@ const Button: Component<ButtonProps> = (props) => {
 
 type ControlsProps = {
   clock: ClockState;
+  reset: () => void;
 };
 export const ControlGroup: Component<ControlsProps> = (props) => {
   const handleQueue = () => props.clock.queueTicks(QUEUE_TICKS_QUANTITY);
@@ -55,6 +56,7 @@ export const ControlGroup: Component<ControlsProps> = (props) => {
           On Clock
         </Show>
       </Button>
+      <Button onClick={props.reset}>Reset</Button>
     </div>
   );
 };
