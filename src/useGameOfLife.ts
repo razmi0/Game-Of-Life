@@ -69,10 +69,20 @@ export const useGameOfLife = (cellWidth: number) => {
     ctx.reset();
     grid.grid.map((row) => {
       row.map((cell) => {
-        ctx.fillStyle = cell.isAlive ? "transparent" : "black";
+        ctx.fillStyle = cell.isAlive ? cellColor() : "black";
         ctx.fillRect(cell.x, cell.y, cell.width, cell.width);
       });
     });
+  };
+
+  const cellColor = () => {
+    let color = "white";
+    const random = Math.random() * 100;
+    if (random <= 25) color = "#3B82F6";
+    if (random > 25 && random <= 50) color = "#6366F1";
+    if (random > 50 && random <= 75) color = "#EC4899";
+    if (random > 75) color = "#F59E0B";
+    return color;
   };
 
   /**
