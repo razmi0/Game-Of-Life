@@ -13,5 +13,5 @@
     <li>change randomness factor with range input</li>
     <li>change speed with range input</li>
     <li>alive : fixed color ; dead : black</li>
-    <li>implement memo neighbors</li>
+    <li>implement memo neighbors to countAliveNeighbors for perf opti</li>
 </ul>
