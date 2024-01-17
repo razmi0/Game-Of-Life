@@ -8,3 +8,15 @@ type Cell = {
 type GridType = {
   grid: Cell[][];
 };
+
+type ClockState = {
+  play: boolean;
+  speed: number;
+  tick: number;
+  playPause: () => void;
+  run: () => void;
+  addTick: () => void;
+  changeSpeed: (speed: number) => void;
+  addSpeed: () => void;
+  subSpeed: () => void;
+};
