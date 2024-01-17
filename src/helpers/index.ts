@@ -11,3 +11,12 @@ export const cellColor = () => {
   if (random > 75) color = "#F59E0B";
   return color;
 };
+
+type ScreenChange = "decrease" | "increase" | "no change";
+/**
+ * Take two numbers, compare them and return :  > 0 "decrease" or < 0 "increase" or "no change"
+ */
+export const screenChange = (val1: number, val2: number): ScreenChange => {
+  if (val1 === val2) return "no change";
+  return val1 > val2 ? "decrease" : "increase";
+};
