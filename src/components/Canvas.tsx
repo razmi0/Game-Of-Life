@@ -1,26 +1,22 @@
-import { onMount } from "solid-js";
-import { useGameOfLife } from "../useGameOfLife";
+import { createSignal, onMount, VoidComponent } from "solid-js";
 import { CanvasWrapper } from "./Wrappers";
 import { ControlsGroup } from "./Buttons";
+import useGameOfLife from "../useGameOfLife";
 import useClock from "../useClock";
 
-const CELL_WIDTH = 10 as const;
 let canvas: HTMLCanvasElement;
-let ctx: CanvasRenderingContext2D;
 
-const Canvas = () => {
-  const [winWidth, winHeight, drawGrid, nextGen] = useGameOfLife(CELL_WIDTH);
-  const [clock, setClock] = useClock([nextGen, () => drawGrid(ctx)]);
+const Canvas: VoidComponent<CanvasProps> = (props) => {
+  const [ctx, setCtx] = createSignal<CanvasRenderingContext2D>();
+  const board = useGameOfLife(props.screen, ctx);
+  const clock = useClock(board.nextCycle);
 
-  onMount(() => {
-    ctx = canvas.getContext("2d")!;
-    drawGrid(ctx);
-  });
+  onMount(() => setCtx(canvas.getContext("2d")!));
 
   return (
     <CanvasWrapper>
       <ControlsGroup clock={clock} />
-      <canvas class="bg-slate-500" width={winWidth()} height={winHeight()} ref={canvas}></canvas>
+      <canvas class="bg-slate-500" width={props.screen.width} height={props.screen.height} ref={canvas}></canvas>
     </CanvasWrapper>
   );
 };
