@@ -1,4 +1,4 @@
-import { onMount } from "solid-js";
+import { createEffect, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import { cellColor, randomChoice } from "./helpers";
 import { CELL_WIDTH } from "./data";
@@ -23,6 +23,12 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
   const [board, setBoard] = createStore({
     grid: [] as GridType,
     generation: 0,
+
+    /**
+     * Build grid (no drawing, no setter)
+     * @param  mode : "random" | "inherit"
+     * @returns newGrid : GridType
+     */
     build: (mode: BuildCellMode) => {
       const newGrid = Array.from({ length: screen.nRow() }, (_, i) =>
         Array.from({ length: screen.nCol() }, (_, j) => {
@@ -35,6 +41,11 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
       );
       return newGrid;
     },
+
+    /**
+     * Draws the grid on the canvas
+     * @returns void
+     */
     draw: () => {
       const context = ctx();
       if (!context) return;
@@ -46,6 +57,10 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
         });
       });
     },
+
+    /**
+     * Generates the next generation with build, countAliveNeighbors, judgement and setBoard
+     */
     nextGen: () => {
       const gridLength = board.grid.length;
       const rowLength = board.grid[0].length;
@@ -61,6 +76,13 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
       }
       setBoard("grid", nextGrid);
     },
+
+    /**
+     * Counts the number of alive neighbors
+     * @param row : number
+     * @param col : number
+     * @returns
+     */
     countAliveNeighbors: (row: number, col: number) => {
       let aliveNeighbors = 0;
       const rowLength = board.grid[0].length;
@@ -76,16 +98,30 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
       }
       return aliveNeighbors;
     },
+
+    /**
+     * Applies the rules of the game
+     * @param cell : Cell
+     * @param count  : number
+     * @returns
+     */
     judgement: (cell: Cell, count: number) => {
       let alive = cell.isAlive;
       if (cell.isAlive) {
-        if (count < 2) alive = false; // underpopulation
-        if (count > 3) alive = false; // overpopulation
+        // underpopulation
+        if (count < 2) alive = false;
+        // overpopulation
+        if (count > 3) alive = false;
       } else {
-        if (count === 3) alive = true; // reproduction
+        // reproduction
+        if (count === 3) alive = true;
       }
       return alive;
     },
+
+    /**
+     * Draws the next generation and increments the generation counter
+     */
     nextCycle: () => {
       console.time("nextCycle");
       board.nextGen();
@@ -98,6 +134,8 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
   onMount(() => {
     setBoard("grid", board.build("random"));
   });
+
+  createEffect(() => console.log(screen.width));
 
   return board as Store<GridStoreState>;
 }
