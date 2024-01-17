@@ -1,4 +1,5 @@
-import { Component, JSX, Show, createEffect, createSignal } from "solid-js";
+import { Component, JSX, Show } from "solid-js";
+import { QUEUE_TICKS_QUANTITY } from "../data";
 
 type ButtonProps = {
   classList?: { [key: string]: boolean };
@@ -25,7 +26,7 @@ type ControlsProps = {
   clock: ClockState;
 };
 export const ControlsGroup: Component<ControlsProps> = (props) => {
-  const handleQueue = () => props.clock.queueTicks(50);
+  const handleQueue = () => props.clock.queueTicks(QUEUE_TICKS_QUANTITY);
   return (
     <div class="flex flex-row gap-1 absolute m-5 opacity-80 flex-wrap">
       <Button
