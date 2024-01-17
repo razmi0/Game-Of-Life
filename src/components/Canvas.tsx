@@ -10,7 +10,7 @@ let ctx: CanvasRenderingContext2D;
 
 const Canvas = () => {
   const [winWidth, winHeight, drawGrid, nextGen] = useGameOfLife(CELL_WIDTH);
-  const clock = useClock([nextGen, () => drawGrid(ctx)]);
+  const [clock, setClock] = useClock([nextGen, () => drawGrid(ctx)]);
 
   onMount(() => {
     ctx = canvas.getContext("2d")!;
