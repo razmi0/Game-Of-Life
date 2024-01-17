@@ -58,6 +58,7 @@ export const useGameOfLife = (cellWidth: number) => {
     );
     setGrid("grid", grid);
     console.timeEnd("onMount building grid");
+    console.log("nbr of cells", nbrOfCells);
   });
 
   /**
