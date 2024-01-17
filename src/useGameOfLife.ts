@@ -2,15 +2,23 @@ import { Accessor, createEffect, createSignal, onCleanup, onMount } from "solid-
 import { createStore } from "solid-js/store";
 
 const ALIVE_RATIO = 0.15 as const;
-const TIME_STEP = 1000 as const;
 
+type BuildCellMode = "random" | "inherit";
+type BuildCellParams = BuildCellMode extends "inherit"
+  ? [BuildCellMode, number, number, number, boolean]
+  : [BuildCellMode, number, number, number, boolean?];
+
+const randomChoice = () => (Math.random() + (0.5 - ALIVE_RATIO) > 0.5 ? false : true);
 /**
  * builda cell
  * init fn
  * @returns
  */
-const buildCell = (x: number, y: number, width: number, isAlive?: boolean) => {
-  const alive = isAlive ? isAlive : Math.random() + (0.5 - ALIVE_RATIO) > 0.5 ? false : true;
+const buildCell = (...args: BuildCellParams): Cell => {
+  const [mode, x, y, width, isAlive = false] = args;
+  let alive = isAlive;
+  if (mode === "random") alive = randomChoice();
+  if (mode === "inherit") alive = isAlive;
   return {
     x,
     y,
@@ -47,17 +55,29 @@ export const useGameOfLife = (cellWidth: number) => {
   const nbrCols = Math.floor(height() / cellWidth);
   const nbrOfCells = Math.floor(width() / cellWidth) * Math.floor(height() / cellWidth);
 
+  const initGrid = () => {
+    console.time("init");
+    const grid = Array.from({ length: nbrRows }, (_, i) =>
+      Array.from({ length: nbrCols }, (_, j) => buildCell("random", i * cellWidth, j * cellWidth, cellWidth))
+    );
+    console.timeEnd("init");
+    setGrid("grid", grid);
+  };
+
+  const newGrid = () => {
+    const grid = Array.from({ length: nbrRows }, (_, i) =>
+      Array.from({ length: nbrCols }, (_, j) => buildCell("inherit", i * cellWidth, j * cellWidth, cellWidth))
+    );
+    return grid;
+  };
+
   /**
    * Mounting the grid & use buildCell and randomize the cells
    * init fn
    */
   onMount(() => {
-    console.time("onMount building grid");
-    const grid = Array.from({ length: nbrRows }, (_, i) =>
-      Array.from({ length: nbrCols }, (_, j) => buildCell(i * cellWidth, j * cellWidth, cellWidth))
-    );
-    setGrid("grid", grid);
-    console.timeEnd("onMount building grid");
+    initGrid();
+    console.log("nbr of cells", nbrOfCells);
   });
 
   /**
@@ -95,20 +115,19 @@ export const useGameOfLife = (cellWidth: number) => {
     const rowLength = grid.grid[0].length;
     const colLength = grid.grid.length;
 
-    for (let k = -1; k <= 1; k++) {
-      for (let l = -1; l <= 1; l++) {
-        if (row + k < 0 || row + k >= colLength) continue;
-        if (col + l < 0 || col + l >= rowLength) continue;
-        if (k === 0 && l === 0) continue;
-        if (grid.grid[row + k][col + l].isAlive) aliveNeighbors++;
+    for (let offsetRow = -1; offsetRow <= 1; offsetRow++) {
+      for (let offsetCol = -1; offsetCol <= 1; offsetCol++) {
+        if (row + offsetRow < 0 || row + offsetRow >= colLength) continue;
+        if (col + offsetCol < 0 || col + offsetCol >= rowLength) continue;
+        if (offsetRow === 0 && offsetCol === 0) continue;
+        if (grid.grid[row + offsetRow][col + offsetCol].isAlive) aliveNeighbors++;
       }
     }
     return aliveNeighbors;
   };
 
   /**
-   * Evolve the cell into alive or dead
-   * chain fn
+   * Evolve the cell chain fn
    */
   const judgement = (cell: Cell, count: number) => {
     let alive = cell.isAlive;
@@ -128,14 +147,23 @@ export const useGameOfLife = (cellWidth: number) => {
    */
   const nextGen = () => {
     console.time("nextGen");
-    for (let row = 0; row < grid.grid.length; row++) {
-      for (let col = 0; col < grid.grid[0].length; col++) {
+
+    const gridLength = grid.grid.length;
+    const rowLength = grid.grid[0].length;
+    const nextGrid = newGrid();
+
+    for (let row = 0; row < gridLength; row++) {
+      for (let col = 0; col < rowLength; col++) {
+        const cell = grid.grid[row][col];
         const neighbors = countAliveNeighbors(row, col);
-        const isAlive = judgement(grid.grid[row][col], neighbors);
-        setGrid("grid", [row], [col], "isAlive", isAlive);
+        const isAlive = judgement(cell, neighbors);
+        nextGrid[row][col].isAlive = isAlive;
       }
     }
+    setGrid("grid", nextGrid);
+
     console.timeEnd("nextGen");
+
     setGenCount((prev) => prev + 1);
   };
 

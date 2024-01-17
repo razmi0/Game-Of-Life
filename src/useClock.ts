@@ -1,6 +1,9 @@
 import { createEffect } from "solid-js";
 import { SetStoreFunction, Store, StoreSetter, createStore } from "solid-js/store";
 
+const DEFAULT_SPEED = 25 as const;
+const START_IMMEDIATELY = false as const;
+const START_CLOCKED = true as const;
 type ClockQueueTicksMode = "clocked" | "free";
 /**
  * Gen playback controls
@@ -8,10 +11,10 @@ type ClockQueueTicksMode = "clocked" | "free";
  */
 export default function useClock(fns: (() => void)[]): [Store<ClockState>, SetStoreFunction<ClockState>] {
   const [clock, setClock] = createStore<ClockState>({
-    play: false,
-    speed: 500 /** ms */,
+    play: START_IMMEDIATELY,
+    speed: DEFAULT_SPEED /** ms */,
     tick: 0,
-    clocked: true,
+    clocked: START_CLOCKED,
     limiter: false,
     queue: 0,
     playPause: () => {
@@ -37,7 +40,7 @@ export default function useClock(fns: (() => void)[]): [Store<ClockState>, SetSt
     queueTicks: (ticks: number) => {
       setClock("queue", ticks + clock.queue);
       setClock("limiter", true);
-      !clock.play && clock.playPause();
+      clock.play && clock.playPause();
     },
     changeSpeed: (speed: number) => setClock("speed", speed),
     switchClocked: () => setClock("clocked", !clock.clocked),
