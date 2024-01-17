@@ -25,7 +25,7 @@ const Button: Component<ButtonProps> = (props) => {
 type ControlsProps = {
   clock: ClockState;
 };
-export const ControlsGroup: Component<ControlsProps> = (props) => {
+export const ControlGroup: Component<ControlsProps> = (props) => {
   const handleQueue = () => props.clock.queueTicks(QUEUE_TICKS_QUANTITY);
   return (
     <div class="flex flex-row gap-1 absolute m-5 opacity-80 flex-wrap">

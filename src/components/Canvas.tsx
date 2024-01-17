@@ -1,6 +1,6 @@
 import { createSignal, onMount, VoidComponent } from "solid-js";
 import { CanvasWrapper } from "./Wrappers";
-import { ControlsGroup } from "./Buttons";
+import { ControlGroup } from "./Buttons";
 import useGameOfLife from "../useGameOfLife";
 import useClock from "../useClock";
 
@@ -11,11 +11,14 @@ const Canvas: VoidComponent<CanvasProps> = (props) => {
   const board = useGameOfLife(props.screen, ctx);
   const clock = useClock(board.nextCycle);
 
-  onMount(() => setCtx(canvas.getContext("2d")!));
+  onMount(() => {
+    setCtx(canvas.getContext("2d")!);
+    board.draw();
+  });
 
   return (
     <CanvasWrapper>
-      <ControlsGroup clock={clock} />
+      <ControlGroup clock={clock} />
       <canvas class="bg-slate-500" width={props.screen.width} height={props.screen.height} ref={canvas}></canvas>
     </CanvasWrapper>
   );

@@ -95,7 +95,9 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
     },
   });
 
-  onMount(() => setBoard("grid", board.build("random")));
+  onMount(() => {
+    setBoard("grid", board.build("random"));
+  });
 
   return board as Store<GridStoreState>;
 }
