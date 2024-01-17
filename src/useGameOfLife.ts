@@ -19,6 +19,7 @@ const buildCell = (...args: BuildCellParams): Cell => {
   let alive = isAlive;
   if (mode === "random") alive = randomChoice();
   if (mode === "inherit") alive = isAlive;
+  if (!mode) throw new Error("mode is not defined");
   return {
     x,
     y,
@@ -55,18 +56,13 @@ export const useGameOfLife = (cellWidth: number) => {
   const nbrCols = Math.floor(height() / cellWidth);
   const nbrOfCells = Math.floor(width() / cellWidth) * Math.floor(height() / cellWidth);
 
-  const initGrid = () => {
-    console.time("init");
+  const newGrid = (mode: BuildCellMode) => {
     const grid = Array.from({ length: nbrRows }, (_, i) =>
-      Array.from({ length: nbrCols }, (_, j) => buildCell("random", i * cellWidth, j * cellWidth, cellWidth))
-    );
-    console.timeEnd("init");
-    setGrid("grid", grid);
-  };
-
-  const newGrid = () => {
-    const grid = Array.from({ length: nbrRows }, (_, i) =>
-      Array.from({ length: nbrCols }, (_, j) => buildCell("inherit", i * cellWidth, j * cellWidth, cellWidth))
+      Array.from({ length: nbrCols }, (_, j) => {
+        const x = i * cellWidth;
+        const y = j * cellWidth;
+        return buildCell(mode, x, y, cellWidth);
+      })
     );
     return grid;
   };
@@ -76,7 +72,7 @@ export const useGameOfLife = (cellWidth: number) => {
    * init fn
    */
   onMount(() => {
-    initGrid();
+    newGrid("random");
     console.log("nbr of cells", nbrOfCells);
   });
 
@@ -150,7 +146,7 @@ export const useGameOfLife = (cellWidth: number) => {
 
     const gridLength = grid.grid.length;
     const rowLength = grid.grid[0].length;
-    const nextGrid = newGrid();
+    const nextGrid = newGrid("inherit");
 
     for (let row = 0; row < gridLength; row++) {
       for (let col = 0; col < rowLength; col++) {
