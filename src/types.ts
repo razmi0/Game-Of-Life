@@ -39,7 +39,7 @@ type ScreenStoreState = {
 type GridStoreState = {
   grid: GridType;
   generation: number;
-  build: (random?: boolean) => GridType;
+  build: (random: boolean) => GridType;
   draw: () => void;
   nextGen: () => void;
   reset: () => void;
