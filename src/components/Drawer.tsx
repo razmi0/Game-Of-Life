@@ -45,18 +45,16 @@ type DrawerWrapperProps = {
 const DrawerWrapper: Component<DrawerWrapperProps> = (props) => {
   return (
     <Show when={props.open} fallback={<DrawerTrigger trigger={props.trigger} />}>
-      <DrawerContent>
-        <div class="absolute top-0 h-full w-full flex flex-row text-dw-t-2-500">
-          <div ref={props.ref} class="h-full bg-dw-500 w-1/3">
-            {props.children}
-          </div>
-          <div class="backdrop-blur-sm bg-white/10 w-full h-full"></div>
-        </div>
+      <DrawerContent ref={props.ref} overlay={<DrawerOverlay />}>
+        {props.children}
       </DrawerContent>
     </Show>
   );
 };
 
+const DrawerOverlay: VoidComponent = () => {
+  return <div class="backdrop-blur-sm bg-white/10 w-full h-full"></div>;
+};
 type DrawerTriggerProps = {
   trigger: () => void;
 };
@@ -71,9 +69,18 @@ const DrawerTrigger: VoidComponent<DrawerTriggerProps> = (props) => {
 };
 type DrawerContentProps = {
   children: JSX.Element[] | JSX.Element;
+  ref: HTMLDivElement;
+  overlay: JSX.Element;
 };
 const DrawerContent: Component<DrawerContentProps> = (props) => {
-  return <div>{props.children}</div>;
+  return (
+    <div class="absolute top-0 h-full w-full flex flex-row text-dw-t-2-500">
+      <div ref={props.ref} class="h-full bg-dw-500 w-1/3">
+        {props.children}
+      </div>
+      {props.overlay}
+    </div>
+  );
 };
 
 type DrawerGroupProps = {
