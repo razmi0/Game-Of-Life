@@ -1,14 +1,11 @@
 import { createEffect, createSignal, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
-import { cellColor, randomChoice, screenChange } from "./helpers";
+import { randomColor, randomChoice, screenChange } from "./helpers";
 import { CELL_WIDTH } from "./data";
 import type { Store } from "solid-js/store";
 import type { Accessor } from "solid-js";
 
 export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<CanvasRenderingContext2D | undefined>) {
-  const [rowChange, setRowChange] = createStore({});
-  const [colChange, setColChange] = createStore({});
-
   const [board, setBoard] = createStore({
     grid: [] as GridType,
     generation: 0,
@@ -16,13 +13,14 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
     /**
      * Build grid (no drawing, no setter) random if undefined
      */
-    build: () => {
+    build: (random: boolean = false) => {
+      console.time("build");
       const newGrid = Array.from({ length: screen.nRow() }, (_, i) =>
         Array.from({ length: screen.nCol() }, (_, j) => {
           const x = i * CELL_WIDTH;
           const y = j * CELL_WIDTH;
-          const isAlive = board.grid[i]?.[j]?.isAlive ?? randomChoice();
-          const color = board.grid[i]?.[j]?.color ?? cellColor();
+          const isAlive = random ? randomChoice() : board.grid[i]?.[j]?.isAlive ?? randomChoice();
+          const color = random ? randomColor() : board.grid[i]?.[j]?.color ?? randomColor();
           return {
             x,
             y,
@@ -32,6 +30,7 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
           };
         })
       );
+      console.timeEnd("build");
       return newGrid;
     },
 
@@ -167,11 +166,13 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
      * Draws the next generation and increments the generation counter
      */
     nextCycle: () => {
-      console.time("nextCycle");
+      console.time("nextGen");
       board.nextGen();
+      console.timeEnd("nextGen");
+      console.time("draw");
       board.draw();
+      console.timeEnd("draw");
       setBoard("generation", board.generation + 1);
-      console.timeEnd("nextCycle");
     },
   });
 
