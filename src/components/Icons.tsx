@@ -1,6 +1,6 @@
 import spriteHref from "/sprite.svg?url";
 
-type IconNames = "dw-icon";
+type IconNames = "dw-icon" | "chevron" | "squares" | "plus";
 type IconProps = {
   width: number;
   height: number;
