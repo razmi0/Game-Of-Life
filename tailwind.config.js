@@ -16,6 +16,10 @@ module.exports = {
           // drawer title & icon
           500: "#4c5366",
         },
+        "dw-left-icon": {
+          // drawer left icon & <sm icon color
+          500: "#7e8baa",
+        },
       },
     },
   },
