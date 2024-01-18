@@ -1,12 +1,12 @@
 import { Portal } from "solid-js/web";
-import { For, Show, createEffect, createSignal, onCleanup, onMount } from "solid-js";
-import type { Accessor, Component, FlowComponent, JSX, VoidComponent } from "solid-js";
-import Icon from "./Icons";
+import { createSignal, onCleanup, onMount } from "solid-js";
 import Wrapper from "./Drawer/Content";
 import Header from "./Drawer/Header";
 import Body from "./Drawer/Body";
 import Group from "./Drawer/Group";
 import Item from "./Drawer/Item";
+import { IconButton } from "./Buttons";
+import type { JSX } from "solid-js";
 
 const portalNode = document.getElementById("portal")! as HTMLDivElement;
 let ref: HTMLDivElement;
@@ -23,7 +23,8 @@ export default function () {
   //   </div>
   // );
   let leftIcon: JSX.Element;
-  const rightIcon = <Icon width={25} height={25} name="chevron" />;
+  const rightIcon = <IconButton onClick={trigger} width={25} height={25} name="chevron" />;
+  // const rightIcon = <Icon width={25} height={25} name="chevron" />;
 
   onMount(() => {
     const handleClickOutside = (e: MouseEvent) => {

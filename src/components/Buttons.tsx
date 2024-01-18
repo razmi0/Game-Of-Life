@@ -1,5 +1,6 @@
 import { Component, JSX, Show } from "solid-js";
 import { QUEUE_TICKS_QUANTITY } from "../data";
+import Icon, { IconProps } from "./Icons";
 
 type ButtonProps = {
   classList?: { [key: string]: boolean };
@@ -61,3 +62,14 @@ export const ControlGroup: Component<ControlsProps> = (props) => {
   );
 };
 export default Button;
+
+interface IconButtonProps extends IconProps {
+  onClick: () => void;
+}
+export const IconButton = (props: IconButtonProps) => {
+  return (
+    <button onClick={props.onClick}>
+      <Icon width={props.width} height={props.height} color={props.color} name="chevron" />
+    </button>
+  );
+};

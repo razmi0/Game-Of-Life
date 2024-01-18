@@ -1,12 +1,12 @@
 import spriteHref from "/sprite.svg?url";
 
-type IconNames = "dw-icon" | "chevron" | "squares" | "plus";
-type IconProps = {
+type IconNames = "dw-icon" | "chevron" | "squares" | "plus" | "minus";
+export interface IconProps {
   width: number;
   height: number;
   name: IconNames;
   color?: string;
-};
+}
 /**
  * <svg>
  *      <defs>
