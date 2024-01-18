@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 ::root {
-  --color: #676f8588;
+  --color: #b3b3b7;
 }
 
 #root {
@@ -12,9 +12,4 @@
   place-items: center;
   height: 100vh;
   width: 100vw;
-}
-
-.dw-left-icon {
-  @apply bg-dw-200 py-2 px-3 border-2 border-dw-300;
-  border-radius: calc(((0.25rem + 0.5rem) / 2));
 }
