@@ -38,7 +38,7 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
      * Reset canvas
      */
     reset: () => {
-      setBoard("grid", board.build());
+      setBoard("grid", board.build(true));
       setBoard("generation", 0);
       board.draw();
     },
