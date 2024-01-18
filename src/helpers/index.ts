@@ -2,7 +2,7 @@ import { INITIAL_ALIVE_RATIO } from "../data";
 
 export const randomChoice = () => (Math.random() + (0.5 - INITIAL_ALIVE_RATIO) > 0.5 ? false : true);
 
-export const cellColor = () => {
+export const randomColor = () => {
   let color = "white";
   const random = Math.random() * 100;
   if (random <= 25) color = "#3B82F6";
