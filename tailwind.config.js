@@ -13,15 +13,9 @@ module.exports = {
           150: "#b3b3b7", // 150
           100: "#efeff3",
         },
-        "dw-t-1": {
-          // drawer text
-        },
-        "dw-t-2": {
-          // drawer title & icon
-        },
-        "dw-left-icon": {
-          // drawer left icon & <sm icon color
-        },
+      },
+      fontSize: {
+        "2xs": "0.625rem",
       },
     },
   },
