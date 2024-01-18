@@ -3,6 +3,7 @@ type Cell = {
   y: number;
   width: number;
   isAlive: boolean;
+  color: string;
 };
 
 type GridType = Cell[][];
@@ -38,7 +39,7 @@ type ScreenStoreState = {
 type GridStoreState = {
   grid: GridType;
   generation: number;
-  build: (mode: BuildCellMode) => GridType;
+  build: () => GridType;
   draw: () => void;
   nextGen: () => void;
   reset: () => void;
