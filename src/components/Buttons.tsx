@@ -65,10 +65,11 @@ export default Button;
 
 interface IconButtonProps extends IconProps {
   onClick: () => void;
+  classes?: string;
 }
 export const IconButton = (props: IconButtonProps) => {
   return (
-    <button onClick={props.onClick}>
+    <button class={props.classes} onClick={props.onClick}>
       <Icon width={props.width} height={props.height} color={props.color} name="chevron" />
     </button>
   );

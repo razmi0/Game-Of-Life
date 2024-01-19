@@ -1,6 +1,26 @@
 import spriteHref from "/sprite.svg?url";
 
-type IconNames = "dw-icon" | "chevron" | "squares" | "plus" | "minus";
+export type IconNames =
+  | "chevron"
+  | "squares"
+  | "speed"
+  | "shuffle"
+  | "plus"
+  | "minus"
+  | "skull"
+  | "heart"
+  | "gear"
+  | "play"
+  | "pause"
+  | "speed"
+  | "clock"
+  | "range"
+  | "reset"
+  | "population"
+  | "random"
+  | "queue"
+  | "wave";
+
 export interface IconProps {
   width: number;
   height: number;

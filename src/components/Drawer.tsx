@@ -6,25 +6,34 @@ import Body from "./Drawer/Body";
 import Group from "./Drawer/Group";
 import Item from "./Drawer/Item";
 import { IconButton } from "./Buttons";
-import type { JSX } from "solid-js";
+import type { JSX, VoidComponent } from "solid-js";
+import Icon, { IconNames } from "./Icons";
 
 const portalNode = document.getElementById("portal")! as HTMLDivElement;
 let ref: HTMLDivElement;
-const title = "Title";
-const subtitle = "Subtitle";
+const title = "Controls";
+const subtitle = "monitoring and control";
 
-export default function () {
-  const [isOpen, setIsOpen] = createSignal(true);
+type DrawerProps = {
+  playPause: () => void;
+  reset: () => void;
+};
+export default function Drawer(props: DrawerProps) {
+  const [isOpen, setIsOpen] = createSignal(false);
   const trigger = () => setIsOpen(true);
 
-  // const leftIcon = (
-  //   <div class="bg-dw-200 border-2 p-2 rounded-lg border-dw-300 opacity-80">
-  //     <Icon width={25} height={25} name="squares" />
-  //   </div>
-  // );
-  let leftIcon: JSX.Element;
-  const rightIcon = <IconButton onClick={trigger} width={25} height={25} name="chevron" />;
-  // const rightIcon = <Icon width={25} height={25} name="chevron" />;
+  const ChevronDown = (
+    <IconButton onClick={trigger} width={25} height={25} name="chevron" classes="hover:bg-dw-300 p-1 rounded-full" />
+  );
+
+  const drawerIcons: Partial<Record<IconNames, JSX.Element>> = {
+    play: <Icon width={25} height={25} name="play" />,
+    reset: <Icon width={23} height={23} name="reset" />,
+    random: <Icon width={25} height={25} name="random" />,
+    gear: <Icon width={23} height={23} name="gear" />,
+    speed: <Icon width={25} height={25} name="speed" />,
+    shuffle: <Icon width={25} height={25} name="shuffle" />,
+  };
 
   onMount(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -37,15 +46,22 @@ export default function () {
   return (
     <Portal mount={portalNode}>
       <Wrapper trigger={trigger} open={isOpen()} ref={ref}>
-        <Header title={title} subtitle={subtitle} leftIcon={leftIcon} rightIcon={rightIcon} />
+        <Header title={title} subtitle={subtitle} right={ChevronDown} />
         <Body>
-          <Group title="First set">
-            <Item>Item 1</Item>
-            <Item>Item 2</Item>
+          <Group title="Control">
+            <Item left={drawerIcons.play} onClick={props.playPause}>
+              Play
+            </Item>
+            <Item left={drawerIcons.shuffle} onClick={props.reset}>
+              Random
+            </Item>
+            <Item left={drawerIcons.reset}>Reset</Item>
           </Group>
-          <Group title="Second set">
-            <Item>Item 2.1</Item>
-            <Item>Item 2.2</Item>
+          <Group title="Settings" left={drawerIcons.gear}>
+            <Item left={drawerIcons.speed} right={59} label="speed">
+              <Range onChange={console.log} />
+            </Item>
+            <Item left={drawerIcons.random}>Item 2.2</Item>
           </Group>
           <Group title="Third set">
             <Item>Item 3.1</Item>
@@ -56,3 +72,10 @@ export default function () {
     </Portal>
   );
 }
+
+type RangeProps = {
+  onChange: () => void;
+};
+const Range: VoidComponent<RangeProps> = (props) => {
+  return <input type="range" onChange={props.onChange} max={100} min={10} />;
+};

@@ -3,8 +3,9 @@ import type { JSX } from "solid-js";
 import Icon from "../Icons";
 
 type GroupProps = {
-  title: string;
+  title?: string;
   children: JSX.Element;
+  left?: JSX.Element;
 };
 const Group: Component<GroupProps> = (props) => {
   const [isOpen, setIsOpen] = createSignal(true);
@@ -14,16 +15,21 @@ const Group: Component<GroupProps> = (props) => {
 
   return (
     <div class="my-3 mt-4">
-      <GroupHeader icon={<PlusIcon />} onClick={trigger}>
-        <h4 class="uppercase monserrat tracking-widest text-xs font-bold">{props.title}</h4>
-      </GroupHeader>
-      <Show when={isOpen()}>{props.children}</Show>
+      <Show when={!!props.title}>
+        <GroupHeader right={<PlusIcon />} left={props.left} onClick={trigger}>
+          <h4 class="uppercase monserrat tracking-widest text-xs font-bold">{props.title}</h4>
+        </GroupHeader>
+      </Show>
+      <Show when={isOpen()}>
+        <div class="py-2 flex flex-col gap-2 ps-1">{props.children}</div>
+      </Show>
     </div>
   );
 };
 
 type GroupHeaderProps = {
-  icon: JSX.Element;
+  left?: JSX.Element;
+  right?: JSX.Element;
   children: JSX.Element;
   onClick: () => void;
 };
@@ -31,13 +37,17 @@ type GroupHeaderProps = {
 const GroupHeader: Component<GroupHeaderProps> = (props) => {
   return (
     <button
-      class="p-1 flex flex-row justify-between w-full items-center text-dw-300 hover:text-dw-200 "
+      class="gap-2 flex flex-row justify-start w-full items-center text-dw-300 hover:text-dw-200 "
       onClick={props.onClick}
     >
+      <div class="ps-1">{props.left}</div>
       <div>{props.children}</div>
-      <div class="pe-1 ">{props.icon}</div>
+      <Spacer />
+      <div class="pe-1 ">{props.right}</div>
     </button>
   );
 };
+
+const Spacer = () => <div class="flex-grow"></div>;
 
 export default Group;

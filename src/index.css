@@ -18,3 +18,12 @@
 .monserrat {
   font-family: "Montserrat", sans-serif;
 }
+
+.after-content::after {
+  content: " ";
+  display: block;
+  width: 100%;
+  height: 1px;
+  background-color: var(--color);
+  margin: 1rem 0;
+}
