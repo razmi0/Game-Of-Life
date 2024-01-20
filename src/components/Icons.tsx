@@ -5,6 +5,7 @@ export type IconNames =
   | "squares"
   | "speed"
   | "shuffle"
+  | "baby"
   | "plus"
   | "minus"
   | "skull"
@@ -19,6 +20,8 @@ export type IconNames =
   | "population"
   | "random"
   | "queue"
+  | "arrowUp"
+  | "arrowDown"
   | "wave";
 
 export interface IconProps {

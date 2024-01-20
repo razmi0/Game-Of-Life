@@ -6,6 +6,7 @@ type GroupProps = {
   title?: string;
   children: JSX.Element;
   left?: JSX.Element;
+  classes?: string;
 };
 const Group: Component<GroupProps> = (props) => {
   const [isOpen, setIsOpen] = createSignal(true);
@@ -21,7 +22,7 @@ const Group: Component<GroupProps> = (props) => {
         </GroupHeader>
       </Show>
       <Show when={isOpen()}>
-        <div class="py-2 flex flex-col gap-2 ps-1">{props.children}</div>
+        <div class={`py-2 flex flex-col gap-2 ps-1 ${props.classes}`}>{props.children}</div>
       </Show>
     </div>
   );
@@ -40,7 +41,7 @@ const GroupHeader: Component<GroupHeaderProps> = (props) => {
       class="gap-2 flex flex-row justify-start w-full items-center text-dw-300 hover:text-dw-200 "
       onClick={props.onClick}
     >
-      <div class="ps-1">{props.left}</div>
+      <div class="ps-1 ">{props.left}</div>
       <div>{props.children}</div>
       <Spacer />
       <div class="pe-1 ">{props.right}</div>

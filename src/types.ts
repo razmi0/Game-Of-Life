@@ -39,11 +39,19 @@ type ScreenStoreState = {
 type GridStoreState = {
   grid: GridType;
   generation: number;
+  nAlive: number;
+  nAliveIncrease: boolean;
+  nDead: number;
+  nDeadIncrease: boolean;
+  randomness: number;
+  randomChoice: () => boolean;
+  shuffle: () => void;
   build: (random: boolean) => GridType;
   draw: () => void;
   nextGen: () => void;
   reset: () => void;
-  resize: () => void;
+  changeRandomness: (value: number) => void;
+  // resize: () => void;
   countAliveNeighbors: (row: number, col: number) => number;
   judgement: (cell: Cell, neighbors: number) => boolean;
   nextCycle: () => void;

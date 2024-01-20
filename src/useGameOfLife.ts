@@ -1,26 +1,47 @@
-import { createEffect, createSignal, onMount } from "solid-js";
+import { onMount } from "solid-js";
 import { createStore } from "solid-js/store";
-import { randomColor, randomChoice, screenChange } from "./helpers";
-import { CELL_WIDTH } from "./data";
+import { randomColor } from "./helpers";
 import type { Store } from "solid-js/store";
 import type { Accessor } from "solid-js";
+import { CELL_WIDTH, DEFAULT_RANDOMNESS, SHUFFLE_MAX_CONSECUTIVE_ALIVE, SHUFFLE_MAX_CONSECUTIVE_DEAD } from "./data";
 
 export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<CanvasRenderingContext2D | undefined>) {
   const [board, setBoard] = createStore({
     grid: [] as GridType,
     generation: 0,
+    nAlive: 0,
+    nAliveIncrease: false,
+    nDead: 0,
+    nDeadIncrease: false,
+    randomness: DEFAULT_RANDOMNESS,
+
+    /**
+     * Random choice
+     */
+    randomChoice: () => (Math.random() * 100 - board.randomness + 50 > 50 ? true : false),
+
+    /**
+     *
+     */
+    changeRandomness: (value: number /** range 0 - 100 */) => {
+      setBoard("randomness", value);
+      setBoard("grid", board.build(true));
+      board.draw();
+    },
 
     /**
      * Build grid (no drawing, no setter) random if undefined
      */
     build: (random: boolean = false) => {
-      console.time("build");
+      let alives = 0;
+      let deads = 0;
       const newGrid = Array.from({ length: screen.nRow() }, (_, i) =>
         Array.from({ length: screen.nCol() }, (_, j) => {
           const x = i * CELL_WIDTH;
           const y = j * CELL_WIDTH;
-          const isAlive = random ? randomChoice() : board.grid[i]?.[j]?.isAlive ?? randomChoice();
+          const isAlive = random ? board.randomChoice() : board.grid[i]?.[j]?.isAlive ?? board.randomChoice();
           const color = random ? randomColor() : board.grid[i]?.[j]?.color ?? randomColor();
+          isAlive ? alives++ : deads++;
           return {
             x,
             y,
@@ -30,7 +51,10 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
           };
         })
       );
-      console.timeEnd("build");
+      setBoard("nAliveIncrease", alives > board.nAlive);
+      setBoard("nDeadIncrease", deads > board.nDead);
+      setBoard("nAlive", alives);
+      setBoard("nDead", deads);
       return newGrid;
     },
 
@@ -41,6 +65,46 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
       setBoard("grid", board.build(true));
       setBoard("generation", 0);
       board.draw();
+    },
+
+    /**
+     * Shuffle a bit the grid based on arbitrary value of consecutive nature of cells (alive or dead)
+     */
+    shuffle: () => {
+      console.time("shuffle");
+      let consecutiveAlive = 0;
+      let consecutiveDead = 0;
+      let indexToChange = [] as [number, number, boolean][];
+
+      for (let i = 0; i < board.grid.length; i++) {
+        for (let j = 0; j < board.grid[i].length; j++) {
+          if (board.grid[i]?.[j]?.isAlive) {
+            consecutiveAlive++;
+            consecutiveDead = 0;
+          } else {
+            consecutiveDead++;
+            consecutiveAlive = 0;
+          }
+          if (consecutiveAlive > SHUFFLE_MAX_CONSECUTIVE_ALIVE) {
+            const changeIndex = j - 1 < 0 ? j : j - 1;
+            indexToChange.push([i, changeIndex, false]);
+            consecutiveAlive = 0;
+          }
+          if (consecutiveDead > SHUFFLE_MAX_CONSECUTIVE_DEAD) {
+            const changeIndex = j - 5 < 0 ? j : j - 5;
+            indexToChange.push([i, changeIndex, true]);
+            consecutiveDead = 0;
+          }
+        }
+      }
+
+      indexToChange.map(([row, col, newState]) => setBoard("grid", [row], [col], "isAlive", newState));
+      board.build();
+      board.draw();
+
+      console.timeEnd("shuffle");
+
+      // return shuffleGrid;
     },
 
     // resize: () => {
@@ -102,7 +166,7 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
     },
 
     /**
-     * Generates the next generation with build, countAliveNeighbors, judgement and setBoard
+     * Generates the next generation
      */
     nextGen: () => {
       const gridLength = board.grid.length;
@@ -166,12 +230,8 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
      * Draws the next generation and increments the generation counter
      */
     nextCycle: () => {
-      console.time("nextGen");
       board.nextGen();
-      console.timeEnd("nextGen");
-      console.time("draw");
       board.draw();
-      console.timeEnd("draw");
       setBoard("generation", board.generation + 1);
     },
   });

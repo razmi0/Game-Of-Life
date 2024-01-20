@@ -1,5 +1,5 @@
 import { SetStoreFunction, Store, createStore } from "solid-js/store";
-import { START_IMMEDIATELY, DEFAULT_SPEED, START_CLOCKED } from "./data";
+import { DEFAULT_SPEED, START_CLOCKED, START_IMMEDIATELY } from "./data";
 
 type ClockQueueTicksMode = "clocked" | "free";
 /**

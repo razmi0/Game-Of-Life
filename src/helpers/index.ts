@@ -1,7 +1,3 @@
-import { INITIAL_ALIVE_RATIO } from "../data";
-
-export const randomChoice = () => (Math.random() + (0.5 - INITIAL_ALIVE_RATIO) > 0.5 ? false : true);
-
 export const randomColor = () => {
   let color = "white";
   const random = Math.random() * 100;

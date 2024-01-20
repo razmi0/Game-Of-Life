@@ -1,9 +1,36 @@
 /** CONSTANTS */
 
-export const DEFAULT_SPEED = 25 as const;
-export const START_IMMEDIATELY = false as const;
-export const START_CLOCKED = true as const;
-export const CELL_WIDTH = 10 as const;
-export const INITIAL_ALIVE_RATIO = 0.15 as const;
+const DEFAULT_RANDOMNESS = 80;
+const DEFAULT_SPEED = 10 as const;
+const START_IMMEDIATELY = false as const;
+const START_CLOCKED = true as const;
+const CELL_WIDTH = 20 as const;
+const QUEUE_TICKS_QUANTITY = 25 as const;
+const MAX_DELAY = 1000 as const;
+const MIN_DELAY = 0 as const;
+const MAX_ALIVE_RANDOMNESS = 100 as const;
+const MIN_ALIVE_RANDOMNESS = 0 as const;
+const SHUFFLE_MAX_CONSECUTIVE_ALIVE = 3 as const;
+const SHUFFLE_MAX_CONSECUTIVE_DEAD = 10 as const;
+const ICON_SIZE = {
+  sm: 20,
+  md: 23,
+  lg: 25,
+  xl: 30,
+} as const;
 
-export const QUEUE_TICKS_QUANTITY = 25 as const;
+export {
+  DEFAULT_RANDOMNESS,
+  CELL_WIDTH,
+  DEFAULT_SPEED,
+  START_IMMEDIATELY,
+  START_CLOCKED,
+  QUEUE_TICKS_QUANTITY,
+  MAX_DELAY,
+  MIN_DELAY,
+  MAX_ALIVE_RANDOMNESS,
+  MIN_ALIVE_RANDOMNESS,
+  SHUFFLE_MAX_CONSECUTIVE_ALIVE,
+  SHUFFLE_MAX_CONSECUTIVE_DEAD,
+  ICON_SIZE,
+};

@@ -8,8 +8,8 @@ import useGameOfLife from "./useGameOfLife";
 let canvas: HTMLCanvasElement;
 
 const App: Component = () => {
-  const screen = useScreen();
   const [ctx, setCtx] = createSignal<CanvasRenderingContext2D>();
+  const screen = useScreen();
   const board = useGameOfLife(screen, ctx);
   const clock = useClock(board.nextCycle);
 
@@ -20,7 +20,7 @@ const App: Component = () => {
 
   return (
     <>
-      <Drawer playPause={clock.playPause} reset={board.reset} />
+      <Drawer clock={clock} board={board} />
       <CanvasWrapper>
         <canvas class="bg-slate-500" width={screen.width} height={screen.height} ref={canvas}></canvas>
       </CanvasWrapper>
