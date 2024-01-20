@@ -3,11 +3,10 @@ type Cell = {
   y: number;
   width: number;
   isAlive: boolean;
+  color: string;
 };
 
-type GridType = {
-  grid: Cell[][];
-};
+type GridType = Cell[][];
 
 type ClockState = {
   play: boolean;
@@ -24,4 +23,41 @@ type ClockState = {
   addSpeed: () => void;
   subSpeed: () => void;
   queueTicks: (ticks: number) => void;
+};
+type BuildCellParams =
+  | [mode: "random", x: number, y: number, width: number]
+  | [mode: "inherit", x: number, y: number, width: number, isAlive: boolean];
+type ScreenStoreState = {
+  width: number;
+  height: number;
+  nRow: () => number;
+  nCol: () => number;
+  nCell: () => number;
+  updateScreen: () => void;
+};
+
+type GridStoreState = {
+  grid: GridType;
+  generation: number;
+  nAlive: number;
+  nAliveIncrease: boolean;
+  nDead: number;
+  nDeadIncrease: boolean;
+  randomness: number;
+  randomChoice: () => boolean;
+  shuffle: () => void;
+  build: (random: boolean) => GridType;
+  draw: () => void;
+  nextGen: () => void;
+  reset: () => void;
+  changeRandomness: (value: number) => void;
+  // resize: () => void;
+  countAliveNeighbors: (row: number, col: number) => number;
+  judgement: (cell: Cell, neighbors: number) => boolean;
+  nextCycle: () => void;
+};
+type BuildCellMode = "random" | "inherit";
+
+type CanvasProps = {
+  screen: ScreenStoreState;
 };

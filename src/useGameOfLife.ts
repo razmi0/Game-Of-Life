@@ -1,171 +1,244 @@
-import { Accessor, createEffect, createSignal, onCleanup, onMount } from "solid-js";
+import { onMount } from "solid-js";
 import { createStore } from "solid-js/store";
+import { randomColor } from "./helpers";
+import type { Store } from "solid-js/store";
+import type { Accessor } from "solid-js";
+import { CELL_WIDTH, DEFAULT_RANDOMNESS, SHUFFLE_MAX_CONSECUTIVE_ALIVE, SHUFFLE_MAX_CONSECUTIVE_DEAD } from "./data";
 
-const ALIVE_RATIO = 0.15 as const;
+export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<CanvasRenderingContext2D | undefined>) {
+  const [board, setBoard] = createStore({
+    grid: [] as GridType,
+    generation: 0,
+    nAlive: 0,
+    nAliveIncrease: false,
+    nDead: 0,
+    nDeadIncrease: false,
+    randomness: DEFAULT_RANDOMNESS,
 
-type BuildCellMode = "random" | "inherit";
-type BuildCellParams = BuildCellMode extends "inherit"
-  ? [BuildCellMode, number, number, number, boolean]
-  : [BuildCellMode, number, number, number, boolean?];
+    /**
+     * Random choice
+     */
+    randomChoice: () => (Math.random() * 100 - board.randomness + 50 > 50 ? true : false),
 
-const randomChoice = () => (Math.random() + (0.5 - ALIVE_RATIO) > 0.5 ? false : true);
-/**
- * builda cell
- * init fn
- * @returns
- */
-const buildCell = (...args: BuildCellParams): Cell => {
-  const [mode, x, y, width, isAlive = false] = args;
-  let alive = isAlive;
-  if (mode === "random") alive = randomChoice();
-  if (mode === "inherit") alive = isAlive;
-  return {
-    x,
-    y,
-    width,
-    isAlive: alive,
-  };
-};
+    /**
+     *
+     */
+    changeRandomness: (value: number /** range 0 - 100 */) => {
+      setBoard("randomness", value);
+      setBoard("grid", board.build(true));
+      board.draw();
+    },
 
-type GameOfLife = readonly [
-  Accessor<number>,
-  Accessor<number>,
-  (ctx: CanvasRenderingContext2D) => void,
-  () => void,
-  Accessor<number>
-] & {};
-export const useGameOfLife = (cellWidth: number) => {
-  const [genCount, setGenCount] = createSignal(0);
-  const [width, setWidth] = createSignal(window.innerWidth);
-  const [height, setHeight] = createSignal(window.innerHeight);
-  const [grid, setGrid] = createStore<GridType>({
-    grid: [],
-  });
+    /**
+     * Build grid (no drawing, no setter) random if undefined
+     */
+    build: (random: boolean = false) => {
+      let alives = 0;
+      let deads = 0;
+      const newGrid = Array.from({ length: screen.nRow() }, (_, i) =>
+        Array.from({ length: screen.nCol() }, (_, j) => {
+          const x = i * CELL_WIDTH;
+          const y = j * CELL_WIDTH;
+          const isAlive = random ? board.randomChoice() : board.grid[i]?.[j]?.isAlive ?? board.randomChoice();
+          const color = random ? randomColor() : board.grid[i]?.[j]?.color ?? randomColor();
+          isAlive ? alives++ : deads++;
+          return {
+            x,
+            y,
+            width: CELL_WIDTH,
+            isAlive: isAlive,
+            color: color,
+          };
+        })
+      );
+      setBoard("nAliveIncrease", alives > board.nAlive);
+      setBoard("nDeadIncrease", deads > board.nDead);
+      setBoard("nAlive", alives);
+      setBoard("nDead", deads);
+      return newGrid;
+    },
 
-  createEffect(() => {
-    const cb = () => {
-      setWidth(window.innerWidth);
-      setHeight(window.innerHeight);
-    };
-    window.addEventListener("resize", cb);
-    onCleanup(() => window.removeEventListener("resize", cb));
-  });
+    /**
+     * Reset canvas
+     */
+    reset: () => {
+      setBoard("grid", board.build(true));
+      setBoard("generation", 0);
+      board.draw();
+    },
 
-  const nbrRows = Math.floor(width() / cellWidth);
-  const nbrCols = Math.floor(height() / cellWidth);
-  const nbrOfCells = Math.floor(width() / cellWidth) * Math.floor(height() / cellWidth);
+    /**
+     * Shuffle a bit the grid based on arbitrary value of consecutive nature of cells (alive or dead)
+     */
+    shuffle: () => {
+      console.time("shuffle");
+      let consecutiveAlive = 0;
+      let consecutiveDead = 0;
+      let indexToChange = [] as [number, number, boolean][];
 
-  const initGrid = () => {
-    console.time("init");
-    const grid = Array.from({ length: nbrRows }, (_, i) =>
-      Array.from({ length: nbrCols }, (_, j) => buildCell("random", i * cellWidth, j * cellWidth, cellWidth))
-    );
-    console.timeEnd("init");
-    setGrid("grid", grid);
-  };
+      for (let i = 0; i < board.grid.length; i++) {
+        for (let j = 0; j < board.grid[i].length; j++) {
+          if (board.grid[i]?.[j]?.isAlive) {
+            consecutiveAlive++;
+            consecutiveDead = 0;
+          } else {
+            consecutiveDead++;
+            consecutiveAlive = 0;
+          }
+          if (consecutiveAlive > SHUFFLE_MAX_CONSECUTIVE_ALIVE) {
+            const changeIndex = j - 1 < 0 ? j : j - 1;
+            indexToChange.push([i, changeIndex, false]);
+            consecutiveAlive = 0;
+          }
+          if (consecutiveDead > SHUFFLE_MAX_CONSECUTIVE_DEAD) {
+            const changeIndex = j - 5 < 0 ? j : j - 5;
+            indexToChange.push([i, changeIndex, true]);
+            consecutiveDead = 0;
+          }
+        }
+      }
 
-  const newGrid = () => {
-    const grid = Array.from({ length: nbrRows }, (_, i) =>
-      Array.from({ length: nbrCols }, (_, j) => buildCell("inherit", i * cellWidth, j * cellWidth, cellWidth))
-    );
-    return grid;
-  };
+      indexToChange.map(([row, col, newState]) => setBoard("grid", [row], [col], "isAlive", newState));
+      board.build();
+      board.draw();
 
-  /**
-   * Mounting the grid & use buildCell and randomize the cells
-   * init fn
-   */
-  onMount(() => {
-    initGrid();
-    console.log("nbr of cells", nbrOfCells);
-  });
+      console.timeEnd("shuffle");
 
-  /**
-   * Loop through the grid and draw the cells
-   * leaf fn
-   * @param ctx
-   */
-  const drawGrid = (ctx: CanvasRenderingContext2D) => {
-    ctx.reset();
-    grid.grid.map((row) => {
-      row.map((cell) => {
-        ctx.fillStyle = cell.isAlive ? cellColor() : "black";
-        ctx.fillRect(cell.x, cell.y, cell.width, cell.width);
+      // return shuffleGrid;
+    },
+
+    // resize: () => {
+    //   createEffect<[number, number]>(
+    //     (prev) => {
+    //       const size = [screen.width, screen.height];
+    //       if (prev[0] === size[0] && prev[1] === size[1]) return prev;
+
+    //       const widthChange = screenChange(prev[0], size[0]);
+    //       const heightChange = screenChange(prev[1], size[1]);
+
+    //       /** width */
+    //       switch (widthChange) {
+    //         case "decrease":
+    //           console.log("width decrease");
+    //           break;
+    //         case "increase":
+    //           console.log("width increase");
+    //           break;
+    //         case "no change":
+    //           break;
+    //       }
+
+    //       /** height */
+    //       switch (heightChange) {
+    //         case "decrease":
+    //           console.log("height decrease");
+    //           break;
+    //         case "increase":
+    //           console.log("height increase");
+    //           break;
+    //         case "no change":
+    //           break;
+    //       }
+
+    //       setBoard("grid", board.build("inherit"));
+    //       board.draw();
+
+    //       return [screen.width, screen.height];
+    //     },
+    //     [screen.width, screen.height]
+    //   );
+    // },
+
+    /**
+     * Draws the grid on the canvas
+     * @returns void
+     */
+    draw: () => {
+      const context = ctx();
+      if (!context) return;
+      context.reset();
+      board.grid.map((row) => {
+        row.map((cell) => {
+          context.fillStyle = cell.isAlive ? cell.color : "black";
+          context.fillRect(cell.x, cell.y, cell.width, cell.width);
+        });
       });
-    });
-  };
+    },
 
-  const cellColor = () => {
-    let color = "white";
-    const random = Math.random() * 100;
-    if (random <= 25) color = "#3B82F6";
-    if (random > 25 && random <= 50) color = "#6366F1";
-    if (random > 50 && random <= 75) color = "#EC4899";
-    if (random > 75) color = "#F59E0B";
-    return color;
-  };
+    /**
+     * Generates the next generation
+     */
+    nextGen: () => {
+      const gridLength = board.grid.length;
+      const rowLength = board.grid[0].length;
+      const nextGrid = board.build();
 
-  /**
-   * Count the neighbors of a cell ( 8 )
-   * chain fn
-   * @returns number
-   */
-  const countAliveNeighbors = (row: number, col: number) => {
-    let aliveNeighbors = 0;
-    const rowLength = grid.grid[0].length;
-    const colLength = grid.grid.length;
-
-    for (let offsetRow = -1; offsetRow <= 1; offsetRow++) {
-      for (let offsetCol = -1; offsetCol <= 1; offsetCol++) {
-        if (row + offsetRow < 0 || row + offsetRow >= colLength) continue;
-        if (col + offsetCol < 0 || col + offsetCol >= rowLength) continue;
-        if (offsetRow === 0 && offsetCol === 0) continue;
-        if (grid.grid[row + offsetRow][col + offsetCol].isAlive) aliveNeighbors++;
+      for (let row = 0; row < gridLength; row++) {
+        for (let col = 0; col < rowLength; col++) {
+          const cell = board.grid[row][col];
+          const neighbors = board.countAliveNeighbors(row, col);
+          const isAlive = board.judgement(cell, neighbors);
+          nextGrid[row][col].isAlive = isAlive;
+        }
       }
-    }
-    return aliveNeighbors;
-  };
+      setBoard("grid", nextGrid);
+    },
 
-  /**
-   * Evolve the cell chain fn
-   */
-  const judgement = (cell: Cell, count: number) => {
-    let alive = cell.isAlive;
-    if (cell.isAlive) {
-      if (count < 2) alive = false; // underpopulation
-      if (count > 3) alive = false; // overpopulation
-    } else {
-      if (count === 3) alive = true; // reproduction
-    }
-    return alive;
-  };
+    /**
+     * Counts the number of alive neighbors
+     * @param row : number
+     * @param col : number
+     * @returns number
+     */
+    countAliveNeighbors: (row: number, col: number) => {
+      let aliveNeighbors = 0;
+      const rowLength = board.grid[0].length;
+      const colLength = board.grid.length;
 
-  /**
-   * Next generation
-   * mutate fn
-   * @returns void
-   */
-  const nextGen = () => {
-    console.time("nextGen");
-
-    const gridLength = grid.grid.length;
-    const rowLength = grid.grid[0].length;
-    const nextGrid = newGrid();
-
-    for (let row = 0; row < gridLength; row++) {
-      for (let col = 0; col < rowLength; col++) {
-        const cell = grid.grid[row][col];
-        const neighbors = countAliveNeighbors(row, col);
-        const isAlive = judgement(cell, neighbors);
-        nextGrid[row][col].isAlive = isAlive;
+      for (let offsetRow = -1; offsetRow <= 1; offsetRow++) {
+        for (let offsetCol = -1; offsetCol <= 1; offsetCol++) {
+          if (row + offsetRow < 0 || row + offsetRow >= colLength) continue;
+          if (col + offsetCol < 0 || col + offsetCol >= rowLength) continue;
+          if (offsetRow === 0 && offsetCol === 0) continue;
+          if (board.grid[row + offsetRow][col + offsetCol].isAlive) aliveNeighbors++;
+        }
       }
-    }
-    setGrid("grid", nextGrid);
+      return aliveNeighbors;
+    },
 
-    console.timeEnd("nextGen");
+    /**
+     * Applies the rules of the game
+     * @param cell : Cell
+     * @param count  : number
+     * @returns boolean
+     */
+    judgement: (cell: Cell, count: number) => {
+      let alive = cell.isAlive;
+      if (cell.isAlive) {
+        // underpopulation
+        if (count < 2) alive = false;
+        // overpopulation
+        if (count > 3) alive = false;
+      } else {
+        // reproduction
+        if (count === 3) alive = true;
+      }
+      return alive;
+    },
 
-    setGenCount((prev) => prev + 1);
-  };
+    /**
+     * Draws the next generation and increments the generation counter
+     */
+    nextCycle: () => {
+      board.nextGen();
+      board.draw();
+      setBoard("generation", board.generation + 1);
+    },
+  });
 
-  return [width, height, drawGrid, nextGen, genCount] as GameOfLife;
-};
+  onMount(() => {
+    setBoard("grid", board.build());
+  });
+
+  return board as Store<GridStoreState>;
+}

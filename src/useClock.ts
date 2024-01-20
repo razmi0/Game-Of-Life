@@ -1,20 +1,17 @@
-import { createEffect } from "solid-js";
-import { SetStoreFunction, Store, StoreSetter, createStore } from "solid-js/store";
+import { SetStoreFunction, Store, createStore } from "solid-js/store";
+import { DEFAULT_SPEED, START_CLOCKED, START_IMMEDIATELY } from "./data";
 
-const DEFAULT_SPEED = 25 as const;
-const START_IMMEDIATELY = false as const;
-const START_CLOCKED = true as const;
 type ClockQueueTicksMode = "clocked" | "free";
 /**
  * Gen playback controls
  * @returns
  */
-export default function useClock(fns: (() => void)[]): [Store<ClockState>, SetStoreFunction<ClockState>] {
-  const [clock, setClock] = createStore<ClockState>({
+export default function useClock(fn: () => void) {
+  const [clock, setClock] = createStore({
     play: START_IMMEDIATELY,
     speed: DEFAULT_SPEED /** ms */,
-    tick: 0,
     clocked: START_CLOCKED,
+    tick: 0,
     limiter: false,
     queue: 0,
     playPause: () => {
@@ -22,7 +19,7 @@ export default function useClock(fns: (() => void)[]): [Store<ClockState>, SetSt
       clock.run();
     },
     work: () => {
-      fns.map((fn) => fn());
+      fn();
       setClock("tick", clock.tick + 1);
       clock.queue > 0 && clock.limiter && setClock("queue", clock.queue - 1);
     },
@@ -48,5 +45,5 @@ export default function useClock(fns: (() => void)[]): [Store<ClockState>, SetSt
     subSpeed: () => setClock("speed", clock.speed + 100),
   }) as [Store<ClockState>, SetStoreFunction<ClockState>];
 
-  return [clock, setClock] as [Store<ClockState>, SetStoreFunction<ClockState>];
+  return clock;
 }
