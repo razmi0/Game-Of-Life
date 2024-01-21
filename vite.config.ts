@@ -12,6 +12,7 @@ export default defineConfig({
     solidPlugin(),
   ],
   server: {
+    hmr: true,
     port: 42069,
   },
   build: {

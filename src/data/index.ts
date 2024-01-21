@@ -12,7 +12,9 @@ const MAX_ALIVE_RANDOMNESS = 100 as const;
 const MIN_ALIVE_RANDOMNESS = 0 as const;
 const SHUFFLE_MAX_CONSECUTIVE_ALIVE = 3 as const;
 const SHUFFLE_MAX_CONSECUTIVE_DEAD = 10 as const;
+
 const ICON_SIZE = {
+  xs: 15,
   sm: 20,
   md: 23,
   lg: 25,

@@ -1,6 +1,7 @@
 import { Component, createSignal, Show } from "solid-js";
 import type { JSX } from "solid-js";
 import Icon from "../Icons";
+import { ICON_SIZE } from "../../data";
 
 type GroupProps = {
   title?: string;
@@ -9,20 +10,42 @@ type GroupProps = {
   classes?: string;
 };
 const Group: Component<GroupProps> = (props) => {
-  const [isOpen, setIsOpen] = createSignal(true);
-  const trigger = () => setIsOpen((p) => !p);
+  const [open, setOpen] = createSignal(true);
+  const [pin, setPin] = createSignal(true);
 
-  const PlusIcon = () => <Icon width={13} height={13} name={isOpen() ? "minus" : "plus"} />;
+  const trigger = () => setOpen((p) => !p);
+  const openPin = (e: Event) => {
+    e.stopImmediatePropagation();
+    setPin((p) => !p);
+  };
+
+  const PlusIcon = () => <Icon width={ICON_SIZE.xs} name={open() ? "minus" : "plus"} />;
+  const PinIcon = () => (
+    <div classList={{ ["hover:bg-dw-400 rounded-full"]: pin() }} onClick={openPin}>
+      <Icon width={ICON_SIZE.xs} name="pin" />
+    </div>
+  );
+
+  const hasTitle = !!props.title;
 
   return (
-    <div class="my-3 mt-4">
-      <Show when={!!props.title}>
-        <GroupHeader right={<PlusIcon />} left={props.left} onClick={trigger}>
+    <div class="my-3 mt-4  ">
+      <Show when={hasTitle}>
+        <GroupHeader
+          right={
+            <>
+              <PinIcon />
+              <PlusIcon />
+            </>
+          }
+          left={props.left}
+          onClick={trigger}
+        >
           <h4 class="uppercase monserrat tracking-widest text-xs font-bold">{props.title}</h4>
         </GroupHeader>
       </Show>
-      <Show when={isOpen()}>
-        <div class={`py-2 flex flex-col gap-2 ps-1 ${props.classes}`}>{props.children}</div>
+      <Show when={open()}>
+        <div class={`py-2 flex flex-col ps-1 ${props.classes || ""}`}>{props.children}</div>
       </Show>
     </div>
   );
@@ -44,7 +67,7 @@ const GroupHeader: Component<GroupHeaderProps> = (props) => {
       <div class="ps-1 ">{props.left}</div>
       <div>{props.children}</div>
       <Spacer />
-      <div class="pe-1 ">{props.right}</div>
+      <div class="pe-1 flex gap-1 ">{props.right}</div>
     </button>
   );
 };

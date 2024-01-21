@@ -1,3 +1,6 @@
+let alivePopTendency: boolean[] = [];
+let deadPopTendency: boolean[] = [];
+
 export const randomColor = () => {
   let color = "white";
   const random = Math.random() * 100;
@@ -15,4 +18,20 @@ type ScreenChange = "decrease" | "increase" | "no change";
 export const screenChange = (val1: number, val2: number): ScreenChange => {
   if (val1 === val2) return "no change";
   return val1 > val2 ? "decrease" : "increase";
+};
+
+type CellNatureType = "alive" | "dead";
+export const confirmTendency = (tendency: boolean, state: CellNatureType) => {
+  let tendencyMaxLength = 5;
+  let leftConsensus = 1;
+  let isTendency = false;
+  let agree = 0; // 1/5
+
+  let arr = state === "alive" ? alivePopTendency : deadPopTendency;
+  const newLength = arr.push(tendency);
+  arr.map((t) => (t === tendency ? agree++ : agree--));
+  if (agree >= tendencyMaxLength - leftConsensus) isTendency = true;
+  if (newLength > tendencyMaxLength) arr.shift();
+  state === "alive" ? (alivePopTendency = arr) : (deadPopTendency = arr);
+  return isTendency;
 };
