@@ -1,7 +1,8 @@
-import { Component, createSignal, Show } from "solid-js";
+import { Component, createEffect, createSignal, Show } from "solid-js";
 import type { JSX } from "solid-js";
 import Icon from "../Icons";
 import { ICON_SIZE } from "../../data";
+import Draggable from "./draggable/Draggable";
 
 type GroupProps = {
   title?: string;
@@ -15,8 +16,9 @@ const Group: Component<GroupProps> = (props) => {
 
   const trigger = () => setOpen((p) => !p);
   const openPin = (e: Event) => {
-    e.stopImmediatePropagation();
     setPin((p) => !p);
+    // e.stopImmediatePropagation();
+    console.log("openpin");
   };
 
   const PlusIcon = () => <Icon width={ICON_SIZE.xs} name={open() ? "minus" : "plus"} />;
@@ -28,26 +30,32 @@ const Group: Component<GroupProps> = (props) => {
 
   const hasTitle = !!props.title;
 
+  createEffect(() => {
+    console.log(pin());
+  });
+
   return (
-    <div class="my-3 mt-4  ">
-      <Show when={hasTitle}>
-        <GroupHeader
-          right={
-            <>
-              <PinIcon />
-              <PlusIcon />
-            </>
-          }
-          left={props.left}
-          onClick={trigger}
-        >
-          <h4 class="uppercase monserrat tracking-widest text-xs font-bold">{props.title}</h4>
-        </GroupHeader>
-      </Show>
-      <Show when={open()}>
-        <div class={`py-2 flex flex-col ps-1 ${props.classes || ""}`}>{props.children}</div>
-      </Show>
-    </div>
+    <Draggable enabled={pin()}>
+      <div class="my-3 mt-4" classList={{ ["bg-dw-500"]: pin() }}>
+        <Show when={hasTitle}>
+          <GroupHeader
+            right={
+              <>
+                <PinIcon />
+                <PlusIcon />
+              </>
+            }
+            left={props.left}
+            onClick={trigger}
+          >
+            <h4 class="uppercase monserrat tracking-widest text-xs font-bold">{props.title}</h4>
+          </GroupHeader>
+        </Show>
+        <Show when={open()}>
+          <div class={`py-2 flex flex-col ps-1 ${props.classes || ""}`}>{props.children}</div>
+        </Show>
+      </div>
+    </Draggable>
   );
 };
 

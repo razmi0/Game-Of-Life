@@ -21,7 +21,7 @@ type DrawerProps = {
   board: GridStoreState;
 };
 export default function Drawer(props: DrawerProps) {
-  const [isOpen, setIsOpen] = createSignal(true);
+  const [isOpen, setIsOpen] = createSignal(false);
   const trigger = () => setIsOpen(true);
   const hasStarted = createMemo(() => props.board.generation > 0);
   const shuffleText = () => (props.board.generation === 0 ? "Pulse of death" : "Pulse of life");
