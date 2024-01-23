@@ -4,13 +4,16 @@ import { createStore, produce } from "solid-js/store";
 type DraggableProps = {
   children: JSXElement;
   enabled?: undefined | boolean;
-  resetOnDragEnd?: boolean;
+  resetOnDragEnd?: boolean | undefined;
 };
 
 type DragState = {
   start: boolean;
   move: boolean;
   end: boolean;
+  setStart: () => void;
+  setMove: () => void;
+  setEnd: () => void;
 };
 
 /**
@@ -31,6 +34,17 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
     start: false,
     move: false,
     end: true,
+    setStart: () => {
+      setDrag("start", true);
+      setDrag("move", false);
+      setDrag("end", false);
+    },
+    setMove: () => setDrag("move", true),
+    setEnd: () => {
+      setDrag("start", false);
+      setDrag("move", false);
+      setDrag("end", true);
+    },
   });
   if (!props.children) throw new Error("Draggable component must have children");
   let child: HTMLElement;
@@ -72,19 +86,12 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
   });
 
   /** click */
-  const handleClick = () => (drag.start ? end() : null);
+  const handleClick = () => {
+    if (drag.start) drag.setEnd();
+  };
 
   /** start */
 
-  const start = () => {
-    setDrag(
-      produce((draft) => {
-        draft.start = true;
-        draft.move = false;
-        draft.end = false;
-      })
-    );
-  };
   const handleMouseDown = (e: MouseEvent) => {
     let enabled = props.enabled ?? true;
     if (!enabled || !drag.end) return;
@@ -93,7 +100,7 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
     initial.x = e.screenX - permanentlyAdded.x;
     initial.y = e.screenY - permanentlyAdded.y;
 
-    start();
+    drag.setStart();
   };
 
   /** move is attach to document */
@@ -111,27 +118,18 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
 
     child.style.transform = `translate(${diff.x + UNIT}, ${diff.y + UNIT})`;
 
-    setDrag("move", true);
+    drag.setMove();
   };
 
   /** end */
 
-  const end = () => {
-    if (drag.end) return;
-    setDrag(
-      produce((draft) => {
-        draft.start = false;
-        draft.move = false;
-        draft.end = true;
-      })
-    );
-  };
   const handleMouseUp = () => {
     let enabled = props.enabled ?? true;
     if (!enabled) return;
 
     props.resetOnDragEnd ? (child.style.transform = `translate(0px, 0px)`) : update(permanentlyAdded, diff);
-    end();
+    if (drag.end) return;
+    drag.setEnd();
   };
 
   return <>{resolved()}</>;
