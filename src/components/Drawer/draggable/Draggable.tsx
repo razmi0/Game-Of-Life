@@ -85,12 +85,12 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
     child.removeEventListener("mouseup", handleMouseUp);
   });
 
-  /** click */
+  /** CLICK */
   const handleClick = () => {
     if (drag.start) drag.setEnd();
   };
 
-  /** start */
+  /** START */
 
   const handleMouseDown = (e: MouseEvent) => {
     let enabled = props.enabled ?? true;
@@ -103,7 +103,7 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
     drag.setStart();
   };
 
-  /** move is attach to document */
+  /** MOVE is attach to document */
 
   const handleMouseMove = (e: MouseEvent) => {
     let isReady = Date.now() - now > MOVE_TIMEOUT;
@@ -121,7 +121,7 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
     drag.setMove();
   };
 
-  /** end */
+  /** END */
 
   const handleMouseUp = () => {
     let enabled = props.enabled ?? true;
