@@ -1,4 +1,4 @@
-import { type Component, type JSXElement, children, createEffect, onCleanup, onMount } from "solid-js";
+import { type Component, type JSXElement, children, onCleanup, onMount } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 
 type DraggableProps = {
