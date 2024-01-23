@@ -1,0 +1,29 @@
+//   const isInside = (coordinates: { x: number; y: number }) => {
+//     const { left, top } = child.getBoundingClientRect();
+//     const border = { left: left, top: top };
+//     if (coordinates.x > border.left && coordinates.y < border.top) return true;
+//   };
+
+// type DragElementDataType = {
+//     rect: { x: number; y: number; width: number; height: number };
+//     unit: string;
+//     child: HTMLElement;
+//   }
+//   const dragElementData : DragElementDataType = {
+//     rect : { x: 0, y: 0, width: 0, height: 0 },
+//     unit : "px",
+//     child : null
+//   }
+
+//   type MoveableDataType = {
+//     initial: { x: number; y: number };
+//     diff: { x: number; y: number };
+//     permanentlyAdded: { x: number; y: number };
+//     rect: { x: number; y: number; width: number; height: number };
+//   }
+//   const moveableData : MoveableDataType = {
+//     initial : { x: 0, y: 0 },
+//     diff : { x: 0, y: 0 },
+//     permanentlyAdded : { x: 0, y: 0 },
+//     rect : { x: 0, y: 0, width: 0, height: 0 }
+//   }
