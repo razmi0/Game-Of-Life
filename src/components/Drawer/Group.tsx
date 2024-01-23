@@ -23,7 +23,7 @@ const Group: Component<GroupProps> = (props) => {
 
   const PlusIcon = () => <Icon width={ICON_SIZE.xs} name={open() ? "minus" : "plus"} />;
   const PinIcon = () => (
-    <div classList={{ ["bg-dw-400 rounded-full"]: pin() }} onClick={pinIt}>
+    <div classList={{ ["bg-dw-400"]: pin() }} onClick={pinIt}>
       <Icon width={ICON_SIZE.xs} name="pin" />
     </div>
   );
