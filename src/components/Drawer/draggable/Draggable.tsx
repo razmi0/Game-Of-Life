@@ -1,4 +1,4 @@
-import { Component, JSXElement, children, createEffect, createSignal, onCleanup } from "solid-js";
+import { Accessor, Component, JSXElement, children, createEffect, createSignal, onCleanup } from "solid-js";
 import { createStore, produce, unwrap } from "solid-js/store";
 import { Portal } from "solid-js/web";
 
@@ -7,7 +7,7 @@ import { Portal } from "solid-js/web";
 
 type DraggableProps = {
   children: JSXElement;
-  enabled?: boolean;
+  enabled?: undefined | boolean;
   /** reset position on end */
   resetOnDragEnd?: boolean;
 };
@@ -19,25 +19,37 @@ type DragState = {
 };
 
 /**
+ * replace listener on move with movement() function
+ * @param e
+ */
+
+const MOVE_HZ = 60;
+const MOVE_TIMEOUT = Math.floor(1000 / MOVE_HZ); // MOVE_HZ/s
+const UNIT = "px";
+const MOUSE_BOUNDARY_RADIUS = 10;
+
+/**
  * Make a draggable element
  */
 const Draggable: Component<DraggableProps> = (props): JSXElement => {
-  const [enabled, setEnabled] = createSignal(props.enabled === undefined ? true : props.enabled);
-  const [drag, setDrag] = createStore({
+  const [drag, setDrag] = createStore<DragState>({
     start: false,
     move: false,
     end: true,
   });
+  // const [localEnabled, setLocalEnabled] = createSignal(props.enabled ?? true);
   if (!props.children) throw new Error("Draggable component must have children");
-
   let child: HTMLElement;
-  const UNIT = "px";
+  let now = Date.now();
   let initial = { x: 0, y: 0 };
   let diff = { x: 0, y: 0 };
   let permanentlyAdded = { x: 0, y: 0 };
   let rect = { x: 0, y: 0, width: 0, height: 0 };
-
   const resolved = children(() => props.children);
+
+  const update = (obj1: Record<string, number>, obj2: Record<string, number>) => {
+    for (let n in obj1) obj1[n] = obj2[n];
+  };
 
   const setup = () => {
     let list = resolved.toArray();
@@ -45,44 +57,35 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
     child = list[0] as HTMLElement;
     if (!child) return;
 
-    /** attributes */
+    /** attributes & data */
     child.toggleAttribute("draggable");
     const { left, top, width, height } = child.getBoundingClientRect();
     rect = { x: left, y: top, width, height };
     initial = { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
 
-    /** listeners */
-    child.addEventListener("mousedown", (e) => mouseDown(e as MouseEvent), { passive: true });
-    child.addEventListener("mousemove", (e) => mouseMove(e as MouseEvent), { passive: true });
-    child.addEventListener("mouseup", (e) => mouseUp(e as MouseEvent), { passive: true });
-    child.addEventListener("mouseleave", (e) => mouseUp(e as MouseEvent), { passive: true });
+    listeners();
+  };
+  createEffect(setup);
 
+  const listeners = () => {
+    const handleClick = () => (drag.start ? end() : null);
+    child.addEventListener("click", handleClick);
+    child.addEventListener("mousedown", (e) => handleMouseDown(e as MouseEvent));
+    child.addEventListener("mousemove", (e) => handleMouseMove(e as MouseEvent));
+    child.addEventListener("mouseup", handleMouseUp);
+    child.addEventListener("mouseleave", handleMouseUp);
     onCleanup(() => {
-      child.removeEventListener("mousedown", (e) => mouseDown(e as MouseEvent));
-      child.removeEventListener("mousemove", (e) => mouseMove(e as MouseEvent));
-      child.removeEventListener("mouseup", (e) => mouseUp(e as MouseEvent));
+      child.removeEventListener("click", handleClick);
+      child.removeEventListener("mousedown", (e) => handleMouseDown(e as MouseEvent));
+      child.removeEventListener("mousemove", (e) => handleMouseMove(e as MouseEvent));
+      child.removeEventListener("mouseup", handleMouseUp);
+      child.removeEventListener("mouseleave", handleMouseUp);
     });
   };
 
-  const getCoord = () => {
-    return child.getBoundingClientRect();
-  };
+  /** start */
 
-  const fn = (e: MouseEvent) => {
-    if (e.type === "click") console.log("click");
-  };
-
-  const mouseDown = (e: MouseEvent) => {
-    console.log("mousedown");
-    if (!enabled() && !drag.end) return;
-    e.stopImmediatePropagation();
-
-    initial.x = e.screenX - permanentlyAdded.x;
-    initial.y = e.screenY - permanentlyAdded.y;
-
-    console.log(permanentlyAdded);
-    console.log("screnn", e.screenX, e.screenY);
-
+  const start = () => {
     setDrag(
       produce((draft) => {
         draft.start = true;
@@ -90,42 +93,40 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
         draft.end = false;
       })
     );
-    console.log("started");
+  };
+  const handleMouseDown = (e: MouseEvent) => {
+    if (!props.enabled || !drag.end) return;
+    e.preventDefault();
+    console.log("mousedown");
+
+    initial.x = e.screenX - permanentlyAdded.x;
+    initial.y = e.screenY - permanentlyAdded.y;
+
+    start();
   };
 
-  const mouseMove = (e: MouseEvent) => {
-    if (!drag.start) return;
-    e.stopImmediatePropagation();
+  /** move */
+
+  const handleMouseMove = (e: MouseEvent) => {
+    let isReady = Date.now() - now > MOVE_TIMEOUT;
+    if (!drag.start || !isReady) return;
+    now = Date.now();
+    console.log("mousemove");
 
     const mouseX = e.screenX;
     const mouseY = e.screenY;
-
     diff.x = mouseX - initial.x;
     diff.y = mouseY - initial.y;
 
-    // console.log("initial", initial);
-    // console.log("diff", diff);
-
-    child.style.transform = `translate(${diff.x}px, ${diff.y}px)`;
+    child.style.transform = `translate(${diff.x + UNIT}, ${diff.y + UNIT})`;
 
     setDrag("move", true);
-    // console.log("moving");
   };
 
-  const mouseUp = (e: MouseEvent) => {
-    if (!drag.move) return;
-    console.log("ended");
-    e.stopImmediatePropagation();
-    console.log("before:initial", initial);
+  /** end */
 
-    if (props.resetOnDragEnd) child.style.transform = `translate(0px, 0px)`;
-    else {
-      permanentlyAdded.x = diff.x;
-      permanentlyAdded.y = diff.y;
-    }
-
-    console.log("after:initial", initial);
-
+  const end = () => {
+    if (drag.end) return;
     setDrag(
       produce((draft) => {
         draft.start = false;
@@ -134,13 +135,51 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
       })
     );
   };
+  const reset = () => {
+    child.style.transform = `translate(0px, 0px)`;
+    end();
+  };
+  const handleMouseUp = () => {
+    console.log("handleMouseUp");
+    if (!props.enabled) return;
+    if (props.resetOnDragEnd) reset();
+    else {
+      update(permanentlyAdded, diff);
+      end();
+    }
+  };
 
-  createEffect(() => {
-    console.log("setup effect");
-    setup();
-  });
-
-  return <>{resolved()}</>; // Portal mount={portalNode} Portal
+  return <>{resolved()}</>;
 };
 
 export default Draggable;
+
+//   const isInside = (coordinates: { x: number; y: number }) => {
+//     const { left, top } = child.getBoundingClientRect();
+//     const border = { left: left, top: top };
+//     if (coordinates.x > border.left && coordinates.y < border.top) return true;
+//   };
+
+// type DragElementDataType = {
+//     rect: { x: number; y: number; width: number; height: number };
+//     unit: string;
+//     child: HTMLElement;
+//   }
+//   const dragElementData : DragElementDataType = {
+//     rect : { x: 0, y: 0, width: 0, height: 0 },
+//     unit : "px",
+//     child : null
+//   }
+
+//   type MoveableDataType = {
+//     initial: { x: number; y: number };
+//     diff: { x: number; y: number };
+//     permanentlyAdded: { x: number; y: number };
+//     rect: { x: number; y: number; width: number; height: number };
+//   }
+//   const moveableData : MoveableDataType = {
+//     initial : { x: 0, y: 0 },
+//     diff : { x: 0, y: 0 },
+//     permanentlyAdded : { x: 0, y: 0 },
+//     rect : { x: 0, y: 0, width: 0, height: 0 }
+//   }

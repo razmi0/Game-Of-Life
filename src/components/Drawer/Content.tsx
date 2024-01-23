@@ -8,13 +8,11 @@ type WrapperProps = {
   open: boolean;
   ref: HTMLDivElement;
 };
-
+// <Overlay />
 const Wrapper: Component<WrapperProps> = (props) => {
   return (
     <Show when={props.open} fallback={<Trigger trigger={props.trigger} />}>
-      <Content ref={props.ref} overlay={<Overlay />}>
-        {props.children}
-      </Content>
+      <Content ref={props.ref}>{props.children}</Content>
     </Show>
   );
 };
@@ -22,7 +20,7 @@ const Wrapper: Component<WrapperProps> = (props) => {
 type ContentProps = {
   children: JSX.Element[] | JSX.Element;
   ref: HTMLDivElement;
-  overlay: JSX.Element;
+  overlay?: JSX.Element;
 };
 const Content: Component<ContentProps> = (props) => {
   return (
@@ -30,7 +28,9 @@ const Content: Component<ContentProps> = (props) => {
       <div ref={props.ref} class="h-full bg-dw-500 w-1/3 py-3 pe-2 ps-3">
         {props.children}
       </div>
-      {props.overlay}
+      <Show when={props.overlay} fallback={<></>}>
+        {props.overlay}
+      </Show>
     </div>
   );
 };
