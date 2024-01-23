@@ -1,4 +1,4 @@
-import { type Component, type JSXElement, children, createEffect, onCleanup } from "solid-js";
+import { type Component, type JSXElement, children, createEffect, onCleanup, onMount } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 
 type DraggableProps = {
@@ -15,8 +15,7 @@ type DragState = {
 
 /**
  * TODO
- * replace listener on move with movement() function
- * @param e
+ * replace listener on move with movement() function ( require listener attch to document so try mouse_boundary before)
  */
 
 const MOVE_HZ = 60;
@@ -60,7 +59,7 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
 
     listeners();
   };
-  createEffect(setup);
+  onMount(setup);
 
   const listeners = () => {
     const handleClick = () => (drag.start ? end() : null);
@@ -90,7 +89,8 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
     );
   };
   const handleMouseDown = (e: MouseEvent) => {
-    if (!props.enabled || !drag.end) return;
+    let enabled = props.enabled ?? true;
+    if (!enabled || !drag.end) return;
     e.preventDefault();
 
     initial.x = e.screenX - permanentlyAdded.x;
@@ -103,7 +103,8 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
 
   const handleMouseMove = (e: MouseEvent) => {
     let isReady = Date.now() - now > MOVE_TIMEOUT;
-    if (!drag.start || !isReady) return;
+    let enabled = props.enabled ?? true;
+    if (!drag.start || !isReady || !enabled) return;
     now = Date.now();
 
     const mouseX = e.screenX;
@@ -133,9 +134,12 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
     end();
   };
   const handleMouseUp = () => {
-    if (!props.enabled) return;
-    if (props.resetOnDragEnd) reset();
-    else {
+    let enabled = props.enabled ?? true;
+    if (!enabled) return;
+
+    if (props.resetOnDragEnd) {
+      reset();
+    } else {
       update(permanentlyAdded, diff);
       end();
     }
