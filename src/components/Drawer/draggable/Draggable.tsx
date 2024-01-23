@@ -20,7 +20,6 @@ type DragState = {
 const MOVE_HZ = 60;
 const MOVE_TIMEOUT = Math.floor(1000 / MOVE_HZ); // MOVE_HZ/s
 const UNIT = "px";
-const MOUSE_BOUNDARY_RADIUS = 10; // px
 
 /**
  * Make a draggable element
