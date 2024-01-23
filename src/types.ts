@@ -24,9 +24,7 @@ type ClockState = {
   subSpeed: () => void;
   queueTicks: (ticks: number) => void;
 };
-type BuildCellParams =
-  | [mode: "random", x: number, y: number, width: number]
-  | [mode: "inherit", x: number, y: number, width: number, isAlive: boolean];
+
 type ScreenStoreState = {
   width: number;
   height: number;
@@ -55,9 +53,4 @@ type GridStoreState = {
   countAliveNeighbors: (row: number, col: number) => number;
   judgement: (cell: Cell, neighbors: number) => boolean;
   nextCycle: () => void;
-};
-type BuildCellMode = "random" | "inherit";
-
-type CanvasProps = {
-  screen: ScreenStoreState;
 };
