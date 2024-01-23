@@ -8,7 +8,6 @@ type WrapperProps = {
   open: boolean;
   ref: HTMLDivElement;
 };
-// <Overlay />
 const Wrapper: Component<WrapperProps> = (props) => {
   return (
     <Show when={props.open} fallback={<Trigger trigger={props.trigger} />}>

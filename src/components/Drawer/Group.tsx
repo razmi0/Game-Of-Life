@@ -31,7 +31,7 @@ const Group: Component<GroupProps> = (props) => {
 
   return (
     <Draggable enabled={pin()}>
-      <div class="my-3 mt-4" classList={{ ["bg-dw-500"]: pin() }}>
+      <div class="my-3 mt-4 z-50 bg-dw-500">
         <Show when={hasTitle}>
           <GroupHeader
             right={
