@@ -25,7 +25,7 @@ type ContentProps = {
 const Content: Component<ContentProps> = (props) => {
   return (
     <div class="absolute top-0 h-full w-full flex flex-row text-dw-100">
-      <div ref={props.ref} class="h-full bg-dw-500 w-1/3 py-3 pe-2 ps-3">
+      <div ref={props.ref} class="h-full bg-dw-500 w-1/3 py-3 pe-2 ps-3 max-w-96">
         {props.children}
       </div>
       <Show when={props.overlay} fallback={<></>}>
