@@ -20,7 +20,9 @@ type DragState = {
 const MOVE_HZ = 60;
 const MOVE_TIMEOUT = Math.floor(1000 / MOVE_HZ); // MOVE_HZ/s
 const UNIT = "px";
-
+const update = (obj1: Record<string, number>, obj2: Record<string, number>) => {
+  for (let n in obj1) obj1[n] = obj2[n];
+};
 /**
  * Make a draggable element
  */
@@ -39,10 +41,6 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
   let rect = { x: 0, y: 0, width: 0, height: 0 };
   const resolved = children(() => props.children);
 
-  const update = (obj1: Record<string, number>, obj2: Record<string, number>) => {
-    for (let n in obj1) obj1[n] = obj2[n];
-  };
-
   const setup = () => {
     let list = resolved.toArray();
     if (list.length > 1) throw new Error("Draggable component must have only one child");
@@ -57,21 +55,24 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
 
     listeners();
   };
-  onMount(setup);
 
   const listeners = () => {
-    const handleClick = () => (drag.start ? end() : null);
     child.addEventListener("click", handleClick);
-    child.addEventListener("mousedown", (e) => handleMouseDown(e as MouseEvent));
+    child.addEventListener("mousedown", handleMouseDown);
     document.addEventListener("mousemove", handleMouseMove);
     child.addEventListener("mouseup", handleMouseUp);
-    onCleanup(() => {
-      child.removeEventListener("click", handleClick);
-      child.removeEventListener("mousedown", (e) => handleMouseDown(e as MouseEvent));
-      document.removeEventListener("mousemove", handleMouseMove);
-      child.removeEventListener("mouseup", handleMouseUp);
-    });
   };
+
+  onMount(setup);
+  onCleanup(() => {
+    child.removeEventListener("click", handleClick);
+    child.removeEventListener("mousedown", handleMouseDown);
+    document.removeEventListener("mousemove", handleMouseMove);
+    child.removeEventListener("mouseup", handleMouseUp);
+  });
+
+  /** click */
+  const handleClick = () => (drag.start ? end() : null);
 
   /** start */
 
