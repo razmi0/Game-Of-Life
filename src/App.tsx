@@ -1,13 +1,12 @@
 import useScreen from "./useScreen";
 import Drawer from "./components/Drawer";
 import { CanvasWrapper } from "./components/Wrappers";
-import { onMount, type Component, createSignal } from "solid-js";
+import { onMount, createSignal } from "solid-js";
 import useClock from "./useClock";
 import useGameOfLife from "./useGameOfLife";
 
 let canvas: HTMLCanvasElement;
-
-const App: Component = () => {
+const App = () => {
   const [ctx, setCtx] = createSignal<CanvasRenderingContext2D>();
   const screen = useScreen();
   const board = useGameOfLife(screen, ctx);

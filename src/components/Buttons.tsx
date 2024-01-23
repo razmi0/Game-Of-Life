@@ -1,4 +1,4 @@
-import Icon, { IconProps } from "./Icons";
+import Icon, { type IconProps } from "./Icons";
 
 type IconButtonProps = IconProps & {
   onClick: () => void;

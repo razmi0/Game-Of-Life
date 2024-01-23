@@ -12,6 +12,7 @@ type ItemProps = {
 const Item: Component<ItemProps> = (props) => {
   if (props.hover === undefined) props.hover = true;
   const hasLbl = !!props.label;
+  const hasLeft = !!props.left;
   return (
     <>
       <div class="flex flex-col justify-center items-start text-dw-150">
@@ -23,9 +24,8 @@ const Item: Component<ItemProps> = (props) => {
           classList={{ ["h-11 leading-none"]: hasLbl, ["hover:bg-dw-300 hover:text-dw-100"]: props.hover }}
           onClick={props.onClick}
         >
-          <Show when={!!props.left}>{props.left}</Show>
+          <Show when={hasLeft}>{props.left}</Show>
           {props.children}
-
           <div class="flex flex-col items-center">
             <Show when={props.right}>{props.right}</Show>
           </div>

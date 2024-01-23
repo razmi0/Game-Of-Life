@@ -22,7 +22,7 @@ const Header: Component<HeaderProps> = (props) => {
         {props.right}
       </Show>
     </div>
-  ); // title subtile left icon right icon
+  );
 };
 
 const Spacer = () => {

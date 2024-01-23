@@ -21,15 +21,16 @@ export type IconNames =
   | "random"
   | "queue"
   | "arrowUp"
+  | "pin"
   | "arrowDown"
   | "wave";
 
-export interface IconProps {
+export type IconProps = {
   width: number;
-  height: number;
+  height?: number;
   name: IconNames;
   color?: string;
-}
+};
 /**
  * <svg>
  *      <defs>
@@ -37,8 +38,9 @@ export interface IconProps {
  *               ...
  */
 export default function Icon(props: IconProps) {
+  const height = props.height || props.width;
   return (
-    <svg width={props.width + "px"} height={props.height + "px"}>
+    <svg width={props.width + "px"} height={height + "px"}>
       <use href={`${spriteHref}#${props.name}`} />
     </svg>
   );

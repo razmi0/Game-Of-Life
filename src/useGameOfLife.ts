@@ -1,8 +1,6 @@
-import { onMount } from "solid-js";
-import { createStore } from "solid-js/store";
-import { randomColor } from "./helpers";
-import type { Store } from "solid-js/store";
-import type { Accessor } from "solid-js";
+import { onMount, type Accessor } from "solid-js";
+import { createStore, type Store } from "solid-js/store";
+import { confirmTendency, randomColor } from "./helpers";
 import { CELL_WIDTH, DEFAULT_RANDOMNESS, SHUFFLE_MAX_CONSECUTIVE_ALIVE, SHUFFLE_MAX_CONSECUTIVE_DEAD } from "./data";
 
 export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<CanvasRenderingContext2D | undefined>) {
@@ -51,8 +49,9 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
           };
         })
       );
-      setBoard("nAliveIncrease", alives > board.nAlive);
-      setBoard("nDeadIncrease", deads > board.nDead);
+
+      setBoard("nAliveIncrease", confirmTendency(alives > board.nAlive, "alive"));
+      setBoard("nDeadIncrease", confirmTendency(deads > board.nAlive, "dead"));
       setBoard("nAlive", alives);
       setBoard("nDead", deads);
       return newGrid;
@@ -99,55 +98,13 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
       }
 
       indexToChange.map(([row, col, newState]) => setBoard("grid", [row], [col], "isAlive", newState));
-      board.build();
+      // board.build();
       board.draw();
 
       console.timeEnd("shuffle");
 
       // return shuffleGrid;
     },
-
-    // resize: () => {
-    //   createEffect<[number, number]>(
-    //     (prev) => {
-    //       const size = [screen.width, screen.height];
-    //       if (prev[0] === size[0] && prev[1] === size[1]) return prev;
-
-    //       const widthChange = screenChange(prev[0], size[0]);
-    //       const heightChange = screenChange(prev[1], size[1]);
-
-    //       /** width */
-    //       switch (widthChange) {
-    //         case "decrease":
-    //           console.log("width decrease");
-    //           break;
-    //         case "increase":
-    //           console.log("width increase");
-    //           break;
-    //         case "no change":
-    //           break;
-    //       }
-
-    //       /** height */
-    //       switch (heightChange) {
-    //         case "decrease":
-    //           console.log("height decrease");
-    //           break;
-    //         case "increase":
-    //           console.log("height increase");
-    //           break;
-    //         case "no change":
-    //           break;
-    //       }
-
-    //       setBoard("grid", board.build("inherit"));
-    //       board.draw();
-
-    //       return [screen.width, screen.height];
-    //     },
-    //     [screen.width, screen.height]
-    //   );
-    // },
 
     /**
      * Draws the grid on the canvas
