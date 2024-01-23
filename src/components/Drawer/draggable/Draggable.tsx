@@ -15,13 +15,12 @@ type DragState = {
 
 /**
  * TODO
- * replace listener on move with movement() function ( require listener attch to document so try mouse_boundary before)
  */
 
 const MOVE_HZ = 60;
 const MOVE_TIMEOUT = Math.floor(1000 / MOVE_HZ); // MOVE_HZ/s
 const UNIT = "px";
-const MOUSE_BOUNDARY_RADIUS = 10;
+const MOUSE_BOUNDARY_RADIUS = 10; // px
 
 /**
  * Make a draggable element
@@ -65,15 +64,13 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
     const handleClick = () => (drag.start ? end() : null);
     child.addEventListener("click", handleClick);
     child.addEventListener("mousedown", (e) => handleMouseDown(e as MouseEvent));
-    child.addEventListener("mousemove", (e) => handleMouseMove(e as MouseEvent));
+    document.addEventListener("mousemove", handleMouseMove);
     child.addEventListener("mouseup", handleMouseUp);
-    child.addEventListener("mouseleave", handleMouseUp);
     onCleanup(() => {
       child.removeEventListener("click", handleClick);
       child.removeEventListener("mousedown", (e) => handleMouseDown(e as MouseEvent));
-      child.removeEventListener("mousemove", (e) => handleMouseMove(e as MouseEvent));
+      document.removeEventListener("mousemove", handleMouseMove);
       child.removeEventListener("mouseup", handleMouseUp);
-      child.removeEventListener("mouseleave", handleMouseUp);
     });
   };
 
@@ -99,7 +96,7 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
     start();
   };
 
-  /** move */
+  /** move is attach to document */
 
   const handleMouseMove = (e: MouseEvent) => {
     let isReady = Date.now() - now > MOVE_TIMEOUT;
@@ -129,20 +126,12 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
       })
     );
   };
-  const reset = () => {
-    child.style.transform = `translate(0px, 0px)`;
-    end();
-  };
   const handleMouseUp = () => {
     let enabled = props.enabled ?? true;
     if (!enabled) return;
 
-    if (props.resetOnDragEnd) {
-      reset();
-    } else {
-      update(permanentlyAdded, diff);
-      end();
-    }
+    props.resetOnDragEnd ? (child.style.transform = `translate(0px, 0px)`) : update(permanentlyAdded, diff);
+    end();
   };
 
   return <>{resolved()}</>;

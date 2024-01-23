@@ -18,7 +18,7 @@ const App = () => {
   //   board.draw();
   // });
 
-  const [enabled, setEnabled] = createSignal(false);
+  const [enabled, setEnabled] = createSignal(true);
 
   return (
     <>
@@ -28,15 +28,13 @@ const App = () => {
       </CanvasWrapper> */}
       <Draggable enabled={enabled()}>
         <div class="bg-green-500 h-40 w-40 text-center">
-          out
-          <button class="bg-red-500 h-6 w-6" onClick={() => setEnabled((p) => !p)}>
-            in
+          <button class="bg-red-500 h-6 w-fit" onClick={() => setEnabled((p) => !p)}>
+            {enabled() ? "enabled" : "disabled"}
           </button>
         </div>
       </Draggable>
       <Draggable>
         <div class="bg-yellow-500 h-40 w-40 text-center">
-          out
           <button class="bg-red-500 h-6 w-6">in</button>
         </div>
       </Draggable>
