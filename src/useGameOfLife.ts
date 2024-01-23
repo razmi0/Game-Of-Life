@@ -1,9 +1,7 @@
-import { onMount } from "solid-js";
-import { createStore } from "solid-js/store";
+import { onMount, type Accessor } from "solid-js";
+import { createStore, type Store } from "solid-js/store";
 import { confirmTendency, randomColor } from "./helpers";
 import { CELL_WIDTH, DEFAULT_RANDOMNESS, SHUFFLE_MAX_CONSECUTIVE_ALIVE, SHUFFLE_MAX_CONSECUTIVE_DEAD } from "./data";
-import type { Store } from "solid-js/store";
-import type { Accessor } from "solid-js";
 
 export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<CanvasRenderingContext2D | undefined>) {
   const [board, setBoard] = createStore({

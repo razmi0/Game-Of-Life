@@ -1,15 +1,14 @@
 import { Portal } from "solid-js/web";
-import { Show, createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
+import { Show, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 import Wrapper from "./Drawer/Content";
 import Header from "./Drawer/Header";
 import Body from "./Drawer/Body";
 import Group from "./Drawer/Group";
 import Item from "./Drawer/Item";
 import { IconButton } from "./Buttons";
-import type { Component, JSX, VoidComponent } from "solid-js";
-import Icon, { IconNames } from "./Icons";
+import Icon from "./Icons";
 import { ICON_SIZE, MAX_ALIVE_RANDOMNESS, MAX_DELAY, MIN_ALIVE_RANDOMNESS, MIN_DELAY } from "../data";
-// import { MAX_DELAY, MIN_DELAY, ICON_SIZE, MIN_ALIVE_RANDOMNESS, MAX_ALIVE_RANDOMNESS } from "../data";
+import type { Component, VoidComponent } from "solid-js";
 
 const portalNode = document.getElementById("portal")! as HTMLDivElement;
 let ref: HTMLDivElement;

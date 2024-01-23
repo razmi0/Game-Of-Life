@@ -25,12 +25,12 @@ export type IconNames =
   | "arrowDown"
   | "wave";
 
-export interface IconProps {
+export type IconProps = {
   width: number;
   height?: number;
   name: IconNames;
   color?: string;
-}
+};
 /**
  * <svg>
  *      <defs>

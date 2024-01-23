@@ -1,6 +1,5 @@
 import { onCleanup, onMount } from "solid-js";
-import { createStore } from "solid-js/store";
-import type { SetStoreFunction, Store } from "solid-js/store";
+import { createStore, type SetStoreFunction, type Store } from "solid-js/store";
 import { CELL_WIDTH } from "./data";
 
 export default function useScreen() {

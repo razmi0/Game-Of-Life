@@ -1,4 +1,4 @@
-import { Component, JSX, Show } from "solid-js";
+import { type Component, type JSX, Show } from "solid-js";
 import Trigger from "./Trigger";
 import Overlay from "./Overlay";
 
@@ -12,7 +12,9 @@ type WrapperProps = {
 const Wrapper: Component<WrapperProps> = (props) => {
   return (
     <Show when={props.open} fallback={<Trigger trigger={props.trigger} />}>
-      <Content ref={props.ref}>{props.children}</Content>
+      <Content ref={props.ref} overlay={<></>}>
+        {props.children}
+      </Content>
     </Show>
   );
 };

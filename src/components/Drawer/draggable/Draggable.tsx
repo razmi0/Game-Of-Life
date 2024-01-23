@@ -1,14 +1,9 @@
-import { Accessor, Component, JSXElement, children, createEffect, createSignal, onCleanup } from "solid-js";
-import { createStore, produce, unwrap } from "solid-js/store";
-import { Portal } from "solid-js/web";
-
-//
-// const portalNode = document.getElementById("portal-draggable")! as HTMLDivElement;
+import { type Component, type JSXElement, children, createEffect, onCleanup } from "solid-js";
+import { createStore, produce } from "solid-js/store";
 
 type DraggableProps = {
   children: JSXElement;
   enabled?: undefined | boolean;
-  /** reset position on end */
   resetOnDragEnd?: boolean;
 };
 
@@ -19,6 +14,7 @@ type DragState = {
 };
 
 /**
+ * TODO
  * replace listener on move with movement() function
  * @param e
  */
@@ -37,7 +33,6 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
     move: false,
     end: true,
   });
-  // const [localEnabled, setLocalEnabled] = createSignal(props.enabled ?? true);
   if (!props.children) throw new Error("Draggable component must have children");
   let child: HTMLElement;
   let now = Date.now();
@@ -97,7 +92,6 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
   const handleMouseDown = (e: MouseEvent) => {
     if (!props.enabled || !drag.end) return;
     e.preventDefault();
-    console.log("mousedown");
 
     initial.x = e.screenX - permanentlyAdded.x;
     initial.y = e.screenY - permanentlyAdded.y;
@@ -111,7 +105,6 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
     let isReady = Date.now() - now > MOVE_TIMEOUT;
     if (!drag.start || !isReady) return;
     now = Date.now();
-    console.log("mousemove");
 
     const mouseX = e.screenX;
     const mouseY = e.screenY;
@@ -140,7 +133,6 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
     end();
   };
   const handleMouseUp = () => {
-    console.log("handleMouseUp");
     if (!props.enabled) return;
     if (props.resetOnDragEnd) reset();
     else {
@@ -153,33 +145,3 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
 };
 
 export default Draggable;
-
-//   const isInside = (coordinates: { x: number; y: number }) => {
-//     const { left, top } = child.getBoundingClientRect();
-//     const border = { left: left, top: top };
-//     if (coordinates.x > border.left && coordinates.y < border.top) return true;
-//   };
-
-// type DragElementDataType = {
-//     rect: { x: number; y: number; width: number; height: number };
-//     unit: string;
-//     child: HTMLElement;
-//   }
-//   const dragElementData : DragElementDataType = {
-//     rect : { x: 0, y: 0, width: 0, height: 0 },
-//     unit : "px",
-//     child : null
-//   }
-
-//   type MoveableDataType = {
-//     initial: { x: number; y: number };
-//     diff: { x: number; y: number };
-//     permanentlyAdded: { x: number; y: number };
-//     rect: { x: number; y: number; width: number; height: number };
-//   }
-//   const moveableData : MoveableDataType = {
-//     initial : { x: 0, y: 0 },
-//     diff : { x: 0, y: 0 },
-//     permanentlyAdded : { x: 0, y: 0 },
-//     rect : { x: 0, y: 0, width: 0, height: 0 }
-//   }
