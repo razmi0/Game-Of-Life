@@ -1,50 +1,76 @@
-import { type Component, type JSXElement, children, createEffect, onCleanup } from "solid-js";
-import { createStore, produce } from "solid-js/store";
+import { type JSXElement, children, onCleanup, onMount, createEffect, on } from "solid-js";
+import { createStore } from "solid-js/store";
 
 type DraggableProps = {
   children: JSXElement;
-  enabled?: undefined | boolean;
+  /** Does this element move ? */
+  enabled?: boolean;
+  /** Do we reset on move's end ? */
   resetOnDragEnd?: boolean;
+  onStart?: () => void;
+  onDrag?: () => void;
+  onEnd?: () => void;
+  /** Trigger reset position immediately when value change (strict equality by reference) */
+  reset?: unknown;
 };
 
 type DragState = {
   start: boolean;
   move: boolean;
   end: boolean;
+  setStart: () => void;
+  setMove: () => void;
+  setEnd: () => void;
+};
+
+type CoordType = {
+  x: number;
+  y: number;
+};
+
+type RectType = CoordType & {
+  width: number;
+  height: number;
 };
 
 /**
  * TODO
- * replace listener on move with movement() function
- * @param e
+ * - [ ] Add touch support
  */
 
 const MOVE_HZ = 60;
 const MOVE_TIMEOUT = Math.floor(1000 / MOVE_HZ); // MOVE_HZ/s
 const UNIT = "px";
-const MOUSE_BOUNDARY_RADIUS = 10;
 
 /**
  * Make a draggable element
  */
-const Draggable: Component<DraggableProps> = (props): JSXElement => {
+export default function Draggable(props: DraggableProps): JSXElement {
   const [drag, setDrag] = createStore<DragState>({
     start: false,
     move: false,
     end: true,
+    setStart: () => {
+      setDrag("start", true);
+      setDrag("move", false);
+      setDrag("end", false);
+    },
+    setMove: () => setDrag("move", true),
+    setEnd: () => {
+      setDrag("start", false);
+      setDrag("move", false);
+      setDrag("end", true);
+    },
   });
   if (!props.children) throw new Error("Draggable component must have children");
   let child: HTMLElement;
   let now = Date.now();
-  let initial = { x: 0, y: 0 };
-  let diff = { x: 0, y: 0 };
-  let permanentlyAdded = { x: 0, y: 0 };
-  let rect = { x: 0, y: 0, width: 0, height: 0 };
-  const resolved = children(() => props.children);
+  let initial: CoordType = { x: 0, y: 0 };
+  let diff: CoordType = { x: 0, y: 0 };
+  let permanentlyAdded: CoordType = { x: 0, y: 0 };
+  let rect: RectType = { x: 0, y: 0, width: 0, height: 0 };
 
-  const update = (obj1: Record<string, number>, obj2: Record<string, number>) => {
-    for (let n in obj1) obj1[n] = obj2[n];
-  };
+  const resolved = children(() => props.children);
 
   const setup = () => {
     let list = resolved.toArray();
@@ -58,52 +84,49 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
     rect = { x: left, y: top, width, height };
     initial = { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
 
-    listeners();
+    addListeners();
   };
-  createEffect(setup);
-
-  const listeners = () => {
-    const handleClick = () => (drag.start ? end() : null);
+  const addListeners = () => {
     child.addEventListener("click", handleClick);
-    child.addEventListener("mousedown", (e) => handleMouseDown(e as MouseEvent));
-    child.addEventListener("mousemove", (e) => handleMouseMove(e as MouseEvent));
+    child.addEventListener("mousedown", handleMouseDown);
+    document.addEventListener("mousemove", handleMouseMove);
     child.addEventListener("mouseup", handleMouseUp);
-    child.addEventListener("mouseleave", handleMouseUp);
-    onCleanup(() => {
-      child.removeEventListener("click", handleClick);
-      child.removeEventListener("mousedown", (e) => handleMouseDown(e as MouseEvent));
-      child.removeEventListener("mousemove", (e) => handleMouseMove(e as MouseEvent));
-      child.removeEventListener("mouseup", handleMouseUp);
-      child.removeEventListener("mouseleave", handleMouseUp);
-    });
+  };
+  const removeListeners = () => {
+    child.removeEventListener("click", handleClick);
+    child.removeEventListener("mousedown", handleMouseDown);
+    document.removeEventListener("mousemove", handleMouseMove);
+    child.removeEventListener("mouseup", handleMouseUp);
   };
 
-  /** start */
+  onMount(setup);
+  onCleanup(removeListeners);
 
-  const start = () => {
-    setDrag(
-      produce((draft) => {
-        draft.start = true;
-        draft.move = false;
-        draft.end = false;
-      })
-    );
+  /** CLICK */
+  const handleClick = () => {
+    if (drag.start) drag.setEnd();
   };
+
+  /** START */
+
   const handleMouseDown = (e: MouseEvent) => {
-    if (!props.enabled || !drag.end) return;
+    let enabled = props.enabled ?? true;
+    if (!enabled || !drag.end) return;
     e.preventDefault();
 
     initial.x = e.screenX - permanentlyAdded.x;
     initial.y = e.screenY - permanentlyAdded.y;
 
-    start();
+    drag.setStart();
+    props.onStart?.();
   };
 
-  /** move */
+  /** MOVE is attach to document */
 
   const handleMouseMove = (e: MouseEvent) => {
     let isReady = Date.now() - now > MOVE_TIMEOUT;
-    if (!drag.start || !isReady) return;
+    let enabled = props.enabled ?? true;
+    if (!drag.start || !isReady || !enabled) return;
     now = Date.now();
 
     const mouseX = e.screenX;
@@ -113,35 +136,28 @@ const Draggable: Component<DraggableProps> = (props): JSXElement => {
 
     child.style.transform = `translate(${diff.x + UNIT}, ${diff.y + UNIT})`;
 
-    setDrag("move", true);
+    drag.setMove();
+    props.onDrag?.();
   };
 
-  /** end */
+  /** END */
 
-  const end = () => {
-    if (drag.end) return;
-    setDrag(
-      produce((draft) => {
-        draft.start = false;
-        draft.move = false;
-        draft.end = true;
-      })
-    );
+  const update = () => {
+    Object.assign(permanentlyAdded, diff);
   };
   const reset = () => {
     child.style.transform = `translate(0px, 0px)`;
-    end();
+    permanentlyAdded = { x: 0, y: 0 };
   };
+  createEffect(on(() => props.reset, reset));
   const handleMouseUp = () => {
-    if (!props.enabled) return;
-    if (props.resetOnDragEnd) reset();
-    else {
-      update(permanentlyAdded, diff);
-      end();
-    }
+    let enabled = props.enabled ?? true;
+    if (!enabled || drag.end) return;
+
+    props.resetOnDragEnd ? reset() : update();
+    drag.setEnd();
+    props.onEnd?.();
   };
 
   return <>{resolved()}</>;
-};
-
-export default Draggable;
+}
