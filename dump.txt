@@ -27,3 +27,39 @@
 //     permanentlyAdded : { x: 0, y: 0 },
 //     rect : { x: 0, y: 0, width: 0, height: 0 }
 //   }
+
+
+
+        {/* GROUP 3 */}
+        {/* title="Stats" left={<Icon width={ICON_SIZE.lg} name="wave" />} */}
+        {/* <Item hover={false} left={"Total cells : "}>
+            {props.board.nAlive + props.board.nDead}
+          </Item>
+          <Item hover={false} left={"Generation : "}>
+            {props.board.generation}
+          </Item>
+          <Item hover={false} left={DeadEvolutionIcon}>
+            Deads : {props.board.nDead}
+          </Item>
+          <Item hover={false} left={AliveEvolutionIcon}>
+            Alives : {props.board.nAlive}
+          </Item> */}
+
+            {/* GROUP 2 left={<Icon width={ICON_SIZE.md} name="gear" />}*/}
+        {/* <Range onChange={handleSpeedChange} value={props.clock.speed} max={MAX_DELAY} min={MIN_DELAY} /> */}
+        {/* label={RangeDelayLabel} hover={false} label={RangeRandomLabel} hover={false} */}
+        {/* <Range
+              onChange={handleRandomChange}
+              value={props.board.randomness}
+              min={MIN_ALIVE_RANDOMNESS}
+              max={MAX_ALIVE_RANDOMNESS}
+            /> */}
+
+
+ // onMount(() => {
+  //   const handleClickOutside = (e: MouseEvent) => {
+  //     if (ref && !ref.contains(e.target as Node)) setIsOpen(false);
+  //   };
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   onCleanup(() => document.removeEventListener("mousedown", handleClickOutside));
+  // });
