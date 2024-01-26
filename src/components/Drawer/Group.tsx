@@ -2,7 +2,7 @@ import { type Component, createSignal, Show } from "solid-js";
 import type { JSX } from "solid-js";
 import Icon from "../Icons";
 import { ICON_SIZE } from "../../data";
-import Draggable from "./draggable/Draggable";
+import Draggable from "../../draggable/Draggable";
 
 type GroupProps = {
   title?: string;
@@ -31,7 +31,7 @@ const Group: Component<GroupProps> = (props) => {
 
   return (
     <Draggable enabled={pin()}>
-      <div class="my-3 mt-4 z-50 bg-dw-500">
+      <div class="my-3 z-50 bg-dw-500">
         <Show when={hasTitle}>
           <GroupHeader
             right={
@@ -47,7 +47,7 @@ const Group: Component<GroupProps> = (props) => {
           </GroupHeader>
         </Show>
         <Show when={open()}>
-          <div class={`py-2 flex flex-col ps-1 ${props.classes || ""}`}>{props.children}</div>
+          <div class={`flex flex-col mt-1 ${props.classes || ""}`}>{props.children}</div>
         </Show>
       </div>
     </Draggable>

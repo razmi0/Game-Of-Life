@@ -1,38 +1,176 @@
-import { type JSX, type Component, Show } from "solid-js";
+import { type JSX, type Component, Show, createSignal, onMount, createEffect, on } from "solid-js";
+import { SHOW_TOOLTIP_DEBUG } from "../../data";
+import SvgSafeTriangle from "./SafeTriangle";
+import { createStore, unwrap } from "solid-js/store";
+
+type RectType = {
+  height: number;
+  width: number;
+  left: number;
+  top: number;
+};
+
+type RefType = {
+  parent: null | RectType;
+  child: null | RectType;
+};
 
 type ItemProps = {
-  children: JSX.Element;
+  children?: JSX.Element;
   right?: JSX.Element;
   left?: JSX.Element;
   label?: JSX.Element;
   onClick?: () => void;
   classes?: string;
   hover?: boolean;
+  onHover?: () => void;
+  tooltip?: JSX.Element;
 };
 const Item: Component<ItemProps> = (props) => {
-  if (props.hover === undefined) props.hover = true;
+  const [hovering, setHovering] = createSignal(SHOW_TOOLTIP_DEBUG);
+  const [mouse, setMouse] = createStore({ x: 0, y: 0 });
+  const [ref, setRef] = createStore<RefType>({ parent: null, child: null });
+
   const hasLbl = !!props.label;
   const hasLeft = !!props.left;
-  return (
-    <>
-      <div class="flex flex-col justify-center items-start text-dw-150">
-        <Show when={hasLbl}>
-          <label class="text-sm w-full mt-2">{props.label}</label>
-        </Show>
+  const hasRight = !!props.right;
+  const hasChildren = !!props.children;
+  const hasTooltip = !!props.tooltip;
+
+  let parentRef: HTMLDivElement;
+  let childRef: HTMLDivElement;
+
+  const Tooltip = (props: TooltipProps) => {
+    const [show, setShow] = createSignal(false);
+
+    createEffect(
+      on(
+        () => hovering(),
+
+        () => {
+          if (!hovering()) return;
+          setRef({
+            parent: parentRef.getBoundingClientRect() as RectType,
+            child: childRef.getBoundingClientRect() as RectType,
+          });
+          console.log(unwrap(ref));
+        }
+      )
+    );
+
+    return (
+      <Show when={(hasTooltip && hovering()) || show()}>
+        <SvgSafeTriangle
+          svgWidth={ref.parent?.width || 0}
+          submenuHeight={ref.child?.height || 0}
+          svgHeight={ref.child?.height || 0}
+          submenuY={ref.child?.top || 0}
+          mouseX={mouse.x}
+          mouseY={mouse.y}
+        />
         <div
-          class={`flex items-center gap-2 text-sm w-full py-1 rounded-md h-8 cursor-pointer ps-2 ${props.classes}`}
-          classList={{ ["h-11 leading-none"]: hasLbl, ["hover:bg-dw-300 hover:text-dw-100"]: props.hover }}
-          onClick={props.onClick}
+          ref={(el) => (childRef = el!)}
+          class="fixed min-w-20 h-fit bg-red-500"
+          style={`transform : translate(${(ref.parent?.width || 0) + 20}px, ${(ref.child?.top || 0) / 2}px)`}
+          onMouseEnter={() => setShow(true)}
+          onMouseLeave={() => setShow(false)}
         >
-          <Show when={hasLeft}>{props.left}</Show>
           {props.children}
-          <div class="flex flex-col items-center">
-            <Show when={props.right}>{props.right}</Show>
-          </div>
         </div>
+      </Show>
+    );
+  };
+
+  createEffect(() => {
+    console.log(parentRef);
+    console.log(childRef);
+  });
+
+  return (
+    <div
+      onMouseEnter={(e) => {
+        setHovering(true);
+      }}
+      onMouseMove={(e) => {
+        setMouse({ x: e.clientX, y: e.clientY });
+      }}
+      onMouseLeave={() => {
+        setMouse({ x: 0, y: 0 });
+        setHovering(false);
+      }}
+    >
+      <Label show={hasLbl}>{props.label}</Label>
+      <div
+        class={
+          "flex items-center justify-center text-sm text-dw-150 w-full cursor-pointer hover:bg-dw-300 hover:text-dw-100 py-2 " +
+            props.classes || ""
+        }
+        onClick={props.onClick}
+        ref={(el) => (parentRef = el)}
+      >
+        <Left show={hasLeft}>{props.left}</Left>
+        <Child show={hasChildren}>{props.children}</Child>
+        <Right show={hasRight}>{props.right}</Right>
+
+        <Tooltip>{props.tooltip}</Tooltip>
       </div>
-    </>
+    </div>
   );
 };
+{
+  /*  */
+}
+
+type TooltipProps = {
+  children?: JSX.Element;
+};
+
+//#region member
+type LabelProps = {
+  show?: boolean;
+  children: JSX.Element;
+};
+const Label = (props: LabelProps) => {
+  return (
+    <Show when={props.show}>
+      <label class="text-sm w-full mt-2">{props.children}</label>
+    </Show>
+  );
+};
+type RightProps = {
+  show?: boolean;
+  children: JSX.Element;
+};
+const Right = (props: RightProps) => {
+  return (
+    <Show when={props.show}>
+      <div class="flex flex-col items-center">{props.children}</div>
+    </Show>
+  );
+};
+type LeftProps = {
+  show?: boolean;
+  children: JSX.Element;
+};
+const Left = (props: LeftProps) => {
+  return (
+    <Show when={props.show}>
+      <div>{props.children}</div>
+    </Show>
+  );
+};
+type ChildProps = {
+  show?: boolean;
+  children: JSX.Element;
+};
+const Child = (props: ChildProps) => {
+  return (
+    <Show when={props.show}>
+      <div>{props.children}</div>
+    </Show>
+  );
+};
+
+//#endregion member
 
 export default Item;

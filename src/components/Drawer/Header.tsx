@@ -2,10 +2,11 @@ import { Show } from "solid-js";
 import type { JSX, Component } from "solid-js";
 
 type HeaderProps = {
-  title: string;
-  subtitle: string;
+  title?: string;
+  subtitle?: string;
   left?: JSX.Element;
   right?: JSX.Element;
+  children?: JSX.Element;
 };
 const Header: Component<HeaderProps> = (props) => {
   return (
@@ -15,6 +16,7 @@ const Header: Component<HeaderProps> = (props) => {
         <div class="flex flex-col justify-start">
           <h3 class="text-dw-100 text-lg leading-none">{props.title}</h3>
           <span class="text-dw-150 text-sm">{props.subtitle}</span>
+          <Show when={props.children}>{props.children}</Show>
         </div>
       </div>
       <Show when={props.right}>

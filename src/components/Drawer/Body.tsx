@@ -5,6 +5,6 @@ type BodyProps = {
   children: JSX.Element | JSX.Element[];
 };
 const Body: Component<BodyProps> = (props: BodyProps) => {
-  return <div>{props.children}</div>;
+  return <>{props.children}</>;
 };
 export default Body;
