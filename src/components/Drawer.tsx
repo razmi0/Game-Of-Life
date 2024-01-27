@@ -77,8 +77,9 @@ export default function Drawer(props: DrawerProps) {
 
   return (
     <Wrapper trigger={trigger} open={isOpen()} ref={ref}>
-      <Header></Header>
-      <IconButton onClick={trigger} width={xl} name="chevron" classes="hover:bg-dw-300 p-1 rounded-full" />
+      <Header>
+        <IconButton onClick={trigger} width={xl} name="chevron" classes="hover:bg-dw-300 p-1 rounded-full" />
+      </Header>
       <Group>
         <Separator />
         <Item onClick={props.clock.playPause} tooltip={<Tooltip />}>

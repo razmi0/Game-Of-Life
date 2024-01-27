@@ -1,4 +1,4 @@
-import { type JSX, type Component, Show, createSignal, onMount, createEffect, on } from "solid-js";
+import { type JSX, type Component, Show, createSignal, onMount, createEffect, on, onCleanup } from "solid-js";
 import { SHOW_TOOLTIP_DEBUG } from "../../data";
 import SvgSafeTriangle from "./SafeTriangle";
 import { createStore, unwrap } from "solid-js/store";
@@ -8,6 +8,8 @@ type RectType = {
   width: number;
   left: number;
   top: number;
+  x: number;
+  y: number;
 };
 
 type RefType = {
@@ -46,22 +48,23 @@ const Item: Component<ItemProps> = (props) => {
     createEffect(
       on(
         () => hovering(),
-
         () => {
           if (!hovering()) return;
-          setRef({
+          setRef(() => ({
             parent: parentRef.getBoundingClientRect() as RectType,
             child: childRef.getBoundingClientRect() as RectType,
-          });
+          }));
           console.log(unwrap(ref));
         }
       )
     );
 
+    onCleanup(() => setRef("child", null));
+
     return (
       <Show when={(hasTooltip && hovering()) || show()}>
         <SvgSafeTriangle
-          svgWidth={ref.parent?.width || 0}
+          svgWidth={(ref.child?.x || 0) - mouse.x}
           submenuHeight={ref.child?.height || 0}
           svgHeight={ref.child?.height || 0}
           submenuY={ref.child?.top || 0}
@@ -71,7 +74,7 @@ const Item: Component<ItemProps> = (props) => {
         <div
           ref={(el) => (childRef = el!)}
           class="fixed min-w-20 h-fit bg-red-500"
-          style={`transform : translate(${(ref.parent?.width || 0) + 20}px, ${(ref.child?.top || 0) / 2}px)`}
+          style={`transform : translate(${(ref.parent?.width || 0) + 20}px, ${0}px)`}
           onMouseEnter={() => setShow(true)}
           onMouseLeave={() => setShow(false)}
         >
@@ -81,10 +84,7 @@ const Item: Component<ItemProps> = (props) => {
     );
   };
 
-  createEffect(() => {
-    console.log(parentRef);
-    console.log(childRef);
-  });
+  onCleanup(() => setRef("parent", null));
 
   return (
     <div

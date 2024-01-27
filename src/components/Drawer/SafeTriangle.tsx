@@ -1,4 +1,4 @@
-import { Component } from "solid-js";
+import { type Component } from "solid-js";
 
 type SafeTriangleProps = {
   mouseX: number;
@@ -8,6 +8,7 @@ type SafeTriangleProps = {
   svgWidth: number;
   svgHeight: number;
 };
+
 const SvgSafeTriangle: Component<SafeTriangleProps> = (props) => {
   return (
     <svg
@@ -18,8 +19,8 @@ const SvgSafeTriangle: Component<SafeTriangleProps> = (props) => {
         height: ${props.submenuHeight};
         pointer-events: none;
         z-index: 2;
-        top: ${props.submenuY - 125};
-        left: ${props.svgWidth - 50};
+        top: ${props.submenuY - (props.mouseY - props.submenuY + 20)};
+        left: ${props.mouseX - 2};
       `}
     >
       {/* Safe Area */}
@@ -28,10 +29,10 @@ const SvgSafeTriangle: Component<SafeTriangleProps> = (props) => {
         stroke="red"
         stroke-width="0.4"
         fill="rgb(114 140 89 / 0.3)"
+        // prettier-ignores
         d={`M 0, ${props.mouseY - props.submenuY} 
-        L ${props.svgWidth},${props.svgHeight}
-        L ${props.svgWidth},0 
-        z`}
+            L ${props.svgWidth},${props.svgHeight}
+            L ${props.svgWidth},0 z`}
       />
     </svg>
   );
