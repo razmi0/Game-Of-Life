@@ -29,6 +29,11 @@ export default function Drawer(props: DrawerProps) {
     </Show>
   );
 
+  const PlayPauseTooltip = () => {
+    const text = () => (props.clock.play ? "Pause" : "Play");
+    return <>{text()}</>;
+  };
+
   type EvolutionIconProps = {
     increaseType: boolean;
   };
@@ -71,7 +76,7 @@ export default function Drawer(props: DrawerProps) {
     props.board.changeRandomness(newRandom);
   };
 
-  const Tooltip = () => <div class="w-20 h-40 border-2 border-red-500 flex place-content-center">I'm a tooltip</div>;
+  const Tooltip = () => <div class="h-8 w-20">I'm a tooltip</div>;
 
   const { xl } = ICON_SIZE;
 
@@ -80,15 +85,15 @@ export default function Drawer(props: DrawerProps) {
       <Header>
         <IconButton onClick={trigger} width={xl} name="chevron" classes="hover:bg-dw-300 p-1 rounded-full" />
       </Header>
+      <Separator />
       <Group>
-        <Separator />
-        <Item onClick={props.clock.playPause} tooltip={<Tooltip />}>
+        <Item onClick={props.clock.playPause} showTooltipOnClick={false} tooltip={<PlayPauseTooltip />}>
           <PlayPauseIcon />
         </Item>
-        <Item tooltip={<Tooltip />} onClick={props.board.shuffle}>
+        <Item tooltip={"yesyesyesyesyesyesyesyesyesyesyesyes"} onClick={props.board.shuffle}>
           <Icon width={xl} name="baby" />
         </Item>
-        <Item tooltip={<Tooltip />} onClick={props.board.reset}>
+        <Item tooltip={"dkjsfbkdsjbfjkdsbfjkdsbfkjds"} onClick={props.board.reset}>
           <Icon width={xl} name="reset" />
         </Item>
       </Group>

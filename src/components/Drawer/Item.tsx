@@ -1,21 +1,5 @@
-import { type JSX, type Component, Show, createSignal, onMount, createEffect, on, onCleanup } from "solid-js";
+import { type JSX, type Component, Show, createSignal, createEffect, onMount, on } from "solid-js";
 import { SHOW_TOOLTIP_DEBUG } from "../../data";
-import SvgSafeTriangle from "./SafeTriangle";
-import { createStore, unwrap } from "solid-js/store";
-
-type RectType = {
-  height: number;
-  width: number;
-  left: number;
-  top: number;
-  x: number;
-  y: number;
-};
-
-type RefType = {
-  parent: null | RectType;
-  child: null | RectType;
-};
 
 type ItemProps = {
   children?: JSX.Element;
@@ -27,86 +11,78 @@ type ItemProps = {
   hover?: boolean;
   onHover?: () => void;
   tooltip?: JSX.Element;
+  showTooltipOnClick?: boolean;
 };
+
 const Item: Component<ItemProps> = (props) => {
   const [hovering, setHovering] = createSignal(SHOW_TOOLTIP_DEBUG);
-  const [mouse, setMouse] = createStore({ x: 0, y: 0 });
-  const [ref, setRef] = createStore<RefType>({ parent: null, child: null });
+
+  let itemRef: HTMLDivElement;
 
   const hasLbl = !!props.label;
   const hasLeft = !!props.left;
   const hasRight = !!props.right;
   const hasChildren = !!props.children;
   const hasTooltip = !!props.tooltip;
+  const withClick = !!props.showTooltipOnClick;
 
-  let parentRef: HTMLDivElement;
-  let childRef: HTMLDivElement;
+  const onMouseEnter = withClick ? () => {} : ([setHovering, true] as const);
+  const onMouseLeave = withClick ? () => {} : ([setHovering, false] as const);
+  const toggleOnClick = !withClick ? () => {} : ([setHovering, !hovering()] as const);
 
   const Tooltip = (props: TooltipProps) => {
-    const [show, setShow] = createSignal(false);
+    const [open, setOpen] = createSignal(false);
+    const [itemSize, setItemSize] = createSignal({ width: 0, height: 0 });
+    const [TTsize, setTTsize] = createSignal({ width: 0, height: 0 });
+    const show = () => (hovering() && hasTooltip) || open();
 
-    createEffect(
-      on(
-        () => hovering(),
-        () => {
-          if (!hovering()) return;
-          setRef(() => ({
-            parent: parentRef.getBoundingClientRect() as RectType,
-            child: childRef.getBoundingClientRect() as RectType,
-          }));
-          console.log(unwrap(ref));
+    let tooltipRef: HTMLDivElement;
+
+    createEffect(() => {
+      if (hovering() && hasTooltip) {
+        if (itemRef) {
+          setItemSize({ width: itemRef.offsetWidth, height: itemRef.offsetHeight });
         }
-      )
-    );
+        if (tooltipRef) {
+          setTTsize({ width: tooltipRef.offsetWidth, height: tooltipRef.offsetHeight });
+        }
+      }
+    });
 
-    onCleanup(() => setRef("child", null));
+    const spacing = 17;
 
     return (
-      <Show when={(hasTooltip && hovering()) || show()}>
-        <SvgSafeTriangle
-          svgWidth={(ref.child?.x || 0) - mouse.x}
-          submenuHeight={ref.child?.height || 0}
-          svgHeight={ref.child?.height || 0}
-          submenuY={ref.child?.top || 0}
-          mouseX={mouse.x}
-          mouseY={mouse.y}
-        />
+      <div
+        class="fixed flex"
+        style={`transform: translate(${-spacing * 2 + itemSize().width + TTsize().width / 2}px , 0px);`}
+        classList={{ ["hidden"]: !show() }}
+        onMouseEnter={[setOpen, true]}
+        onMouseLeave={[setOpen, false]}
+      >
         <div
-          ref={(el) => (childRef = el!)}
-          class="fixed min-w-20 h-fit bg-red-500"
-          style={`transform : translate(${(ref.parent?.width || 0) + 20}px, ${0}px)`}
-          onMouseEnter={() => setShow(true)}
-          onMouseLeave={() => setShow(false)}
+          style={`height : ${itemSize().height};
+             width: ${spacing}px; pointer-events: none; background-color: transparent;`} // itemSize().width
+        ></div>
+        <div
+          class="h-fit py-2 px-1 bg-dw-500 visible flex place-content-center"
+          style={`min-height: ${itemSize().height}px;`}
+          ref={(el) => (tooltipRef = el)}
         >
           {props.children}
         </div>
-      </Show>
+      </div>
     );
   };
 
-  onCleanup(() => setRef("parent", null));
-
   return (
-    <div
-      onMouseEnter={(e) => {
-        setHovering(true);
-      }}
-      onMouseMove={(e) => {
-        setMouse({ x: e.clientX, y: e.clientY });
-      }}
-      onMouseLeave={() => {
-        setMouse({ x: 0, y: 0 });
-        setHovering(false);
-      }}
-    >
+    <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onClick={toggleOnClick} ref={(el) => (itemRef = el)}>
       <Label show={hasLbl}>{props.label}</Label>
       <div
         class={
           "flex items-center justify-center text-sm text-dw-150 w-full cursor-pointer hover:bg-dw-300 hover:text-dw-100 py-2 " +
-            props.classes || ""
+          (props.classes || "")
         }
         onClick={props.onClick}
-        ref={(el) => (parentRef = el)}
       >
         <Left show={hasLeft}>{props.left}</Left>
         <Child show={hasChildren}>{props.children}</Child>
@@ -125,7 +101,7 @@ type TooltipProps = {
   children?: JSX.Element;
 };
 
-//#region member
+//#region members
 type LabelProps = {
   show?: boolean;
   children: JSX.Element;
@@ -171,6 +147,6 @@ const Child = (props: ChildProps) => {
   );
 };
 
-//#endregion member
+//#endregion members
 
 export default Item;
