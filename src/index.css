@@ -76,9 +76,26 @@ input[type="range"]:focus::-moz-range-thumb {
   outline: 1px solid #3e4554;
 }
 
-/* .triangle-left {
-  @apply w-0 h-0;
-  border-top: 10px solid transparent;
-  border-right: 20px solid var(--bg-dw-color-500);
-  border-bottom: 10px solid transparent;
-} */
+.caret {
+  z-index: -100;
+  background: #1d1f25;
+  display: inline-block;
+  height: 11px;
+  margin-left: 15px;
+  position: relative;
+  width: 46px;
+  transform: rotate(-90deg) translateX(-13.5px);
+  padding: 0;
+  border: none;
+}
+.caret:before {
+  border-bottom: 20px solid #1d1f25;
+  border-left: 23px solid transparent;
+  border-right: 23px solid transparent;
+  content: "";
+  height: 0;
+  left: 0;
+  position: absolute;
+  top: -19.5px;
+  width: 0;
+}
