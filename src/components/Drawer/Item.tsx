@@ -50,19 +50,15 @@ const Item: Component<ItemProps> = (props) => {
     });
 
     const spacing = () => itemSize().width - TOOLTIP_SPACING * 2 + TTsize().width / 2;
-
-    // .triangle-left {
-    //   width: 0;
-    //   height: 0;
-    //   border-top: 50px solid transparent;
-    //   border-right: 100px solid red;
-    //   border-bottom: 50px solid transparent;
-    // }
+    const offsetY = () => {
+      if (TTsize().height <= itemSize().height) return 0;
+      return (TTsize().height - itemSize().height) / 2;
+    };
 
     return (
       <div
         class="fixed flex"
-        style={`transform: translate(${spacing()}px , 0px);`}
+        style={`transform: translate(${spacing()}px , ${offsetY()}px);`}
         classList={{ ["hidden"]: !show() }}
         onMouseEnter={[setOpen, true]}
         onMouseLeave={[setOpen, false]}
@@ -71,21 +67,11 @@ const Item: Component<ItemProps> = (props) => {
           style={`height : ${itemSize().height};
              width: ${
                TOOLTIP_SPACING + 25
-             }px; pointer-events: none; background-color: ${BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP};`} // itemSize().width
+             }px; pointer-events: none; background-color: ${BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP};`}
         >
-          <div
-            style={`width : 0px; height: 0px; border-top: ${
-              itemSize().height / 2
-            }px solid transparent; border-right: 20px solid #1d1f25; border-bottom: ${
-              itemSize().height / 2
-            }px solid transparent; transform : translate(23px, 0px);`}
-          ></div>
+          <div class="caret"></div>
         </div>
-        <div
-          class="h-fit py-2 px-1 bg-dw-500 visible flex place-content-center"
-          style={`min-height: ${itemSize().height}px;`}
-          ref={(el) => (tooltipRef = el)}
-        >
+        <div class="h-fit bg-dw-500" style={`min-height: ${itemSize().height}px;`} ref={(el) => (tooltipRef = el)}>
           {props.children}
         </div>
       </div>
@@ -168,3 +154,10 @@ const Child = (props: ChildProps) => {
 //#endregion members
 
 export default Item;
+
+// style={`width : 0px; height: 0px; border-top: ${
+//   itemSize().height / 2
+// }px solid transparent; border-right: 20px solid #1d1f25; border-bottom: ${
+//   itemSize().height / 2
+// }px solid transparent; transform : translate(20px, 0px);
+// `}
