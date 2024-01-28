@@ -76,7 +76,7 @@ export default function Drawer(props: DrawerProps) {
     props.board.changeRandomness(newRandom);
   };
 
-  const Tooltip = () => <div class="h-8 w-20">I'm a tooltip</div>;
+  const Tooltip = () => <div class="h-64 w-64">I'm a tooltip</div>;
 
   const { xl } = ICON_SIZE;
 
