@@ -5,6 +5,7 @@
 
 ::root {
   --color: #b3b3b7;
+  --bg-dw-color-500: #1d1f25;
 }
 
 #root {
@@ -36,6 +37,7 @@
 /*********** Baseline, reset styles ***********/
 input[type="range"] {
   @apply appearance-none cursor-pointer w-full;
+  appearance: none;
   -webkit-appearance: none;
   background: transparent;
 }
@@ -73,3 +75,10 @@ input[type="range"]::-moz-range-thumb {
 input[type="range"]:focus::-moz-range-thumb {
   outline: 1px solid #3e4554;
 }
+
+/* .triangle-left {
+  @apply w-0 h-0;
+  border-top: 10px solid transparent;
+  border-right: 20px solid var(--bg-dw-color-500);
+  border-bottom: 10px solid transparent;
+} */

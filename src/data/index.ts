@@ -13,6 +13,8 @@ const MIN_ALIVE_RANDOMNESS = 0 as const;
 const SHUFFLE_MAX_CONSECUTIVE_ALIVE = 3 as const;
 const SHUFFLE_MAX_CONSECUTIVE_DEAD = 10 as const;
 const SHOW_TOOLTIP_DEBUG = false;
+const BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP = "transparent"; // red
+const TOOLTIP_SPACING = 17 as const;
 
 const ICON_SIZE = {
   xs: 15,
@@ -23,6 +25,8 @@ const ICON_SIZE = {
 } as const;
 
 export {
+  TOOLTIP_SPACING,
+  BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP,
   DEFAULT_RANDOMNESS,
   CELL_WIDTH,
   DEFAULT_SPEED,
