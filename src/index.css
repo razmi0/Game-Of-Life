@@ -5,6 +5,12 @@
 
 ::root {
   --color: #b3b3b7;
+  /** TW custom colors */
+  --bg-dw-color-100: #efeff3;
+  --bg-dw-color-150: #b3b3b7;
+  --bg-dw-color-200: #7e8baa;
+  --bg-dw-color-300: #4c5366;
+  --bg-dw-color-400: #3e4554;
   --bg-dw-color-500: #1d1f25;
 }
 
@@ -27,6 +33,10 @@
   height: 1px;
   background-color: var(--color);
   margin: 1rem 0;
+}
+
+span {
+  z-index: 1;
 }
 
 /*
@@ -77,14 +87,15 @@ input[type="range"]:focus::-moz-range-thumb {
 }
 
 .caret {
-  z-index: -100;
+  --TOOLTIP_SPACING: 17px;
+  z-index: -1;
   background: #1d1f25;
   display: inline-block;
   height: 11px;
   margin-left: 15px;
   position: relative;
   width: 46px;
-  transform: rotate(-90deg) translateX(-13.5px);
+  transform: rotate(-90deg) translate(-13.5px, var(--TOOLTIP_SPACING));
   padding: 0;
   border: none;
 }
@@ -98,4 +109,5 @@ input[type="range"]:focus::-moz-range-thumb {
   position: absolute;
   top: -19.5px;
   width: 0;
+  z-index: -1;
 }
