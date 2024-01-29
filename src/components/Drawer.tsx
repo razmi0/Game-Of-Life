@@ -7,7 +7,7 @@ import Separator from "./Drawer/Separator";
 import { IconButton } from "./Buttons";
 import Icon from "./Icons";
 import { ICON_SIZE } from "../data";
-import type { Component, VoidComponent } from "solid-js";
+import type { Component, JSX, VoidComponent } from "solid-js";
 
 let ref: HTMLDivElement;
 const title = "Controls";
@@ -21,18 +21,16 @@ export default function Drawer(props: DrawerProps) {
   const [isOpen, setIsOpen] = createSignal(true);
   const trigger = () => setIsOpen((p) => !p);
   const hasStarted = createMemo(() => props.board.generation > 0);
-  const shuffleText = () => (props.board.generation === 0 ? "Pulse of death" : "Pulse of life");
+
+  const shuffleText = () => (props.board.generation === 0 ? "pulse of death" : "pulse of life");
+  const playPauseText = () => (props.clock.play ? "Pause" : "Play");
+  const { xl } = ICON_SIZE;
 
   const PlayPauseIcon = () => (
     <Show when={props.clock.play} fallback={<Icon width={ICON_SIZE.xl} name="play" />}>
       <Icon width={ICON_SIZE.xl} name="pause" />
     </Show>
   );
-
-  const PlayPauseTooltip = () => {
-    const text = () => (props.clock.play ? "Pause" : "Play");
-    return <>{text()}</>;
-  };
 
   type EvolutionIconProps = {
     increaseType: boolean;
@@ -76,9 +74,11 @@ export default function Drawer(props: DrawerProps) {
     props.board.changeRandomness(newRandom);
   };
 
-  const Tooltip = () => <div class="h-64 w-64">I'm a tooltip</div>;
-
-  const { xl } = ICON_SIZE;
+  const Tooltip: Component<{ children: JSX.Element }> = (props) => (
+    <div class="flex h-fit w-40  p-2 ">
+      <span class="text-balance">{props.children}</span>
+    </div>
+  );
 
   return (
     <Wrapper trigger={trigger} open={isOpen()} ref={ref}>
@@ -87,28 +87,34 @@ export default function Drawer(props: DrawerProps) {
       </Header>
       <Separator />
       <Group>
-        <Item onClick={props.clock.playPause} showTooltipOnClick={false} tooltip={<PlayPauseTooltip />}>
+        <Item onClick={props.clock.playPause} tooltip={<Tooltip>{playPauseText()}</Tooltip>}>
           <PlayPauseIcon />
         </Item>
-        <Item tooltip={"yesyesyesyesyesyesyesyesyesyesyesyes"} onClick={props.board.shuffle}>
+        <Item
+          tooltip={<Tooltip>Shuffle this board, randomly adding a {shuffleText()}</Tooltip>}
+          onClick={props.board.shuffle}
+        >
           <Icon width={xl} name="baby" />
         </Item>
-        <Item tooltip={"dkjsfbkdsjbfjkdsbfjkdsbfkjds"} onClick={props.board.reset}>
+        <Item
+          tooltip={<Tooltip>Reset the board to a new original fresh random board</Tooltip>}
+          onClick={props.board.reset}
+        >
           <Icon width={xl} name="reset" />
         </Item>
       </Group>
       <Separator />
       <Group>
-        <Item tooltip={<Tooltip />}>
+        <Item tooltip={<Tooltip>Change the speed of the simulation</Tooltip>}>
           <Icon width={xl} name="speed" />
         </Item>
-        <Item tooltip={<Tooltip />}>
+        <Item tooltip={<Tooltip>Change the ratio between alive cells and dead cells when reseting the board</Tooltip>}>
           <Icon width={xl} name="random" />
         </Item>
       </Group>
       <Separator />
       <Group>
-        <Item tooltip={<Tooltip />}>
+        <Item tooltip={<Tooltip>Stats</Tooltip>}>
           <Icon width={xl} name="wave" />
         </Item>
       </Group>
