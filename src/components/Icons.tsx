@@ -22,6 +22,7 @@ export type IconNames =
   | "queue"
   | "arrowUp"
   | "pin"
+  | "caret"
   | "arrowDown"
   | "wave";
 
@@ -30,6 +31,8 @@ export type IconProps = {
   height?: number;
   name: IconNames;
   color?: string;
+  class?: string;
+  style?: string;
 };
 /**
  * <svg>
@@ -40,7 +43,7 @@ export type IconProps = {
 export default function Icon(props: IconProps) {
   const height = props.height || props.width;
   return (
-    <svg width={props.width + "px"} height={height + "px"}>
+    <svg width={props.width + "px"} height={height + "px"} class={props.class ?? ""} style={props.style ?? ""}>
       <use href={`${spriteHref}#${props.name}`} />
     </svg>
   );

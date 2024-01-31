@@ -29,32 +29,60 @@
 //   }
 
 
+type HeaderProps = {
+  title?: string;
+  subtitle?: string;
+  left?: JSX.Element;
+  right?: JSX.Element;
+  children?: JSX.Element;
+};
+const Header: Component<HeaderProps> = (props) => {
+  const hasTitle = !!props.title;
+  const hasSubtitle = !!props.subtitle;
+  const hasLeft = !!props.left;
+  const hasRight = !!props.right;
+  const hasChildren = !!props.children;
+
+  return (
+    <div class="flex flex-row justify-start items-center mt-3 mb-10">
+      <div class="flex flex-row gap-3 items-center">
+        <Show when={props.left}>{props.left}</Show>
+        <div class="flex flex-col justify-start">
+          <h3 class="text-dw-100 text-lg leading-none">{props.title}</h3>
+          <span class="text-dw-150 text-sm">{props.subtitle}</span>
+          <Show when={props.children}>{props.children}</Show>
+        </div>
+      </div>
+      <Show when={props.right}>
+        <Spacer />
+        {props.right}
+      </Show>
+    </div>
+  );
+};
+
 
         {/* GROUP 3 */}
-        {/* title="Stats" left={<Icon width={ICON_SIZE.lg} name="wave" />} */}
-        {/* <Item hover={false} left={"Total cells : "}>
-            {props.board.nAlive + props.board.nDead}
-          </Item>
-          <Item hover={false} left={"Generation : "}>
-            {props.board.generation}
-          </Item>
-          <Item hover={false} left={DeadEvolutionIcon}>
-            Deads : {props.board.nDead}
-          </Item>
-          <Item hover={false} left={AliveEvolutionIcon}>
-            Alives : {props.board.nAlive}
-          </Item> */}
+        
 
             {/* GROUP 2 left={<Icon width={ICON_SIZE.md} name="gear" />}*/}
-        {/* <Range onChange={handleSpeedChange} value={props.clock.speed} max={MAX_DELAY} min={MIN_DELAY} /> */}
         {/* label={RangeDelayLabel} hover={false} label={RangeRandomLabel} hover={false} */}
-        {/* <Range
-              onChange={handleRandomChange}
-              value={props.board.randomness}
-              min={MIN_ALIVE_RANDOMNESS}
-              max={MAX_ALIVE_RANDOMNESS}
-            /> */}
 
+const RangeRandomLabel = (
+    <div class="flex w-full">
+      <span>Alive/dead ratio : </span>
+      <Spacer />
+      <span>{props.board.randomness + " %"}</span>
+    </div>
+  );
+
+  const RangeDelayLabel = (
+    <div class="flex justify-start w-full">
+      <span>Delay : </span>
+      <Spacer />
+      <span>{props.clock.speed + " ms"}</span>
+    </div>
+  );
 
  // onMount(() => {
   //   const handleClickOutside = (e: MouseEvent) => {

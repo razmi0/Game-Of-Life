@@ -25,6 +25,10 @@ type ClockState = {
   queueTicks: (ticks: number) => void;
 };
 
+type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
+
 type ScreenStoreState = {
   width: number;
   height: number;

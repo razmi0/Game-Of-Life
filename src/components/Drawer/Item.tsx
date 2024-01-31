@@ -1,6 +1,8 @@
-import { Show, createSignal, createEffect } from "solid-js";
+import { Show, createSignal, createEffect, children } from "solid-js";
 import { BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP, SHOW_TOOLTIP_DEBUG, TOOLTIP_SPACING } from "../../data";
-import type { JSX, Component } from "solid-js";
+import type { JSX, Component, ChildrenReturn } from "solid-js";
+import { createStore } from "solid-js/store";
+import Icon from "../Icons";
 
 type ItemProps = {
   children?: JSX.Element;
@@ -15,7 +17,7 @@ type ItemProps = {
   showTooltipOnClick?: boolean;
 };
 
-const Item: Component<ItemProps> = (props) => {
+const Item: Component<Prettify<ItemProps>> = (props) => {
   const [hovering, setHovering] = createSignal(SHOW_TOOLTIP_DEBUG);
 
   let itemRef: HTMLDivElement;
@@ -61,8 +63,8 @@ type TooltipProps = {
 };
 const Tooltip = (props: TooltipProps) => {
   const [open, setOpen] = createSignal(false);
-  const [itemSize, setItemSize] = createSignal({ width: 0, height: 0 });
-  const [tooltipSize, setTooltipSize] = createSignal({ width: 0, height: 0 });
+  const [itemSize, setItemSize] = createStore({ width: 0, height: 0 });
+  const [tooltipSize, setTooltipSize] = createStore({ width: 0, height: 0 });
   const show = () => props.when || open();
 
   let tooltipRef: HTMLDivElement;
@@ -78,37 +80,39 @@ const Tooltip = (props: TooltipProps) => {
     }
   });
 
-  const spacing = () => itemSize().width - TOOLTIP_SPACING + tooltipSize().width / 2 - 20;
+  const spacing = () => itemSize.width + tooltipSize.width / 2 - TOOLTIP_SPACING * 2;
+
   const offsetY = () => {
-    if (tooltipSize().height <= itemSize().height) return 0;
-    return (tooltipSize().height / 2 - itemSize().height) / 2;
-  };
-  const TToffsetY = () => {
-    if (tooltipSize().height <= itemSize().height) return 0;
-    return (tooltipSize().height - itemSize().height) / 2;
+    if (tooltipSize.height <= itemSize.height) return 0;
+    return itemSize.height / tooltipSize.height;
   };
 
   return (
     <div
       class="fixed flex"
-      style={`transform: translate(${spacing()}px , ${offsetY()}px);`}
+      style={`transform: translate(${spacing()}px, -${offsetY()}px);`}
       classList={{ ["hidden"]: !show() }}
       onMouseEnter={[setOpen, true]}
       onMouseLeave={[setOpen, false]}
+      ref={(el) => (tooltipRef = el)}
     >
       <div
         // SAFE AREA
         style={`
-          height : ${itemSize().height};
-          width: ${TOOLTIP_SPACING + 25}px;
+          height : ${tooltipSize.height}px;
+          width: ${TOOLTIP_SPACING}px;
           pointer-events: none;
           background-color: ${BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP};
-          transform: translate(0px, ${TToffsetY()}px);
+          transform: translate(0px, 0px); 
         `}
+        class="-z-10 grid items-center"
       >
-        <div class="caret"></div>
+        <Icon name="caret" width={30} />
       </div>
-      <div class="h-fit bg-dw-500" style={`min-height: ${itemSize().height}px;`} ref={(el) => (tooltipRef = el)}>
+      <div
+        class="w-full bg-dw-500"
+        style={`min-height: ${itemSize.height}px `} // ;
+      >
         {props.children}
       </div>
     </div>

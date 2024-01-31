@@ -86,20 +86,19 @@ input[type="range"]:focus::-moz-range-thumb {
   outline: 1px solid #3e4554;
 }
 
-.caret {
-  --TOOLTIP_SPACING: 17px;
-  z-index: -1;
+/* .caret {
   background: #1d1f25;
   display: inline-block;
-  height: 11px;
-  margin-left: 15px;
+  height: 10px;
   position: relative;
   width: 46px;
-  transform: rotate(-90deg) translate(-13.5px, var(--TOOLTIP_SPACING));
   padding: 0;
   border: none;
-}
-.caret:before {
+} */
+
+/** The caret itself */
+/* .caret:before {
+  z-index: -10;
   border-bottom: 20px solid #1d1f25;
   border-left: 23px solid transparent;
   border-right: 23px solid transparent;
@@ -109,5 +108,4 @@ input[type="range"]:focus::-moz-range-thumb {
   position: absolute;
   top: -19.5px;
   width: 0;
-  z-index: -1;
-}
+} */
