@@ -85,27 +85,3 @@ input[type="range"]::-moz-range-thumb {
 input[type="range"]:focus::-moz-range-thumb {
   outline: 1px solid #3e4554;
 }
-
-/* .caret {
-  background: #1d1f25;
-  display: inline-block;
-  height: 10px;
-  position: relative;
-  width: 46px;
-  padding: 0;
-  border: none;
-} */
-
-/** The caret itself */
-/* .caret:before {
-  z-index: -10;
-  border-bottom: 20px solid #1d1f25;
-  border-left: 23px solid transparent;
-  border-right: 23px solid transparent;
-  content: "";
-  height: 0;
-  left: 0;
-  position: absolute;
-  top: -19.5px;
-  width: 0;
-} */
