@@ -1,18 +1,9 @@
-import { type Component, type JSX } from "solid-js";
+import type { Component, JSX, VoidComponent } from "solid-js";
 
 export const CanvasWrapper: Component<{ children: JSX.Element }> = (props) => {
   return <div>{props.children}</div>;
 };
 
-type EventManagerProps = {
-  children: JSX.Element;
-  onHover?: () => void;
-  onLeave?: () => void;
-};
-export const EventManager: Component<EventManagerProps> = (props) => {
-  return (
-    <div data-events onMouseEnter={props.onHover} onMouseLeave={props.onLeave}>
-      {props.children}
-    </div>
-  );
+export const Overlay: VoidComponent = () => {
+  return <div class="backdrop-blur-sm bg-white/10 w-full h-full"></div>;
 };

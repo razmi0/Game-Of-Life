@@ -1,8 +1,8 @@
-import { Show, createSignal, createEffect, children } from "solid-js";
+import { Show, createSignal, createEffect } from "solid-js";
 import { BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP, SHOW_TOOLTIP_DEBUG, TOOLTIP_SPACING } from "../../data";
-import type { JSX, Component, ChildrenReturn } from "solid-js";
 import { createStore } from "solid-js/store";
 import Icon from "../Icons";
+import type { JSX, Component } from "solid-js";
 
 type ItemProps = {
   children?: JSX.Element;

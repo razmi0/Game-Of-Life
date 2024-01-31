@@ -9,10 +9,6 @@ import Icon from "./Icons";
 import { ICON_SIZE, MAX_ALIVE_RANDOM, MAX_DELAY, MIN_ALIVE_RANDOM, MIN_DELAY } from "../data";
 import type { Component, JSX, VoidComponent } from "solid-js";
 
-let ref: HTMLDivElement;
-const title = "Controls";
-const subtitle = "monitoring and control";
-
 type DrawerProps = {
   clock: ClockState;
   board: GridStoreState;
