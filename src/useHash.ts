@@ -1,5 +1,3 @@
-import { createStore } from "solid-js/store";
-
 export function useHash(screen: ScreenStoreState, board: GridStoreState) {
   const hash = {
     hash: new Uint8Array(screen.nCell()).map(() => (board.randomChoice() ? 1 : 0)),
