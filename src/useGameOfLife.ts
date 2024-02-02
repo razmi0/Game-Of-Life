@@ -13,6 +13,73 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
     nDeadIncrease: false,
     randomness: DEFAULT_RANDOMNESS,
 
+    /** first hash generation  */
+    initHash: () => {
+      const hash = new Uint8Array(screen.nCell());
+      for (let i = 0; i < hash.length; i++) {
+        hash[i] = board.randomChoice() ? 1 : 0;
+      }
+      return hash;
+    },
+
+    /** countNeighbord hash */
+    /**
+     *
+     */
+    updateHash: (hash: Uint8Array) => {
+      console.time("updateHash");
+      let i = 0;
+      while (i < hash.length) {
+        const center = hash[i] ?? 0;
+
+        /** Count alive neighbors */
+
+        const top = hash[i - screen.nRow()] ?? 0;
+        const topRight = hash[i - screen.nRow() + 1] ?? 0;
+        const right = hash[i + 1] ?? 0;
+        const bottomRight = hash[i + screen.nRow() + 1] ?? 0;
+        const bottom = hash[i + screen.nRow()] ?? 0;
+        const bottomLeft = hash[i + screen.nRow() - 1] ?? 0;
+        const left = hash[i - 1] ?? 0;
+        const topLeft = hash[i - screen.nRow() - 1] ?? 0;
+
+        const neighbors = top + topRight + right + bottomRight + bottom + bottomLeft + left + topLeft;
+
+        /** Apply rules */
+
+        if (center === 1) {
+          // underpopulation
+          if (neighbors < 2) hash[i] = 0;
+          // overpopulation
+          if (neighbors > 3) hash[i] = 0;
+        } else {
+          // reproduction
+          if (neighbors === 3) hash[i] = 1;
+        }
+
+        i++;
+      }
+      console.time("updateHash");
+
+      console.log("hash : ", hash);
+    },
+
+    // countAliveNeighbors: (row: number, col: number) => {
+    //   let aliveNeighbors = 0;
+    //   const rowLength = board.grid[0].length;
+    //   const colLength = board.grid.length;
+
+    //   for (let offsetRow = -1; offsetRow <= 1; offsetRow++) {
+    //     for (let offsetCol = -1; offsetCol <= 1; offsetCol++) {
+    //       if (row + offsetRow < 0 || row + offsetRow >= colLength) continue;
+    //       if (col + offsetCol < 0 || col + offsetCol >= rowLength) continue;
+    //       if (offsetRow === 0 && offsetCol === 0) continue;
+    //       if (board.grid[row + offsetRow][col + offsetCol].isAlive) aliveNeighbors++;
+    //     }
+    //   }
+    //   return aliveNeighbors;
+    // },
+
     /**
      * Random choice
      */
@@ -35,9 +102,11 @@ export default function useGameOfLife(screen: ScreenStoreState, ctx: Accessor<Ca
       let deads = 0;
       const newGrid = Array.from({ length: screen.nRow() }, (_, i) =>
         Array.from({ length: screen.nCol() }, (_, j) => {
-          const x = i * CELL_WIDTH;
-          const y = j * CELL_WIDTH;
+          const x = i * CELL_WIDTH; // row number
+          const y = j * CELL_WIDTH; // col number
+          /** random or copy ?? random */
           const isAlive = random ? board.randomChoice() : board.grid[i]?.[j]?.isAlive ?? board.randomChoice();
+          /** random or copy ?? random */
           const color = random ? randomColor() : board.grid[i]?.[j]?.color ?? randomColor();
           isAlive ? alives++ : deads++;
           return {

@@ -25,6 +25,10 @@ type ClockState = {
   queueTicks: (ticks: number) => void;
 };
 
+type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
+
 type ScreenStoreState = {
   width: number;
   height: number;
@@ -49,6 +53,8 @@ type GridStoreState = {
   nextGen: () => void;
   reset: () => void;
   changeRandomness: (value: number) => void;
+  initHash: () => Uint8Array;
+  updateHash: () => void;
   // resize: () => void;
   countAliveNeighbors: (row: number, col: number) => number;
   judgement: (cell: Cell, neighbors: number) => boolean;

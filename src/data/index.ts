@@ -8,10 +8,13 @@ const CELL_WIDTH = 20 as const;
 const QUEUE_TICKS_QUANTITY = 25 as const;
 const MAX_DELAY = 1000 as const;
 const MIN_DELAY = 0 as const;
-const MAX_ALIVE_RANDOMNESS = 100 as const;
-const MIN_ALIVE_RANDOMNESS = 0 as const;
+const MAX_ALIVE_RANDOM = 100 as const;
+const MIN_ALIVE_RANDOM = 0 as const;
 const SHUFFLE_MAX_CONSECUTIVE_ALIVE = 3 as const;
 const SHUFFLE_MAX_CONSECUTIVE_DEAD = 10 as const;
+const SHOW_TOOLTIP_DEBUG = false;
+const BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP = "transparent"; // red
+const TOOLTIP_SPACING = 17 as const;
 
 const ICON_SIZE = {
   xs: 15,
@@ -22,6 +25,8 @@ const ICON_SIZE = {
 } as const;
 
 export {
+  TOOLTIP_SPACING,
+  BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP,
   DEFAULT_RANDOMNESS,
   CELL_WIDTH,
   DEFAULT_SPEED,
@@ -30,9 +35,10 @@ export {
   QUEUE_TICKS_QUANTITY,
   MAX_DELAY,
   MIN_DELAY,
-  MAX_ALIVE_RANDOMNESS,
-  MIN_ALIVE_RANDOMNESS,
+  MAX_ALIVE_RANDOM,
+  MIN_ALIVE_RANDOM,
   SHUFFLE_MAX_CONSECUTIVE_ALIVE,
   SHUFFLE_MAX_CONSECUTIVE_DEAD,
+  SHOW_TOOLTIP_DEBUG,
   ICON_SIZE,
 };

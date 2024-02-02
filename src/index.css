@@ -5,6 +5,13 @@
 
 ::root {
   --color: #b3b3b7;
+  /** TW custom colors */
+  --bg-dw-color-100: #efeff3;
+  --bg-dw-color-150: #b3b3b7;
+  --bg-dw-color-200: #7e8baa;
+  --bg-dw-color-300: #4c5366;
+  --bg-dw-color-400: #3e4554;
+  --bg-dw-color-500: #1d1f25;
 }
 
 #root {
@@ -28,6 +35,10 @@
   margin: 1rem 0;
 }
 
+span {
+  z-index: 1;
+}
+
 /*
   Based on TailwindCSS recommendations,
   consider using classes instead of the `@apply` directive
@@ -36,6 +47,7 @@
 /*********** Baseline, reset styles ***********/
 input[type="range"] {
   @apply appearance-none cursor-pointer w-full;
+  appearance: none;
   -webkit-appearance: none;
   background: transparent;
 }

@@ -20,5 +20,9 @@ export default function useScreen() {
     onCleanup(() => window.removeEventListener("resize", screen.updateScreen));
   });
 
+  console.log("Cells : ", screen.nCell());
+  console.log("Cells : ", screen.nRow());
+  console.log("Cells : ", screen.nCol());
+
   return screen;
 }

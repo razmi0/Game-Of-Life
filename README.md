@@ -18,26 +18,23 @@
 
 #### Inputs
 
-pin group
+On group : // for stats ; ranges
+pin => trigger drag
++/- => minimilaze/maximilaze
+cross => close
 
-<ul>
+param
 
-</ul>
+- size
 
-nAlive nDead nGen nSpeed nRandomness population size
-
-// PlayPause => (play/pause switch icons)
-Speed => range input (0-100) + label at left
 range Add to Queue (x) => button to add x to queue
-randomness factor => range input
 
-button disabled Switch clocked => button & data
-
-// button reset => button is data
+(button disabled Switch clocked => button & data) ?
 
 save file ?
 paint the grid?
 typology open closed wrap
+group => remarquable shapes + add it to grid
 
 Cells :
 Age => color

@@ -1,152 +1,162 @@
-import { Portal } from "solid-js/web";
-import { Show, createMemo, createSignal, onCleanup, onMount } from "solid-js";
+import { Show, createSignal } from "solid-js";
 import Wrapper from "./Drawer/Content";
 import Header from "./Drawer/Header";
-import Body from "./Drawer/Body";
 import Group from "./Drawer/Group";
 import Item from "./Drawer/Item";
+import Separator from "./Drawer/Separator";
 import { IconButton } from "./Buttons";
 import Icon from "./Icons";
-import { ICON_SIZE, MAX_ALIVE_RANDOMNESS, MAX_DELAY, MIN_ALIVE_RANDOMNESS, MIN_DELAY } from "../data";
-import type { Component, VoidComponent } from "solid-js";
-
-const portalNode = document.getElementById("portal")! as HTMLDivElement;
-let ref: HTMLDivElement;
-const title = "Controls";
-const subtitle = "monitoring and control";
+import { ICON_SIZE, MAX_ALIVE_RANDOM, MAX_DELAY, MIN_ALIVE_RANDOM, MIN_DELAY } from "../data";
+import type { Component, JSX, VoidComponent } from "solid-js";
 
 type DrawerProps = {
   clock: ClockState;
   board: GridStoreState;
 };
+type EvolutionIconProps = {
+  increaseType: boolean;
+};
 export default function Drawer(props: DrawerProps) {
-  const [isOpen, setIsOpen] = createSignal(false);
-  const trigger = () => setIsOpen(true);
-  const hasStarted = createMemo(() => props.board.generation > 0);
-  const shuffleText = () => (props.board.generation === 0 ? "Pulse of death" : "Pulse of life");
+  const [isOpen, setIsOpen] = createSignal(true);
+  const trigger = () => setIsOpen((p) => !p);
+  const hasStarted = () => props.board.generation > 0;
 
-  const PlayPauseIcon = (
-    <Show when={props.clock.play} fallback={<Icon width={ICON_SIZE.sm} name="play" />}>
-      <Icon width={ICON_SIZE.sm} name="pause" />
+  const playPauseText = () => (props.clock.play ? "pause" : "play");
+  const { xl } = ICON_SIZE;
+
+  const PlayPauseIcon = () => (
+    <Show when={props.clock.play} fallback={<Icon width={ICON_SIZE.xl} name="play" />}>
+      <Icon width={ICON_SIZE.xl} name="pause" />
     </Show>
   );
-
-  type EvolutionIconProps = {
-    increaseType: boolean;
-  };
 
   const EvolutionIcon: Component<EvolutionIconProps> = (props) => (
     <Show
       when={hasStarted() && props.increaseType}
-      fallback={hasStarted() && <Icon width={ICON_SIZE.sm} name="arrowDown" />}
+      fallback={hasStarted() && <Icon width={ICON_SIZE.lg} name="arrowDown" />}
     >
-      <Icon width={ICON_SIZE.sm} name="arrowUp" />
+      <Icon width={ICON_SIZE.lg} name="arrowUp" />
     </Show>
   );
 
-  const AliveEvolutionIcon = <EvolutionIcon increaseType={props.board.nAliveIncrease} />;
-  const DeadEvolutionIcon = <EvolutionIcon increaseType={props.board.nDeadIncrease} />;
+  const AliveEvolutionIcon = () => <EvolutionIcon increaseType={props.board.nAliveIncrease} />;
+  const DeadEvolutionIcon = () => <EvolutionIcon increaseType={props.board.nDeadIncrease} />;
 
-  const RangeRandomLabel = (
-    <div class="flex w-full">
-      <span>Alive/dead ratio : </span>
-      <Spacer />
-      <span>{props.board.randomness + " %"}</span>
-    </div>
-  );
-
-  const RangeDelayLabel = (
-    <div class="flex justify-start w-full">
-      <span>Delay : </span>
-      <Spacer />
-      <span>{props.clock.speed + " ms"}</span>
-    </div>
-  );
-
-  const handleSpeedChange = (e: Event) => {
-    const newTime = (e.target as HTMLInputElement).valueAsNumber;
-    props.clock.changeSpeed(newTime);
+  const StatsTooltip: Component = () => {
+    return (
+      <div class="flex flex-col py-2 px-3 gap-1 w-44 bg-dw-500">
+        <div class="flex items-center justify-between z-10 w-full">
+          <span>generation : </span>
+          <span class="w-fit">{props.board.generation}</span>
+        </div>
+        <div class="flex items-center justify-between z-10 w-full">
+          <span>total cells : </span>
+          <span class="w-fit"> {props.board.nAlive + props.board.nDead}</span>
+        </div>
+        <div class="flex items-center justify-between z-10 w-full gap-2">
+          <span>deads : </span>
+          <span class="w-fit grid grid-row-1 grid-cols-2 items-center gap-1">
+            <DeadEvolutionIcon />
+            {props.board.nDead}
+          </span>
+        </div>
+        <div class="flex items-center justify-between z-10 w-full gap-2">
+          <span>alives : </span>
+          <span class="w-fit grid grid-row-1 grid-cols-2 items-center gap-1">
+            <AliveEvolutionIcon />
+            {props.board.nAlive}
+          </span>
+        </div>
+      </div>
+    );
   };
 
-  const handleRandomChange = (e: Event) => {
-    const newRandom = (e.target as HTMLInputElement).valueAsNumber;
-    props.board.changeRandomness(newRandom);
-  };
-
-  onMount(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (ref && !ref.contains(e.target as Node)) setIsOpen(false);
+  const DelayTooltip = () => {
+    const handleSpeedChange = (e: Event) => {
+      const newTime = (e.target as HTMLInputElement).valueAsNumber;
+      props.clock.changeSpeed(newTime);
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    onCleanup(() => document.removeEventListener("mousedown", handleClickOutside));
-  });
+    return <Range onChange={handleSpeedChange} value={props.clock.speed} max={MAX_DELAY} min={MIN_DELAY} />;
+  };
+
+  const RandomTooltip = () => {
+    const handleRandomChange = (e: Event) => {
+      const newRandom = (e.target as HTMLInputElement).valueAsNumber;
+      props.board.changeRandomness(newRandom);
+    };
+    return (
+      <Range
+        onChange={handleRandomChange}
+        value={props.board.randomness}
+        min={MIN_ALIVE_RANDOM}
+        max={MAX_ALIVE_RANDOM}
+      />
+    );
+  };
+
+  const StandardTooltip: Component<{ children: JSX.Element }> = (props) => (
+    <div class="flex h-fit w-40 p-2 bg-dw-500">
+      <span class="text-balance">{props.children}</span>
+    </div>
+  );
 
   return (
-    <Portal mount={portalNode}>
-      <Wrapper trigger={trigger} open={isOpen()} ref={ref}>
-        <Header
-          title={title}
-          subtitle={subtitle}
-          right={
-            <IconButton
-              onClick={trigger}
-              width={ICON_SIZE.lg}
-              name="chevron"
-              classes="hover:bg-dw-300 p-1 rounded-full"
-            />
+    <Wrapper trigger={trigger} open={isOpen()}>
+      <Header>
+        <IconButton onClick={trigger} width={xl} name="chevron" classes="hover:bg-dw-300 p-1 rounded-full" />
+      </Header>
+      <Separator />
+      <Group>
+        <Item
+          onClick={props.clock.playPause}
+          tooltip={<div class="w-fit pe-3 ps-3 flex place-items-center h-full bg-dw-500">{playPauseText()}</div>}
+        >
+          <PlayPauseIcon />
+        </Item>
+
+        <Item
+          tooltip={<StandardTooltip>reset the board to a new original fresh random board</StandardTooltip>}
+          onClick={props.board.reset}
+        >
+          <Icon width={xl} name="reset" />
+        </Item>
+      </Group>
+      <Separator />
+      <Group>
+        <Item
+          tooltip={<StandardTooltip>shuffle this board, randomly adding a pulse of life</StandardTooltip>}
+          onClick={props.board.shuffle}
+        >
+          <Icon width={xl} name={"baby"} />
+        </Item>
+        <Item
+          tooltip={
+            <StandardTooltip>
+              change the speed of the simulation <DelayTooltip />
+            </StandardTooltip>
           }
-        />
-        <Body>
-          {/* GROUP 1 */}
-
-          <Group title="Control" classes="mt-1">
-            <Item left={PlayPauseIcon} onClick={props.clock.playPause}>
-              <Show when={props.clock.play}>Pause</Show>
-              <Show when={!props.clock.play}>Play</Show>
-            </Item>
-            <Item left={<Icon width={ICON_SIZE.sm} name="baby" />} onClick={props.board.shuffle}>
-              {shuffleText()}
-            </Item>
-            <Item left={<Icon width={ICON_SIZE.sm} name="reset" />} onClick={props.board.reset}>
-              Reset
-            </Item>
-          </Group>
-
-          {/* GROUP 2 */}
-
-          <Group title="Settings" classes="gap-4 mt-1" left={<Icon width={ICON_SIZE.md} name="gear" />}>
-            <Item left={<Icon width={ICON_SIZE.xl} name="clock" />} label={RangeDelayLabel} hover={false}>
-              <Range onChange={handleSpeedChange} value={props.clock.speed} max={MAX_DELAY} min={MIN_DELAY} />
-            </Item>
-            <Item left={<Icon width={ICON_SIZE.xl} name="random" />} label={RangeRandomLabel} hover={false}>
-              <Range
-                onChange={handleRandomChange}
-                value={props.board.randomness}
-                min={MIN_ALIVE_RANDOMNESS}
-                max={MAX_ALIVE_RANDOMNESS}
-              />
-            </Item>
-          </Group>
-
-          {/* GROUP 3 */}
-
-          <Group classes="gap-0" title="Stats" left={<Icon width={ICON_SIZE.lg} name="wave" />}>
-            <Item hover={false} left={"Total cells : "}>
-              {props.board.nAlive + props.board.nDead}
-            </Item>
-            <Item hover={false} left={"Generation : "}>
-              {props.board.generation}
-            </Item>
-            <Item hover={false} left={DeadEvolutionIcon}>
-              Deads : {props.board.nDead}
-            </Item>
-            <Item hover={false} left={AliveEvolutionIcon}>
-              Alives : {props.board.nAlive}
-            </Item>
-          </Group>
-        </Body>
-      </Wrapper>
-    </Portal>
+        >
+          <Icon width={xl} name="speed" />
+        </Item>
+        <Item
+          tooltip={
+            <StandardTooltip>
+              change the ratio between alive cells and dead cells when reseting the board
+              <RandomTooltip />
+            </StandardTooltip>
+          }
+        >
+          <Icon width={xl} name="random" />
+        </Item>
+      </Group>
+      <Separator />
+      <Group>
+        <Item tooltip={<StatsTooltip />}>
+          <Icon width={xl} name="wave" />
+        </Item>
+      </Group>
+      <Separator />
+    </Wrapper>
   );
 }
 
