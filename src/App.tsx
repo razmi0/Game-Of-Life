@@ -6,6 +6,7 @@ import useClock from "./useClock";
 import useGameOfLife from "./useGameOfLife";
 import { SimpleButton } from "./components/Buttons";
 import { useHash } from "./useHash";
+import DebuggerPanel from "./components/DebuggerPanel";
 
 let canvas: HTMLCanvasElement;
 const App = () => {
@@ -23,9 +24,9 @@ const App = () => {
 
   return (
     <>
-      <div class="absolute transform-gpu z-50">
+      <DebuggerPanel>
         <SimpleButton handler={hash.updateHash}>evolve hash</SimpleButton>
-      </div>
+      </DebuggerPanel>
       <Drawer clock={clock} board={board} />
       <CanvasWrapper>
         <canvas class="bg-slate-500" width={screen.width} height={screen.height} ref={canvas}></canvas>
