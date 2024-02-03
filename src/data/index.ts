@@ -1,10 +1,10 @@
 /** CONSTANTS */
 
 const DEFAULT_RANDOMNESS = 80;
-const DEFAULT_SPEED = 10 as const;
+const DEFAULT_SPEED = 50 as const;
 const START_IMMEDIATELY = false as const;
 const START_CLOCKED = true as const;
-const CELL_WIDTH = 20 as const;
+const CELL_WIDTH = 5 as const;
 const QUEUE_TICKS_QUANTITY = 25 as const;
 const MAX_DELAY = 1000 as const;
 const MIN_DELAY = 0 as const;
