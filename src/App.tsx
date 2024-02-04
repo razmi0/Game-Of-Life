@@ -18,13 +18,6 @@ const App = () => {
   const { findColor } = useColors(screen.nCell());
   const { updateHash, readHashAndDraw, resetHash } = useHash(screen, data, findColor, ctx);
 
-  //   switchAliveIncrease: () => {
-  //     setData("nAliveIncrease", !data.nAliveIncrease);
-  //   },
-  //   switchDeadIncrease: () => {
-  //     setData("nDeadIncrease", !data.nDeadIncrease);
-  //   },
-
   const run = () => {
     updateHash();
     readHashAndDraw();
