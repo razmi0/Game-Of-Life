@@ -11,15 +11,16 @@ import type { Component, JSX, VoidComponent } from "solid-js";
 
 type DrawerProps = {
   clock: ClockState;
-  board: GridStoreState;
+  data: DataStore;
+  reset: () => void;
 };
 type EvolutionIconProps = {
   increaseType: boolean;
 };
-export default function Drawer(props: DrawerProps) {
+export default function Drawer(props: Prettify<DrawerProps>) {
   const [isOpen, setIsOpen] = createSignal(true);
   const trigger = () => setIsOpen((p) => !p);
-  const hasStarted = () => props.board.generation > 0;
+  const hasStarted = () => props.data.generation > 0;
 
   const playPauseText = () => (props.clock.play ? "pause" : "play");
   const { xl } = ICON_SIZE;
@@ -39,32 +40,32 @@ export default function Drawer(props: DrawerProps) {
     </Show>
   );
 
-  const AliveEvolutionIcon = () => <EvolutionIcon increaseType={props.board.nAliveIncrease} />;
-  const DeadEvolutionIcon = () => <EvolutionIcon increaseType={props.board.nDeadIncrease} />;
+  const AliveEvolutionIcon = () => <EvolutionIcon increaseType={props.data.nAliveIncrease} />;
+  const DeadEvolutionIcon = () => <EvolutionIcon increaseType={props.data.nDeadIncrease} />;
 
   const StatsTooltip: Component = () => {
     return (
       <div class="flex flex-col py-2 px-3 gap-1 w-44 bg-dw-500">
         <div class="flex items-center justify-between z-10 w-full">
           <span>generation : </span>
-          <span class="w-fit">{props.board.generation}</span>
+          <span class="w-fit">{props.data.generation}</span>
         </div>
         <div class="flex items-center justify-between z-10 w-full">
           <span>total cells : </span>
-          <span class="w-fit"> {props.board.nAlive + props.board.nDead}</span>
+          <span class="w-fit"> {props.data.nAlive + props.data.nDead}</span>
         </div>
         <div class="flex items-center justify-between z-10 w-full gap-2">
           <span>deads : </span>
           <span class="w-fit grid grid-row-1 grid-cols-2 items-center gap-1">
             <DeadEvolutionIcon />
-            {props.board.nDead}
+            {props.data.nDead}
           </span>
         </div>
         <div class="flex items-center justify-between z-10 w-full gap-2">
           <span>alives : </span>
           <span class="w-fit grid grid-row-1 grid-cols-2 items-center gap-1">
             <AliveEvolutionIcon />
-            {props.board.nAlive}
+            {props.data.nAlive}
           </span>
         </div>
       </div>
@@ -82,12 +83,12 @@ export default function Drawer(props: DrawerProps) {
   const RandomTooltip = () => {
     const handleRandomChange = (e: Event) => {
       const newRandom = (e.target as HTMLInputElement).valueAsNumber;
-      props.board.changeRandomness(newRandom);
+      props.data.setRandom(newRandom);
     };
     return (
       <Range
         onChange={handleRandomChange}
-        value={props.board.randomness}
+        value={props.data.randomness}
         min={MIN_ALIVE_RANDOM}
         max={MAX_ALIVE_RANDOM}
       />
@@ -115,20 +116,20 @@ export default function Drawer(props: DrawerProps) {
         </Item>
 
         <Item
-          tooltip={<StandardTooltip>reset the board to a new original fresh random board</StandardTooltip>}
-          onClick={props.board.reset}
+          tooltip={<StandardTooltip>reset the data to a new original fresh random data</StandardTooltip>}
+          onClick={props.reset}
         >
           <Icon width={xl} name="reset" />
         </Item>
       </Group>
       <Separator />
       <Group>
-        <Item
-          tooltip={<StandardTooltip>shuffle this board, randomly adding a pulse of life</StandardTooltip>}
-          onClick={props.board.shuffle}
+        {/* <Item
+          tooltip={<StandardTooltip>shuffle this data, randomly adding a pulse of life</StandardTooltip>}
+          onClick={props.data.shuffle}
         >
           <Icon width={xl} name={"baby"} />
-        </Item>
+        </Item> */}
         <Item
           tooltip={
             <StandardTooltip>
@@ -141,7 +142,7 @@ export default function Drawer(props: DrawerProps) {
         <Item
           tooltip={
             <StandardTooltip>
-              change the ratio between alive cells and dead cells when reseting the board
+              change the ratio between alive cells and dead cells when reseting the data
               <RandomTooltip />
             </StandardTooltip>
           }

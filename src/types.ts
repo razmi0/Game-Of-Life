@@ -38,25 +38,46 @@ type ScreenStoreState = {
   updateScreen: () => void;
 };
 
-type GridStoreState = {
-  grid: GridType;
+type DataStore = {
   generation: number;
+  incrementGeneration: () => void;
+
   nAlive: number;
+  setAlive: (value: number) => void;
+
   nAliveIncrease: boolean;
+  switchAliveIncrease: () => void;
+
   nDead: number;
+  setDead: (value: number) => void;
+
   nDeadIncrease: boolean;
+  switchDeadIncrease: () => void;
+
   randomness: number;
   randomChoice: () => boolean;
-  shuffle: () => void;
-  build: (random: boolean) => GridType;
-  draw: () => void;
-  nextGen: () => void;
-  reset: () => void;
-  changeRandomness: (value: number) => void;
-  initHash: () => Uint8Array;
-  updateHash: () => void;
-  // resize: () => void;
-  countAliveNeighbors: (row: number, col: number) => number;
-  judgement: (cell: Cell, neighbors: number) => boolean;
-  nextCycle: () => void;
+  setRandom: (value: number) => void;
 };
+
+// type GridStoreState = {
+//   grid: GridType;
+//   generation: number;
+//   nAlive: number;
+//   nAliveIncrease: boolean;
+//   nDead: number;
+//   nDeadIncrease: boolean;
+//   randomness: number;
+//   randomChoice: () => boolean;
+//   shuffle: () => void;
+//   build: (random: boolean) => GridType;
+//   draw: () => void;
+//   nextGen: () => void;
+//   reset: () => void;
+//   changeRandomness: (value: number) => void;
+//   initHash: () => Uint8Array;
+//   updateHash: () => void;
+//   // resize: () => void;
+//   countAliveNeighbors: (row: number, col: number) => number;
+//   judgement: (cell: Cell, neighbors: number) => boolean;
+//   nextCycle: () => void;
+// };

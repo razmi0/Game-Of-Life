@@ -7,6 +7,9 @@ export default function useData() {
     incrementGeneration: () => {
       setData("generation", data.generation + 1);
     },
+    resetGeneration: () => {
+      setData("generation", 0);
+    },
 
     nAlive: 0,
     setAlive: (value: number) => {

@@ -40,5 +40,5 @@ export default function useColors(nCell: number) {
 
   initColors();
 
-  return findColor;
+  return { findColor };
 }
