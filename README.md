@@ -56,4 +56,4 @@ A[grid] --evolve--> A[grid]
 ```
 
 evolve : count judge on hash and evolve hash mutate hash
-update : grid from hash // copie grid
+update : grid from hash 
