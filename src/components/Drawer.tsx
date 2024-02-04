@@ -156,5 +156,3 @@ const Range: VoidComponent<RangeProps> = (props) => {
     <input type="range" class="w-full" onChange={(e) => props.onChange(e)} max={max} min={min} value={props.value} />
   );
 };
-
-const Spacer = () => <div class="flex-grow"></div>;

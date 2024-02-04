@@ -22,7 +22,7 @@ export const SimpleButton = (props: SimpleButtonProps) => {
   return (
     <button
       onClick={props.handler}
-      class=" z-50 cursor-pointer w-fit h-fit py-2 px-3 bg-dw-500 text-dw-100 rounded-md hover:bg-dw-100 hover:text-dw-200"
+      class=" z-50 cursor-pointer w-fit h-fit py-1 px-3 bg-dw-500 text-dw-100 rounded-sm hover:bg-dw-100 hover:text-dw-200"
     >
       {props.children}
     </button>
