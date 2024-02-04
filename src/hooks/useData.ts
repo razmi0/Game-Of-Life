@@ -16,19 +16,9 @@ export default function useData() {
       setData("nAlive", value);
     },
 
-    nAliveIncrease: false,
-    switchAliveIncrease: () => {
-      setData("nAliveIncrease", !data.nAliveIncrease);
-    },
-
     nDead: 0,
     setDead: (value: number) => {
       setData("nDead", value);
-    },
-
-    nDeadIncrease: false,
-    switchDeadIncrease: () => {
-      setData("nDeadIncrease", !data.nDeadIncrease);
     },
 
     randomness: DEFAULT_RANDOMNESS,

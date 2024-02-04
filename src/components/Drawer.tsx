@@ -31,18 +31,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     </Show>
   );
 
-  const EvolutionIcon: Component<EvolutionIconProps> = (props) => (
-    <Show
-      when={hasStarted() && props.increaseType}
-      fallback={hasStarted() && <Icon width={ICON_SIZE.lg} name="arrowDown" />}
-    >
-      <Icon width={ICON_SIZE.lg} name="arrowUp" />
-    </Show>
-  );
-
-  const AliveEvolutionIcon = () => <EvolutionIcon increaseType={props.data.nAliveIncrease} />;
-  const DeadEvolutionIcon = () => <EvolutionIcon increaseType={props.data.nDeadIncrease} />;
-
   const StatsTooltip: Component = () => {
     return (
       <div class="flex flex-col py-2 px-3 gap-1 w-44 bg-dw-500">
@@ -56,17 +44,11 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         </div>
         <div class="flex items-center justify-between z-10 w-full gap-2">
           <span>deads : </span>
-          <span class="w-fit grid grid-row-1 grid-cols-2 items-center gap-1">
-            <DeadEvolutionIcon />
-            {props.data.nDead}
-          </span>
+          <span class="w-fit grid grid-row-1 grid-cols-2 items-center gap-1">{props.data.nDead}</span>
         </div>
         <div class="flex items-center justify-between z-10 w-full gap-2">
           <span>alives : </span>
-          <span class="w-fit grid grid-row-1 grid-cols-2 items-center gap-1">
-            <AliveEvolutionIcon />
-            {props.data.nAlive}
-          </span>
+          <span class="w-fit grid grid-row-1 grid-cols-2 items-center gap-1">{props.data.nAlive}</span>
         </div>
       </div>
     );

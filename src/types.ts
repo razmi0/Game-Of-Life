@@ -45,14 +45,8 @@ type DataStore = {
   nAlive: number;
   setAlive: (value: number) => void;
 
-  nAliveIncrease: boolean;
-  switchAliveIncrease: () => void;
-
   nDead: number;
   setDead: (value: number) => void;
-
-  nDeadIncrease: boolean;
-  switchDeadIncrease: () => void;
 
   randomness: number;
   randomChoice: () => boolean;

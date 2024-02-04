@@ -1,5 +1,6 @@
 import { Accessor, batch } from "solid-js";
 import { CELL_WIDTH } from "../data";
+import { confirmTendency } from "../helpers";
 
 type Hash8Type = Uint8Array & { [index: number]: 0 | 1 };
 type Hash8 = Prettify<Hash8Type>;
