@@ -32,7 +32,7 @@ const App = () => {
     if (screen.width) readHashAndDraw();
   });
 
-  const clock = useClock(run);
+  const { clock, changeSpeed } = useClock(run);
 
   onMount(() => {
     setCtx(canvas.getContext("2d")!);
@@ -44,10 +44,10 @@ const App = () => {
       <Show when={import.meta.env.DEV}>
         <DebuggerPanel>
           <SimpleButton handler={run}>run hash</SimpleButton>
-          <SimpleButton handler={clock.playPause}>{clock.play ? "pause" : "play"}</SimpleButton>
+          <SimpleButton handler={clock.switchPlayPause}>{clock.play ? "pause" : "play"}</SimpleButton>
         </DebuggerPanel>
       </Show>
-      <Drawer clock={clock} data={data} reset={reset} />
+      <Drawer clock={clock} data={data} reset={reset} changeSpeed={changeSpeed} />
       <CanvasWrapper>
         <canvas class="bg-slate-500" width={screen.width} height={screen.height} ref={canvas}></canvas>
       </CanvasWrapper>

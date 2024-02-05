@@ -11,19 +11,17 @@ type GridType = Cell[][];
 type ClockState = {
   play: boolean;
   speed: number;
-  tick: number;
   clocked: boolean;
+  tick: number;
   limiter: boolean;
   queue: number;
-  playPause: () => void;
   run: () => void;
   work: () => void;
-  changeSpeed: (speed: number) => void;
-  switchClocked: () => void;
-  addSpeed: () => void;
-  subSpeed: () => void;
+  switchPlayPause: () => void;
   queueTicks: (ticks: number) => void;
 };
+
+type ClockQueueTicksMode = "clocked" | "free";
 
 type Prettify<T> = {
   [K in keyof T]: T[K];

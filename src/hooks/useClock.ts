@@ -1,11 +1,18 @@
 import { type SetStoreFunction, Store, createStore } from "solid-js/store";
 import { DEFAULT_SPEED, START_CLOCKED, START_IMMEDIATELY } from "../data";
 
-type ClockQueueTicksMode = "clocked" | "free";
 /**
  * Gen playback controls
  * @returns
  */
+
+type ClockHook = {
+  clock: Store<ClockState>;
+  switchClocked: () => void;
+  changeSpeed: (speed: number) => void;
+  addSpeed: () => void;
+  subSpeed: () => void;
+};
 export default function useClock(fn: () => void) {
   const [clock, setClock] = createStore({
     play: START_IMMEDIATELY,
@@ -14,7 +21,7 @@ export default function useClock(fn: () => void) {
     tick: 0,
     limiter: false,
     queue: 0,
-    playPause: () => {
+    switchPlayPause: () => {
       setClock("play", !clock.play);
       clock.run();
     },
@@ -27,7 +34,7 @@ export default function useClock(fn: () => void) {
       if (!clock.play) return;
       if (clock.limiter && clock.queue <= 0) {
         setClock("limiter", false);
-        clock.playPause();
+        clock.switchPlayPause();
         return;
       }
       clock.work();
@@ -37,13 +44,25 @@ export default function useClock(fn: () => void) {
     queueTicks: (ticks: number) => {
       setClock("queue", ticks + clock.queue);
       setClock("limiter", true);
-      clock.play && clock.playPause();
+      clock.play && clock.switchPlayPause();
     },
-    changeSpeed: (speed: number) => setClock("speed", speed),
-    switchClocked: () => setClock("clocked", !clock.clocked),
-    addSpeed: () => setClock("speed", Math.min(Math.max(Math.floor(clock.speed / 2), 0), 100)),
-    subSpeed: () => setClock("speed", clock.speed + 100),
-  }) as [Store<ClockState>, SetStoreFunction<ClockState>];
+  });
 
-  return clock;
+  const switchClocked = () => {
+    setClock("clocked", !clock.clocked);
+  };
+
+  const changeSpeed = (speed: number) => {
+    setClock("speed", speed);
+  };
+
+  const addSpeed = () => {
+    setClock("speed", Math.min(Math.max(Math.floor(clock.speed / 2), 0), 100));
+  };
+
+  const subSpeed = () => {
+    setClock("speed", clock.speed + 100);
+  };
+
+  return { clock, switchClocked, changeSpeed, addSpeed, subSpeed } as Prettify<ClockHook>;
 }

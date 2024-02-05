@@ -1,4 +1,4 @@
-import { Show, createSignal, For } from "solid-js";
+import { Show, createSignal, For, createMemo } from "solid-js";
 import Wrapper from "./Drawer/Content";
 import Header from "./Drawer/Header";
 import Group from "./Drawer/Group";
@@ -13,18 +13,17 @@ type DrawerProps = {
   clock: ClockState;
   data: DataStore;
   reset: () => void;
+  changeSpeed: (newTime: number) => void;
 };
-type EvolutionIconProps = {
-  increaseType: boolean;
-};
+
 export default function Drawer(props: Prettify<DrawerProps>) {
   const [isOpen, setIsOpen] = createSignal(true);
   const trigger = () => setIsOpen((p) => !p);
-  const hasStarted = () => props.data.generation > 0;
+  // const hasStarted = () => props.data.generation > 0;
 
-  const playPauseText = () => (props.clock.play ? "pause" : "play");
   const { xl } = ICON_SIZE;
 
+  const playPauseText = () => (props.clock.play ? "pause" : "play");
   const PlayPauseIcon = () => (
     <Show when={props.clock.play} fallback={<Icon width={ICON_SIZE.xl} name="play" />}>
       <Icon width={ICON_SIZE.xl} name="pause" />
@@ -33,8 +32,8 @@ export default function Drawer(props: Prettify<DrawerProps>) {
 
   const DelayTooltip = () => {
     const handleSpeedChange = (e: Event) => {
-      const newTime = (e.target as HTMLInputElement).valueAsNumber;
-      props.clock.changeSpeed(newTime);
+      const newSpeed = (e.target as HTMLInputElement).valueAsNumber;
+      props.changeSpeed(newSpeed);
     };
     return <Range onChange={handleSpeedChange} value={props.clock.speed} max={MAX_DELAY} min={MIN_DELAY} />;
   };
@@ -60,7 +59,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     </div>
   );
 
-  const stats = () => [
+  const stats = createMemo(() => [
     {
       label: "generation",
       value: props.data.generation,
@@ -81,7 +80,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       label: "alive cells",
       value: props.data.nAlive,
     },
-  ];
+  ]);
 
   return (
     <Wrapper trigger={trigger} open={isOpen()}>
@@ -91,7 +90,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Separator />
       <Group>
         <Item
-          onClick={props.clock.playPause}
+          onClick={props.clock.switchPlayPause}
           tooltip={<div class="w-fit pe-3 ps-3 flex place-items-center h-full bg-dw-500">{playPauseText()}</div>}
         >
           <PlayPauseIcon />
@@ -106,12 +105,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       </Group>
       <Separator />
       <Group>
-        {/* <Item
-          tooltip={<StandardTooltip>shuffle this data, randomly adding a pulse of life</StandardTooltip>}
-          onClick={props.data.shuffle}
-        >
-          <Icon width={xl} name={"baby"} />
-        </Item> */}
         <Item
           tooltip={
             <StandardTooltip>
@@ -171,19 +164,6 @@ const StatsTooltip: Component<StatsTooltipProps> = (props) => {
           </div>
         )}
       </For>
-
-      {/* <div class="flex items-center justify-between z-10 w-full">
-        <span>total cells : </span>
-        <span class="w-fit"> {props.data.nAlive + props.data.nDead}</span>
-      </div>
-      <div class="flex items-center justify-between z-10 w-full ">
-        <span>deads : </span>
-        <span class="w-fit ">{props.data.nDead}</span>
-      </div>
-      <div class="flex items-center justify-between z-10 w-full ">
-        <span>alives : </span>
-        <span class="w-fit ">{props.data.nAlive}</span>
-      </div> */}
     </div>
   );
 };
