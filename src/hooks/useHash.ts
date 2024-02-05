@@ -66,13 +66,18 @@ export default function useHash(
     const rowSize = screen.nRow();
     const context = ctx();
     if (!context) return;
-    context.reset();
     while (i < hash.length) {
       const y = Math.floor(i / rowSize) * CELL_WIDTH;
       const x = (i % rowSize) * CELL_WIDTH;
+      if (hash[i]) {
+        context.fillStyle = findColor(i);
+        context.fillRect(x, y, CELL_WIDTH, CELL_WIDTH);
+      } else {
+        context.clearRect(x, y, CELL_WIDTH, CELL_WIDTH);
+      }
 
-      context.fillStyle = hash[i] ? findColor(i) : "black";
-      context.fillRect(x, y, CELL_WIDTH, CELL_WIDTH);
+      // context.fillStyle = hash[i] ? findColor(i) : "black";
+      // context.fillRect(x, y, CELL_WIDTH, CELL_WIDTH);
 
       i++;
     }
