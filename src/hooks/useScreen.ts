@@ -31,5 +31,5 @@ export default function useScreen() {
   console.log("Number of cols : ", screen.nRow());
   console.log("Number of rows : ", screen.nCol());
 
-  return screen;
+  return screen as Prettify<ScreenStoreState>;
 }
