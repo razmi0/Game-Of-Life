@@ -38,19 +38,3 @@ group => remarquable shapes + add it to grid
 
 Cells :
 Age => color
-
-algo : read through hash to generate grid
-hash evolve and than buildFromhash fn
-
-```mermaid
-graph LR
-A[hash] --evolve--> A[hash] --update--> B[grid]
-```
-
-```mermaid
-graph LR
-A[grid] --evolve--> A[grid]
-```
-
-evolve : count judge on hash and evolve hash mutate hash
-update : grid from hash // copie grid
