@@ -1,4 +1,4 @@
-import { Show, createSignal } from "solid-js";
+import { Show, createSignal, For } from "solid-js";
 import Wrapper from "./Drawer/Content";
 import Header from "./Drawer/Header";
 import Group from "./Drawer/Group";
@@ -7,7 +7,7 @@ import Separator from "./Drawer/Separator";
 import { IconButton } from "./Buttons";
 import Icon from "./Icons";
 import { ICON_SIZE, MAX_ALIVE_RANDOM, MAX_DELAY, MIN_ALIVE_RANDOM, MIN_DELAY } from "../data";
-import type { Component, JSX, VoidComponent } from "solid-js";
+import type { Component, JSX, JSXElement, VoidComponent } from "solid-js";
 
 type DrawerProps = {
   clock: ClockState;
@@ -30,29 +30,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Icon width={ICON_SIZE.xl} name="pause" />
     </Show>
   );
-
-  const StatsTooltip: Component = () => {
-    return (
-      <div class="flex flex-col py-2 px-3 gap-1 w-44 bg-dw-500">
-        <div class="flex items-center justify-between z-10 w-full">
-          <span>generation : </span>
-          <span class="w-fit">{props.data.generation}</span>
-        </div>
-        <div class="flex items-center justify-between z-10 w-full">
-          <span>total cells : </span>
-          <span class="w-fit"> {props.data.nAlive + props.data.nDead}</span>
-        </div>
-        <div class="flex items-center justify-between z-10 w-full gap-2">
-          <span>deads : </span>
-          <span class="w-fit grid grid-row-1 grid-cols-2 items-center gap-1">{props.data.nDead}</span>
-        </div>
-        <div class="flex items-center justify-between z-10 w-full gap-2">
-          <span>alives : </span>
-          <span class="w-fit grid grid-row-1 grid-cols-2 items-center gap-1">{props.data.nAlive}</span>
-        </div>
-      </div>
-    );
-  };
 
   const DelayTooltip = () => {
     const handleSpeedChange = (e: Event) => {
@@ -82,6 +59,29 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <span class="text-balance">{props.children}</span>
     </div>
   );
+
+  const stats = () => [
+    {
+      label: "generation",
+      value: props.data.generation,
+    },
+    {
+      label: "speed",
+      value: props.clock.speed,
+    },
+    {
+      label: "randomness",
+      value: props.data.randomness,
+    },
+    {
+      label: "total cells",
+      value: props.data.nAlive + props.data.nDead,
+    },
+    {
+      label: "alive cells",
+      value: props.data.nAlive,
+    },
+  ];
 
   return (
     <Wrapper trigger={trigger} open={isOpen()}>
@@ -134,7 +134,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       </Group>
       <Separator />
       <Group>
-        <Item tooltip={<StatsTooltip />}>
+        <Item tooltip={<StatsTooltip data={stats()} />}>
           <Icon width={xl} name="wave" />
         </Item>
       </Group>
@@ -154,5 +154,36 @@ const Range: VoidComponent<RangeProps> = (props) => {
   const max = props.max || 1000;
   return (
     <input type="range" class="w-full" onChange={(e) => props.onChange(e)} max={max} min={min} value={props.value} />
+  );
+};
+
+type StatsTooltipProps = {
+  data: { label: string; value: JSXElement }[];
+};
+const StatsTooltip: Component<StatsTooltipProps> = (props) => {
+  return (
+    <div class="flex flex-col py-2 px-3 gap-1 w-44 bg-dw-500">
+      <For each={props.data}>
+        {(data) => (
+          <div class="flex items-center justify-between z-10 w-full">
+            <span>{data.label} : </span>
+            <span class="w-fit">{data.value}</span>
+          </div>
+        )}
+      </For>
+
+      {/* <div class="flex items-center justify-between z-10 w-full">
+        <span>total cells : </span>
+        <span class="w-fit"> {props.data.nAlive + props.data.nDead}</span>
+      </div>
+      <div class="flex items-center justify-between z-10 w-full ">
+        <span>deads : </span>
+        <span class="w-fit ">{props.data.nDead}</span>
+      </div>
+      <div class="flex items-center justify-between z-10 w-full ">
+        <span>alives : </span>
+        <span class="w-fit ">{props.data.nAlive}</span>
+      </div> */}
+    </div>
   );
 };
