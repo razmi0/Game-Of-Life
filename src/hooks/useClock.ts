@@ -7,7 +7,7 @@ import { DEFAULT_SPEED, START_CLOCKED, START_IMMEDIATELY } from "../data";
  */
 
 type ClockHook = {
-  clock: Store<ClockState>;
+  clock: Store<Prettify<ClockState>>;
   switchClocked: () => void;
   changeSpeed: (speed: number) => void;
   addSpeed: () => void;
