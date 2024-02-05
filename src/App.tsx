@@ -27,13 +27,14 @@ const App = () => {
 
   const reset = () => {
     setHasStarted(false);
+    if (clock.play) clock.switchPlayPause();
     resetHash();
+    readHashAndDraw();
     data.resetGeneration();
   };
 
   const changeRandomization = (newRandom: number) => {
     data.setRandom(newRandom);
-    reset();
   };
 
   createEffect(() => {

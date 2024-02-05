@@ -4,7 +4,7 @@ import Header from "./Drawer/Header";
 import Group from "./Drawer/Group";
 import Item from "./Drawer/Item";
 import Separator from "./Drawer/Separator";
-import { IconButton } from "./Buttons";
+import { IconButton, SimpleButton } from "./Buttons";
 import Icon from "./Icons";
 import { ICON_SIZE, MAX_ALIVE_RANDOM, MAX_DELAY, MIN_ALIVE_RANDOM, MIN_DELAY } from "../data";
 import type { Component, JSX, JSXElement, VoidComponent } from "solid-js";
@@ -27,6 +27,11 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   const [isOpen, setIsOpen] = createSignal(true);
   const trigger = () => setIsOpen((p) => !p);
 
+  const fps = () => {
+    if (props.speed === 0) return "max";
+    return (1000 / props.speed).toFixed(2);
+  };
+
   const { xl } = ICON_SIZE;
 
   const playPauseText = () => (props.play ? "pause" : "play");
@@ -36,12 +41,17 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     </Show>
   );
 
-  const DelayTooltip = () => {
+  const SpeedTooltip = () => {
     const handleSpeedChange = (e: Event) => {
       const newSpeed = (e.target as HTMLInputElement).valueAsNumber;
       props.changeSpeed(newSpeed);
     };
-    return <Range onChange={handleSpeedChange} value={props.speed} max={MAX_DELAY} min={MIN_DELAY} />;
+    return (
+      <div class="mt-3 flex gap-2 items-center justify-center min-w-48 max-w-48">
+        <Range class="w-8/12" onChange={handleSpeedChange} value={props.speed} max={MAX_DELAY} min={MIN_DELAY} />
+        <span class="whitespace-nowrap text-dw-200 text-sm font-bold text-right translate-y-[2px]">{`${fps()} fps`}</span>
+      </div>
+    );
   };
 
   const RandomTooltip = () => {
@@ -50,7 +60,15 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       props.randomize(newRandom);
     };
     return (
-      <Range onChange={handleRandomChange} value={props.randomness} min={MIN_ALIVE_RANDOM} max={MAX_ALIVE_RANDOM} />
+      <div class="flex flex-col gap-4 mt-3 min-w-48 max-w-48">
+        <div class="flex gap-2 items-start justify-center">
+          <Range onChange={handleRandomChange} value={props.randomness} min={MIN_ALIVE_RANDOM} max={MAX_ALIVE_RANDOM} />
+          <span class="translate-y-[2px] text-dw-200 text-sm font-bold text-right">{props.randomness}</span>
+        </div>
+        <SimpleButton class="bg-dw-300 w-full hover:bg-dw-200" handler={props.reset}>
+          reset game
+        </SimpleButton>
+      </div>
     );
   };
 
@@ -81,19 +99,27 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   return (
     <Wrapper trigger={trigger} open={isOpen()}>
       <Header>
-        <IconButton onClick={trigger} width={xl} name="chevron" classes="hover:bg-dw-300 p-1 rounded-full" />
+        <IconButton onClick={trigger} width={xl} name="chevron" class="hover:bg-dw-300 p-1 rounded-full" />
       </Header>
       <Separator />
       <Group>
         <Item
           onClick={props.switchPlayPause}
-          tooltip={<div class="w-fit pe-3 ps-3 flex place-items-center h-full bg-dw-500">{playPauseText()}</div>}
+          tooltip={
+            <div class="w-fit pe-3 ps-3 flex place-items-center h-full bg-dw-500">
+              <p>{playPauseText()}</p>
+            </div>
+          }
         >
           <PlayPauseIcon />
         </Item>
 
         <Item
-          tooltip={<StandardTooltip title="reset">reset the data to a new original fresh random data</StandardTooltip>}
+          tooltip={
+            <StandardTooltip title="reset">
+              <p class="min-w-48">reset the data to a new original fresh random data</p>
+            </StandardTooltip>
+          }
           onClick={props.reset}
         >
           <Icon width={xl} name="reset" />
@@ -103,8 +129,9 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Group>
         <Item
           tooltip={
-            <StandardTooltip title="speed">
-              change the speed of the simulation <DelayTooltip />
+            <StandardTooltip title={`speed`}>
+              <p>change the delay between two frames affecting FPS</p>
+              <SpeedTooltip />
             </StandardTooltip>
           }
         >
@@ -113,7 +140,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         <Item
           tooltip={
             <StandardTooltip title="randomness">
-              change the ratio between alive cells and dead cells when reseting the data
+              <p>change the ratio between alive cells and dead cells when reseting the data</p>
               <RandomTooltip />
             </StandardTooltip>
           }
@@ -137,6 +164,7 @@ type RangeProps = {
   value?: number;
   min?: number;
   max?: number;
+  class?: string;
 };
 const Range: VoidComponent<RangeProps> = (props) => {
   const min = props.min === 0 ? 0 : props.min || 10;
@@ -144,7 +172,7 @@ const Range: VoidComponent<RangeProps> = (props) => {
   return (
     <input
       type="range"
-      class="w-full mt-2"
+      class={`w-full mt-2 ${props.class || ""}`}
       onChange={(e) => props.onChange(e)}
       max={max}
       min={min}
@@ -155,37 +183,37 @@ const Range: VoidComponent<RangeProps> = (props) => {
 
 type StandardTooltipProps = {
   children: JSXElement;
-  title?: string;
+  title?: JSXElement;
 };
 const StandardTooltip: Component<StandardTooltipProps> = (props) => (
-  <div class="flex h-fit w-40 p-5 bg-dw-500 flex-col">
+  <div class="flex h-fit w-fit p-5 bg-dw-500 flex-col">
     <Show when={!!props.title}>
-      <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2">{props.title}</h4>
+      <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
     </Show>
-    <span class="text-balance">{props.children}</span>
+    <div class="text-balance">{props.children}</div>
   </div>
 );
 
 type StatsTooltipProps = {
   data: { label: string; value: JSXElement; separator?: boolean }[];
-  title?: string;
+  title?: JSXElement;
 };
 const StatsTooltip: Component<StatsTooltipProps> = (props) => {
   return (
     <div class="flex flex-col p-5 w-fit bg-dw-500">
       <Show when={!!props.title}>
-        <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2">{props.title}</h4>
+        <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
       </Show>
       <div class="gap-1">
         <For each={props.data}>
           {(data) => (
             <>
               <div class="flex items-center justify-between z-10 w-full flex-nowrap">
-                <span class="whitespace-nowrap w-20 text-left">{data.label} : </span>
+                <span class="whitespace-nowrap w-20 text-left">{data.label}</span>
                 <span class="whitespace-nowrap w-20 text-right">{data.value}</span>
               </div>
               <Show when={data.separator}>
-                <Separator classes="w-full my-3" />
+                <Separator classes="w-full my-3 h-[2px]" />
               </Show>
             </>
           )}

@@ -14,6 +14,7 @@ export default function useHash(
   const initHash = () => new Uint8Array(screen.nCell()).map(() => (data.randomChoice() ? 1 : 0)) as Hash8;
 
   let hash = initHash();
+  let flipIndexes: number[] = [];
 
   const resetHash = () => {
     hash = initHash();
@@ -22,7 +23,7 @@ export default function useHash(
   /** updateHash counting alives neighbors and judgment if alive or dead ( mutation in-place ) */
   const updateHash = () => {
     let i = 0;
-    const flipIndexes: number[] = [];
+    flipIndexes = [];
     const rowSize = screen.nRow();
     let zeros = 0;
     let ones = 0;
@@ -61,27 +62,22 @@ export default function useHash(
   };
 
   const readHashAndDraw = () => {
-    console.time("readHash");
     let i = 0;
     const rowSize = screen.nRow();
     const context = ctx();
     if (!context) return;
-    while (i < hash.length) {
-      const y = Math.floor(i / rowSize) * CELL_WIDTH;
-      const x = (i % rowSize) * CELL_WIDTH;
-      if (hash[i]) {
+    while (i < flipIndexes.length) {
+      const y = Math.floor(flipIndexes[i] / rowSize) * CELL_WIDTH;
+      const x = (flipIndexes[i] % rowSize) * CELL_WIDTH; // 1,2,3,4, 5
+      if (hash[flipIndexes[i]]) {
         context.fillStyle = findColor(i);
         context.fillRect(x, y, CELL_WIDTH, CELL_WIDTH);
       } else {
         context.clearRect(x, y, CELL_WIDTH, CELL_WIDTH);
       }
 
-      // context.fillStyle = hash[i] ? findColor(i) : "black";
-      // context.fillRect(x, y, CELL_WIDTH, CELL_WIDTH);
-
       i++;
     }
-    console.timeEnd("readHash");
   };
 
   return { updateHash, readHashAndDraw, resetHash };

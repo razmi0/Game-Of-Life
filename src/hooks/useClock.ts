@@ -37,9 +37,10 @@ export default function useClock(fn: () => void) {
         clock.switchPlayPause();
         return;
       }
+
       clock.work();
-      if (clock.clocked) setTimeout(clock.run, clock.speed);
-      else clock.run();
+
+      if (clock.clocked) setTimeout(() => requestAnimationFrame(clock.run), clock.speed);
     },
     queueTicks: (ticks: number) => {
       setClock("queue", ticks + clock.queue);
@@ -54,6 +55,7 @@ export default function useClock(fn: () => void) {
 
   const changeSpeed = (speed: number) => {
     setClock("speed", speed);
+    console.log(clock.speed);
   };
 
   const addSpeed = () => {
