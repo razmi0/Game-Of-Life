@@ -10,22 +10,28 @@ import { ICON_SIZE, MAX_ALIVE_RANDOM, MAX_DELAY, MIN_ALIVE_RANDOM, MIN_DELAY } f
 import type { Component, JSX, JSXElement, VoidComponent } from "solid-js";
 
 type DrawerProps = {
-  clock: ClockState;
-  data: DataStore;
+  hasStarted: boolean;
+  play: boolean;
+  speed: number;
+  randomness: number;
+  generation: number;
+  nAlive: number;
+  nDead: number;
   reset: () => void;
   changeSpeed: (newTime: number) => void;
+  randomize: (newRandom: number) => void;
+  switchPlayPause: () => void;
 };
 
 export default function Drawer(props: Prettify<DrawerProps>) {
   const [isOpen, setIsOpen] = createSignal(true);
   const trigger = () => setIsOpen((p) => !p);
-  // const hasStarted = () => props.data.generation > 0;
 
   const { xl } = ICON_SIZE;
 
-  const playPauseText = () => (props.clock.play ? "pause" : "play");
+  const playPauseText = () => (props.play ? "pause" : "play");
   const PlayPauseIcon = () => (
-    <Show when={props.clock.play} fallback={<Icon width={ICON_SIZE.xl} name="play" />}>
+    <Show when={props.play} fallback={<Icon width={ICON_SIZE.xl} name="play" />}>
       <Icon width={ICON_SIZE.xl} name="pause" />
     </Show>
   );
@@ -35,50 +41,40 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       const newSpeed = (e.target as HTMLInputElement).valueAsNumber;
       props.changeSpeed(newSpeed);
     };
-    return <Range onChange={handleSpeedChange} value={props.clock.speed} max={MAX_DELAY} min={MIN_DELAY} />;
+    return <Range onChange={handleSpeedChange} value={props.speed} max={MAX_DELAY} min={MIN_DELAY} />;
   };
 
   const RandomTooltip = () => {
     const handleRandomChange = (e: Event) => {
       const newRandom = (e.target as HTMLInputElement).valueAsNumber;
-      props.data.setRandom(newRandom);
+      props.randomize(newRandom);
     };
     return (
-      <Range
-        onChange={handleRandomChange}
-        value={props.data.randomness}
-        min={MIN_ALIVE_RANDOM}
-        max={MAX_ALIVE_RANDOM}
-      />
+      <Range onChange={handleRandomChange} value={props.randomness} min={MIN_ALIVE_RANDOM} max={MAX_ALIVE_RANDOM} />
     );
   };
-
-  const StandardTooltip: Component<{ children: JSX.Element }> = (props) => (
-    <div class="flex h-fit w-40 p-2 bg-dw-500">
-      <span class="text-balance">{props.children}</span>
-    </div>
-  );
 
   const stats = createMemo(() => [
     {
       label: "generation",
-      value: props.data.generation,
+      value: props.generation,
     },
     {
       label: "speed",
-      value: props.clock.speed,
+      value: props.speed,
     },
     {
       label: "randomness",
-      value: props.data.randomness,
+      value: props.randomness,
+      separator: true,
     },
     {
       label: "total cells",
-      value: props.data.nAlive + props.data.nDead,
+      value: props.nAlive + props.nDead,
     },
     {
       label: "alive cells",
-      value: props.data.nAlive,
+      value: `${props.nAlive} (${Math.floor((props.nAlive / (props.nAlive + props.nDead)) * 100)}%)`,
     },
   ]);
 
@@ -90,14 +86,14 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Separator />
       <Group>
         <Item
-          onClick={props.clock.switchPlayPause}
+          onClick={props.switchPlayPause}
           tooltip={<div class="w-fit pe-3 ps-3 flex place-items-center h-full bg-dw-500">{playPauseText()}</div>}
         >
           <PlayPauseIcon />
         </Item>
 
         <Item
-          tooltip={<StandardTooltip>reset the data to a new original fresh random data</StandardTooltip>}
+          tooltip={<StandardTooltip title="reset">reset the data to a new original fresh random data</StandardTooltip>}
           onClick={props.reset}
         >
           <Icon width={xl} name="reset" />
@@ -107,7 +103,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Group>
         <Item
           tooltip={
-            <StandardTooltip>
+            <StandardTooltip title="speed">
               change the speed of the simulation <DelayTooltip />
             </StandardTooltip>
           }
@@ -116,7 +112,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         </Item>
         <Item
           tooltip={
-            <StandardTooltip>
+            <StandardTooltip title="randomness">
               change the ratio between alive cells and dead cells when reseting the data
               <RandomTooltip />
             </StandardTooltip>
@@ -127,7 +123,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       </Group>
       <Separator />
       <Group>
-        <Item tooltip={<StatsTooltip data={stats()} />}>
+        <Item tooltip={<StatsTooltip title={"Stats"} data={stats()} />}>
           <Icon width={xl} name="wave" />
         </Item>
       </Group>
@@ -146,24 +142,55 @@ const Range: VoidComponent<RangeProps> = (props) => {
   const min = props.min === 0 ? 0 : props.min || 10;
   const max = props.max || 1000;
   return (
-    <input type="range" class="w-full" onChange={(e) => props.onChange(e)} max={max} min={min} value={props.value} />
+    <input
+      type="range"
+      class="w-full mt-2"
+      onChange={(e) => props.onChange(e)}
+      max={max}
+      min={min}
+      value={props.value}
+    />
   );
 };
 
+type StandardTooltipProps = {
+  children: JSXElement;
+  title?: string;
+};
+const StandardTooltip: Component<StandardTooltipProps> = (props) => (
+  <div class="flex h-fit w-40 p-5 bg-dw-500 flex-col">
+    <Show when={!!props.title}>
+      <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2">{props.title}</h4>
+    </Show>
+    <span class="text-balance">{props.children}</span>
+  </div>
+);
+
 type StatsTooltipProps = {
-  data: { label: string; value: JSXElement }[];
+  data: { label: string; value: JSXElement; separator?: boolean }[];
+  title?: string;
 };
 const StatsTooltip: Component<StatsTooltipProps> = (props) => {
   return (
-    <div class="flex flex-col py-2 px-3 gap-1 w-44 bg-dw-500">
-      <For each={props.data}>
-        {(data) => (
-          <div class="flex items-center justify-between z-10 w-full">
-            <span>{data.label} : </span>
-            <span class="w-fit">{data.value}</span>
-          </div>
-        )}
-      </For>
+    <div class="flex flex-col p-5 w-fit bg-dw-500">
+      <Show when={!!props.title}>
+        <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2">{props.title}</h4>
+      </Show>
+      <div class="gap-1">
+        <For each={props.data}>
+          {(data) => (
+            <>
+              <div class="flex items-center justify-between z-10 w-full flex-nowrap">
+                <span class="whitespace-nowrap w-20 text-left">{data.label} : </span>
+                <span class="whitespace-nowrap w-20 text-right">{data.value}</span>
+              </div>
+              <Show when={data.separator}>
+                <Separator classes="w-full my-3" />
+              </Show>
+            </>
+          )}
+        </For>
+      </div>
     </div>
   );
 };
