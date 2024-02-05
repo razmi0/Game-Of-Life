@@ -1,7 +1,6 @@
 import { CanvasWrapper } from "./components/Wrappers";
-import { onMount, createSignal, Show } from "solid-js";
+import { onMount, createSignal, Show, createEffect } from "solid-js";
 import useScreen from "./hooks/useScreen";
-import useGameOfLife from "./hooks/useGameOfLife";
 import useHash from "./hooks/useHash";
 import useColors from "./hooks/useColors";
 import useClock from "./hooks/useClock";
@@ -28,6 +27,10 @@ const App = () => {
     resetHash();
     data.resetGeneration();
   };
+
+  createEffect(() => {
+    if (screen.width) readHashAndDraw();
+  });
 
   const clock = useClock(run);
 
