@@ -1,4 +1,4 @@
-import { Accessor, batch, createEffect, createSignal, onCleanup, onMount } from "solid-js";
+import { Accessor, batch, createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 import { CELL_WIDTH } from "../data";
 
 const nRowInit = Math.floor(window.innerHeight / CELL_WIDTH) + 1;
@@ -19,17 +19,17 @@ export default function useScreen() {
   const [nCol, setnCol] = createSignal(nColInit);
   const [nCell, setnCell] = createSignal(nCellInit);
 
-  const calcnRow = () => {
+  const calcnRow = createMemo(() => {
     setnRow(Math.floor(wH() / CELL_WIDTH) + 1);
-  };
+  });
 
-  const calcnCol = () => {
+  const calcnCol = createMemo(() => {
     setnCol(Math.floor(wW() / CELL_WIDTH) + 1);
-  };
+  });
 
-  const calcnCell = () => {
+  const calcnCell = createMemo(() => {
     setnCell(nRow() * nCol());
-  };
+  });
 
   const updateSizes = () => {
     console.log("Resizing screen & cells in useScreen");
