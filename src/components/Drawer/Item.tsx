@@ -33,7 +33,7 @@ const Item: Component<Prettify<ItemProps>> = (props) => {
   const toggleOnClick = !withClick ? () => {} : () => setHovering((p) => !p);
 
   return (
-    <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onClick={toggleOnClick} ref={(el) => (itemRef = el)}>
+    <div ref={(el) => (itemRef = el)} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onClick={toggleOnClick}>
       <Label show={hasLbl}>{props.label}</Label>
       <div
         class={
@@ -43,7 +43,9 @@ const Item: Component<Prettify<ItemProps>> = (props) => {
         onClick={props.onClick}
       >
         <Left show={hasLeft}>{props.left}</Left>
-        <Child show={hasChildren}>{props.children}</Child>
+        <Child show={hasChildren}>
+          <div>{props.children}</div>
+        </Child>
         <Right show={hasRight}>{props.right}</Right>
 
         <Tooltip when={hovering() && hasChildren} itemRef={itemRef!}>
@@ -89,29 +91,31 @@ const Tooltip = (props: TooltipProps) => {
 
   return (
     <div
-      class="fixed flex"
+      class="fixed flex transition-opacity"
       style={`transform: translate(${spacing()}px, -${offsetY()}px);`}
-      classList={{ ["hidden"]: !show() }}
+      classList={{ ["opacity-0"]: !show(), ["opacity-100"]: show() }}
       onMouseEnter={[setOpen, true]}
       onMouseLeave={[setOpen, false]}
       ref={(el) => (tooltipRef = el)}
     >
-      <div
-        // SAFE AREA
-        style={`
+      <Show when={show()}>
+        <div
+          // SAFE AREA
+          style={`
           height : ${tooltipSize.height}px;
           width: ${TOOLTIP_SPACING}px;
           pointer-events: none;
           background-color: ${BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP};
           transform: translate(0px, 0px); 
         `}
-        class="-z-10 grid items-center"
-      >
-        <Icon name="caret" width={30} />
-      </div>
-      <div class="w-full bg-dw-500" style={`min-height: ${itemSize.height}px `}>
-        {props.children}
-      </div>
+          class="-z-10 grid items-center"
+        >
+          <Icon name="caret" width={30} />
+        </div>
+        <div class="w-full bg-dw-500" style={`min-height: ${itemSize.height}px `}>
+          {props.children}
+        </div>
+      </Show>
     </div>
   );
 };

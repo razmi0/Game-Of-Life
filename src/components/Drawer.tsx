@@ -184,7 +184,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           onClick={props.switchPlayPause}
           tooltip={
             <StandardTooltip class="p-3 w-16">
-              <div class="uppercase monserrat tracking-widest text-xs font-bold text-dw-200 translate-y-[3px]">
+              <div class="uppercase monserrat tracking-widest text-xs font-bold text-dw-200 translate-y-[2px]">
                 {playPauseText()}
               </div>
             </StandardTooltip>
@@ -265,7 +265,7 @@ type StatsTooltipProps = {
 };
 const StatsTooltip: Component<StatsTooltipProps> = (props) => {
   return (
-    <div class="flex flex-col p-5 w-fit bg-dw-500 min-w-72 rounded-full">
+    <div class="flex flex-col p-5 w-fit bg-dw-500 min-w-72">
       <Show when={!!props.title}>
         <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
       </Show>
