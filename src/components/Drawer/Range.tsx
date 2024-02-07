@@ -1,4 +1,4 @@
-import { Component, For, JSXElement, Show } from "solid-js";
+import { Component, For, JSXElement, Show, createSignal } from "solid-js";
 import Separator from "./Separator";
 
 type Milestones = [string | number, string | number, string | number, string | number];
@@ -16,6 +16,7 @@ const milestoneLayout = {
 
 export type RangeProps = {
   onChange: (e: Event) => void;
+  onInput?: (e: Event) => void;
   value?: number;
   min?: number;
   max?: number;
@@ -31,6 +32,8 @@ const SimpleRange = (props: RangeProps) => {
   const milestoneIsBoolean = typeof props.milestones === "boolean" ? true : false;
   const milestonesSize = Array.isArray(props.milestones) ? props.milestones.length : 0;
 
+  const handleInput = props.onInput ?? (() => null);
+
   return (
     <div class={`relative mb-5`}>
       <label for={props.aria} class="sr-only">
@@ -44,6 +47,8 @@ const SimpleRange = (props: RangeProps) => {
         max={max}
         class={`h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-yellow-400 ${props.class || ""}`} // prettier-ignore
         onChange={(e) => props.onChange(e)}
+        aria-label={props.aria}
+        onInput={handleInput}
       />
       <Show when={milestoneIsBoolean && props.milestones}>
         <For each={[min, max]}>
@@ -72,20 +77,5 @@ const SimpleRange = (props: RangeProps) => {
     </div>
   );
 };
-
-// const Range: VoidComponent<RangeProps> = (props) => {
-//   const min = props.min === 0 ? 0 : props.min || 10;
-//   const max = props.max || 1000;
-//   return (
-//     <input
-//       type="range"
-//       class={`w-full mt-2 ${props.class || ""}`}
-//       onChange={(e) => props.onChange(e)}
-//       max={max}
-//       min={min}
-//       value={props.value}
-//     />
-//   );
-// };
 
 export default SimpleRange;

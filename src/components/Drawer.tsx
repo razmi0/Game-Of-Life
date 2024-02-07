@@ -1,7 +1,5 @@
-import type { Component, JSXElement } from "solid-js";
 import { For, Show, createMemo, createSignal } from "solid-js";
 import { ICON_SIZE, MAX_ALIVE_RANDOM, MAX_DELAY, MIN_ALIVE_RANDOM, MIN_DELAY } from "../data";
-import useShorcuts, { type Shortcut } from "../hooks/useShorcuts";
 import { IconButton, SimpleButton } from "./Buttons";
 import Wrapper from "./Drawer/Content";
 import Group from "./Drawer/Group";
@@ -10,6 +8,8 @@ import Item from "./Drawer/Item";
 import SimpleRange from "./Drawer/Range";
 import Separator from "./Drawer/Separator";
 import Icon from "./Icons";
+import type { Accessor, Component, JSXElement } from "solid-js";
+import useShorcuts, { type Shortcut } from "../hooks/useShorcuts";
 
 type DrawerProps = {
   hasStarted: boolean;
@@ -66,12 +66,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   ];
   useShorcuts(shorcuts);
 
-  const fps = () => {
-    if (props.speed === 0) return "max";
-    const lbl = 1000 / props.speed; // .toFixed(2)
-    return lbl > 200 ? "200" : Math.floor(lbl);
-  };
-
   const { xl } = ICON_SIZE;
 
   const playPauseText = () => (props.play ? "pause" : "play");
@@ -81,47 +75,70 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     </Show>
   );
 
+  const fps = (speed: number) => {
+    if (speed === 0) return "max fps";
+    const lbl = 1000 / speed;
+    return lbl > 200 ? "200 fps" : Math.floor(lbl) + " fps";
+  };
+
   const SpeedTooltip = () => {
+    const [output, setOutput] = createSignal(fps(props.speed));
+
+    const handleInputOutput = (e: Event) => {
+      setOutput(fps((e.target as HTMLInputElement).valueAsNumber));
+    };
+
     const handleSpeedChange = (e: Event) => {
       const newSpeed = (e.target as HTMLInputElement).valueAsNumber;
       props.changeSpeed(newSpeed);
     };
+
     return (
       <div class="mt-3 flex items-center min-w-48">
         <SimpleRange
           milestones={["10", "20", "200"]}
           onChange={handleSpeedChange}
+          onInput={handleInputOutput}
           value={props.speed}
           max={MAX_DELAY}
           min={MIN_DELAY}
           class="w-56 rotate-180"
           aria="speed"
         />
-        <div class="whitespace-nowrap text-yellow-400 text-sm font-bold translate-y-[-9px] h-full w-16 text-right">{`${fps()} fps`}</div>
+        <div class="whitespace-nowrap text-yellow-400 text-sm font-bold translate-y-[-9px] h-full w-16 text-right">
+          {output()}
+        </div>
       </div>
     );
   };
 
   const RandomTooltip = () => {
+    const [output, setOutput] = createSignal(props.randomness);
+
     const handleRandomChange = (e: Event) => {
       const newRandom = (e.target as HTMLInputElement).valueAsNumber;
       props.randomize(newRandom);
     };
+
+    const handleInputOutput = (e: Event) => {
+      const newRandom = (e.target as HTMLInputElement).valueAsNumber;
+      setOutput(newRandom);
+    };
+
     return (
       <div class="flex flex-col gap-4 mt-3 min-w-48">
         <div class="flex gap-2 items-start ">
           <SimpleRange
+            milestones
             onChange={handleRandomChange}
+            onInput={handleInputOutput}
             value={props.randomness}
             min={MIN_ALIVE_RANDOM}
             max={MAX_ALIVE_RANDOM}
-            milestones
             aria="randomness"
             class="w-56"
           />
-          <div class="translate-y-[1px] text-yellow-400 text-sm font-bold h-full w-8 text-right">
-            {props.randomness}
-          </div>
+          <div class="translate-y-[1px] text-yellow-400 text-sm font-bold h-full w-8 text-right">{output()}</div>
         </div>
         <SimpleButton class="bg-dw-300 w-full hover:bg-dw-200" handler={props.reset}>
           reset game
@@ -130,14 +147,14 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     );
   };
 
-  const stats = createMemo(() => [
+  const stats: Accessor<StatsTooltipData[]> = createMemo(() => [
     {
       label: "generation",
       value: props.generation,
     },
     {
       label: "speed",
-      value: props.speed,
+      value: `${props.speed}ms (${fps(props.speed)})`,
     },
     {
       label: "randomness",
@@ -232,13 +249,14 @@ const StandardTooltip: Component<StandardTooltipProps> = (props) => (
   </div>
 );
 
+type StatsTooltipData = { label: string; value: JSXElement; separator?: boolean };
 type StatsTooltipProps = {
-  data: { label: string; value: JSXElement; separator?: boolean }[];
+  data: StatsTooltipData[];
   title?: JSXElement;
 };
 const StatsTooltip: Component<StatsTooltipProps> = (props) => {
   return (
-    <div class="flex flex-col p-5 w-fit bg-dw-500">
+    <div class="flex flex-col p-5 w-fit bg-dw-500 min-w-72 resize">
       <Show when={!!props.title}>
         <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
       </Show>
@@ -246,9 +264,9 @@ const StatsTooltip: Component<StatsTooltipProps> = (props) => {
         <For each={props.data}>
           {(data) => (
             <>
-              <div class="flex items-center justify-between z-10 w-full flex-nowrap whitespace-nowrap">
+              <div class="flex items-center justify-between z-10 w-full flex-nowrap ">
                 <span class="w-20 text-left">{data.label}</span>
-                <span class="w-20 text-right text-yellow-400">{data.value}</span>
+                <span class="whitespace-nowrap w-20 text-right text-yellow-400">{data.value}</span>
               </div>
               <Show when={data.separator}>
                 <Separator classes="w-full my-3 h-[2px]" />
