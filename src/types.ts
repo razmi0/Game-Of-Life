@@ -27,15 +27,6 @@ type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};
 
-type ScreenStoreState = {
-  width: number;
-  height: number;
-  nRow: () => number;
-  nCol: () => number;
-  nCell: () => number;
-  updateScreen: () => void;
-};
-
 type DataStore = {
   generation: number;
   incrementGeneration: () => void;

@@ -1,5 +1,5 @@
 import { CanvasWrapper } from "./components/Wrappers";
-import { onMount, createSignal, Show, createEffect } from "solid-js";
+import { onMount, createSignal, Show } from "solid-js";
 import useScreen from "./hooks/useScreen";
 import useHash from "./hooks/useHash";
 import useColors from "./hooks/useColors";
@@ -15,13 +15,13 @@ const App = () => {
   const [hasStarted, setHasStarted] = createSignal(false);
   const screen = useScreen(); // context candidate
   const data = useData();
-  const { findColor } = useColors(screen.nCell());
-  const { updateHash, readHashAndDraw, resetHash } = useHash(screen, data, findColor, ctx);
+  const { findColor } = useColors(screen.nCell);
+  const { updateHash, drawHash, resetHash } = useHash(screen, data, findColor, ctx);
 
   const run = () => {
     if (!hasStarted()) setHasStarted(true);
     updateHash();
-    readHashAndDraw();
+    drawHash();
     data.incrementGeneration();
   };
 
@@ -29,17 +29,12 @@ const App = () => {
     setHasStarted(false);
     if (clock.play) clock.switchPlayPause();
     resetHash();
-    readHashAndDraw();
     data.resetGeneration();
   };
 
   const changeRandomization = (newRandom: number) => {
     data.setRandom(newRandom);
   };
-
-  createEffect(() => {
-    if (screen.width && hasStarted()) readHashAndDraw();
-  });
 
   const { clock, changeSpeed } = useClock(run);
 
@@ -54,6 +49,15 @@ const App = () => {
         <DebuggerPanel>
           <SimpleButton handler={run}>run hash</SimpleButton>
           <SimpleButton handler={clock.switchPlayPause}>{clock.play ? "pause" : "play"}</SimpleButton>
+          <SimpleButton
+            handler={() => {
+              console.log("cells : ", screen.nCell());
+              console.log("rows : ", screen.nRow());
+              console.log("cols : ", screen.nCol());
+            }}
+          >
+            log
+          </SimpleButton>
         </DebuggerPanel>
       </Show>
       <Drawer
@@ -70,7 +74,7 @@ const App = () => {
         hasStarted={hasStarted()}
       />
       <CanvasWrapper>
-        <canvas class="bg-black" width={screen.width} height={screen.height} ref={canvas}></canvas>
+        <canvas class="bg-black" width={screen.wW()} height={screen.wH()} ref={canvas}></canvas>
       </CanvasWrapper>
     </>
   );

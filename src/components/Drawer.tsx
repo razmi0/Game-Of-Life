@@ -8,6 +8,7 @@ import { IconButton, SimpleButton } from "./Buttons";
 import Icon from "./Icons";
 import { ICON_SIZE, MAX_ALIVE_RANDOM, MAX_DELAY, MIN_ALIVE_RANDOM, MIN_DELAY } from "../data";
 import type { Component, JSX, JSXElement, VoidComponent } from "solid-js";
+import useShorcuts, { Shortcut } from "../hooks/useShorcuts";
 
 type DrawerProps = {
   hasStarted: boolean;
@@ -26,6 +27,43 @@ type DrawerProps = {
 export default function Drawer(props: Prettify<DrawerProps>) {
   const [isOpen, setIsOpen] = createSignal(true);
   const trigger = () => setIsOpen((p) => !p);
+
+  const shorcuts: Shortcut[] = [
+    {
+      key: " ",
+      action: () => props.switchPlayPause(),
+    },
+    {
+      key: "k",
+      action: () => props.switchPlayPause(),
+    },
+    {
+      key: "r",
+      action: () => props.reset(),
+    },
+    {
+      key: "ArrowUp",
+      action: () => props.changeSpeed(props.speed + 10),
+    },
+    {
+      key: "ArrowDown",
+      action: () => props.changeSpeed(props.speed - 10),
+    },
+    {
+      key: "ArrowRight",
+      action: () => props.randomize(props.randomness + 2),
+    },
+    {
+      key: "ArrowLeft",
+      action: () => props.randomize(props.randomness - 2),
+    },
+    {
+      key: "a",
+      action: () => trigger(),
+      ctrl: true,
+    },
+  ];
+  useShorcuts(shorcuts);
 
   const fps = () => {
     if (props.speed === 0) return "max";
