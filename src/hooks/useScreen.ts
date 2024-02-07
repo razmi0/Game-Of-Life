@@ -1,5 +1,7 @@
-import { Accessor, batch, createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
+import type { Accessor } from "solid-js";
+import { batch, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 import { CELL_WIDTH } from "../data";
+import { debounce } from "../helpers";
 
 const nRowInit = Math.floor(window.innerHeight / CELL_WIDTH) + 1;
 const nColInit = Math.floor(window.innerWidth / CELL_WIDTH) + 1;
@@ -31,16 +33,18 @@ export default function useScreen() {
     setnCell(nRow() * nCol());
   });
 
-  const updateSizes = () => {
+  const updateSizes = debounce(() => {
     console.log("Resizing screen & cells in useScreen");
     batch(() => {
       setWW(window.innerWidth);
       setWH(window.innerHeight);
     });
-    calcnRow();
-    calcnCol();
-    calcnCell();
-  };
+    batch(() => {
+      calcnRow();
+      calcnCol();
+      calcnCell();
+    });
+  }, 100);
 
   onMount(() => {
     window.addEventListener("resize", updateSizes);
