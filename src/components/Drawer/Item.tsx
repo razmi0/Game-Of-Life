@@ -109,10 +109,7 @@ const Tooltip = (props: TooltipProps) => {
       >
         <Icon name="caret" width={30} />
       </div>
-      <div
-        class="w-full bg-dw-500"
-        style={`min-height: ${itemSize.height}px `} // ;
-      >
+      <div class="w-full bg-dw-500" style={`min-height: ${itemSize.height}px `}>
         {props.children}
       </div>
     </div>
