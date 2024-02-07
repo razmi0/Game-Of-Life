@@ -29,8 +29,6 @@ param
 
 range Add to Queue (x) => button to add x to queue
 
-(button disabled Switch clocked => button & data) ?
-
 save file ?
 paint the grid?
 typology open closed wrap
