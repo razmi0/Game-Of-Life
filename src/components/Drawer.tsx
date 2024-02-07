@@ -1,15 +1,15 @@
-import { Show, createSignal, For, createMemo, Switch, Match } from "solid-js";
-import Wrapper from "./Drawer/Content";
-import Header from "./Drawer/Header";
-import Group from "./Drawer/Group";
-import Item from "./Drawer/Item";
-import Separator from "./Drawer/Separator";
-import { IconButton, SimpleButton } from "./Buttons";
-import Icon from "./Icons";
+import type { Component, JSXElement } from "solid-js";
+import { For, Show, createMemo, createSignal } from "solid-js";
 import { ICON_SIZE, MAX_ALIVE_RANDOM, MAX_DELAY, MIN_ALIVE_RANDOM, MIN_DELAY } from "../data";
-import type { Component, JSX, JSXElement, VoidComponent } from "solid-js";
-import useShorcuts, { Shortcut } from "../hooks/useShorcuts";
+import useShorcuts, { type Shortcut } from "../hooks/useShorcuts";
+import { IconButton, SimpleButton } from "./Buttons";
+import Wrapper from "./Drawer/Content";
+import Group from "./Drawer/Group";
+import Header from "./Drawer/Header";
+import Item from "./Drawer/Item";
 import SimpleRange from "./Drawer/Range";
+import Separator from "./Drawer/Separator";
+import Icon from "./Icons";
 
 type DrawerProps = {
   hasStarted: boolean;
@@ -68,7 +68,8 @@ export default function Drawer(props: Prettify<DrawerProps>) {
 
   const fps = () => {
     if (props.speed === 0) return "max";
-    return (1000 / props.speed).toFixed(2);
+    const lbl = 1000 / props.speed; // .toFixed(2)
+    return lbl > 200 ? "200" : Math.floor(lbl);
   };
 
   const { xl } = ICON_SIZE;
@@ -86,17 +87,17 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       props.changeSpeed(newSpeed);
     };
     return (
-      <div class="mt-3 flex gap-3 items-center min-w-48">
+      <div class="mt-3 flex items-center min-w-48">
         <SimpleRange
-          milestones
+          milestones={["10", "20", "200"]}
           onChange={handleSpeedChange}
           value={props.speed}
           max={MAX_DELAY}
           min={MIN_DELAY}
-          class="w-56"
+          class="w-56 rotate-180"
+          aria="speed"
         />
-        {/* <Range class="w-8/12" onChange={handleSpeedChange} value={props.speed} max={MAX_DELAY} min={MIN_DELAY} /> */}
-        <div class="whitespace-nowrap text-yellow-400 text-sm font-bold translate-y-[-9px] h-full w-15 text-right">{`${fps()} fps`}</div>
+        <div class="whitespace-nowrap text-yellow-400 text-sm font-bold translate-y-[-9px] h-full w-16 text-right">{`${fps()} fps`}</div>
       </div>
     );
   };
@@ -109,7 +110,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     return (
       <div class="flex flex-col gap-4 mt-3 min-w-48">
         <div class="flex gap-2 items-start ">
-          {/* <Range onChange={handleRandomChange} value={props.randomness} min={MIN_ALIVE_RANDOM} max={MAX_ALIVE_RANDOM} /> */}
           <SimpleRange
             onChange={handleRandomChange}
             value={props.randomness}
@@ -246,9 +246,9 @@ const StatsTooltip: Component<StatsTooltipProps> = (props) => {
         <For each={props.data}>
           {(data) => (
             <>
-              <div class="flex items-center justify-between z-10 w-full flex-nowrap">
-                <span class="whitespace-nowrap w-20 text-left">{data.label}</span>
-                <span class="whitespace-nowrap w-20 text-right">{data.value}</span>
+              <div class="flex items-center justify-between z-10 w-full flex-nowrap whitespace-nowrap">
+                <span class="w-20 text-left">{data.label}</span>
+                <span class="w-20 text-right text-yellow-400">{data.value}</span>
               </div>
               <Show when={data.separator}>
                 <Separator classes="w-full my-3 h-[2px]" />
