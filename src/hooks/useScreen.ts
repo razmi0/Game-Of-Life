@@ -33,6 +33,7 @@ export default function useScreen() {
     setnCell(nRow() * nCol());
   });
 
+  const delayDebounce = 80;
   const updateSizes = debounce(() => {
     console.log("Resizing screen & cells in useScreen");
     batch(() => {
@@ -44,7 +45,7 @@ export default function useScreen() {
       calcnCol();
       calcnCell();
     });
-  }, 100);
+  }, delayDebounce);
 
   onMount(() => {
     window.addEventListener("resize", updateSizes);
