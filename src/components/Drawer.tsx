@@ -130,7 +130,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     return (
       <div class="flex flex-col gap-4 mt-3 min-w-48">
         <div class="flex gap-2 items-start ">
-          <Icon width={md} name="skull" class="mb-5" />
+          <Icon width={md} name="baby" class="mb-5" />
           <SimpleRange
             milestones={["0", "50", "100"]}
             onChange={handleRandomChange}
@@ -141,7 +141,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             aria="randomness"
             class="w-56"
           />
-          <Icon width={md} name="baby" class="mb-5" />
+          <Icon width={md} name="skull" class="mb-5" />
           <div class="translate-y-[1px] text-yellow-400 text-sm font-bold h-full w-10 tabular-nums text-right">
             {output()}
           </div>
