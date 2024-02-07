@@ -42,9 +42,10 @@ Age => color
 #### TODO
 
 - [ ] implement workers
-- [ ] implement redraw only flipped ?
+- [x] implement redraw only flipped ?
 - [ ] replace SafeArea Rect with safeArea trapezoid svg (left height === item height ; right height === tooltip height)
 - [ ] paint the grid
 - [ ] toroidal grid
 - [ ] implement remarquable shapes and add it to grid
 - [ ] tortue/escargot lapin icon pour speed range
+- [ ] reset default params
