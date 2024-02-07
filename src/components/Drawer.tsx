@@ -10,6 +10,7 @@ import Separator from "./Drawer/Separator";
 import Icon from "./Icons";
 import type { Accessor, Component, JSXElement } from "solid-js";
 import useShorcuts, { type Shortcut } from "../hooks/useShorcuts";
+import Draggable from "./Draggable/Draggable";
 
 type DrawerProps = {
   hasStarted: boolean;
@@ -268,10 +269,24 @@ type StatsTooltipProps = {
   title?: JSXElement;
 };
 const StatsTooltip: Component<StatsTooltipProps> = (props) => {
+  // const [drag, setDrag] = createSignal(false);
+
+  // const toggleDrag = () => setDrag((p) => !p);
+
   return (
+    // <Draggable enabled={drag()}>
     <div class="flex flex-col p-5 w-fit bg-dw-500 min-w-72">
       <Show when={!!props.title}>
-        <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
+        <div class="flex flex-row justify-between">
+          <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
+          {/* <IconButton
+              width={ICON_SIZE.sm}
+              name="pin"
+              class="translate-y-[-4px] p-1 rounded-full"
+              onClick={toggleDrag}
+              classList={{ ["bg-dw-200"]: drag() }}
+            /> */}
+        </div>
       </Show>
       <div class="gap-1">
         <For each={props.data}>
@@ -289,5 +304,6 @@ const StatsTooltip: Component<StatsTooltipProps> = (props) => {
         </For>
       </div>
     </div>
+    // </Draggable>
   );
 };

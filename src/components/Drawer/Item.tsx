@@ -3,6 +3,8 @@ import { BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP, SHOW_TOOLTIP_DEBUG, TOOLTIP_SPACING }
 import { createStore } from "solid-js/store";
 import Icon from "../Icons";
 import type { JSX, Component } from "solid-js";
+import Draggable from "../Draggable/Draggable";
+import { ICON_SIZE } from "../../data/index";
 
 type ItemProps = {
   children?: JSX.Element;
@@ -112,9 +114,14 @@ const Tooltip = (props: TooltipProps) => {
         >
           <Icon name="caret" width={30} />
         </div>
-        <div class="w-full bg-dw-500" style={`min-height: ${itemSize.height}px `}>
-          {props.children}
-        </div>
+        <Draggable enabled>
+          <div class="w-full bg-dw-500" style={`min-height: ${itemSize.height}px `}>
+            <div class="w-full h-fit flex flex-row-reverse ">
+              <Icon name="pin" width={ICON_SIZE.sm} class="m-2 hover:bg-dw-200 rounded-full" />
+            </div>
+            {props.children}
+          </div>
+        </Draggable>
       </Show>
     </div>
   );
