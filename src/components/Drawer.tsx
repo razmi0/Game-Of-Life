@@ -68,7 +68,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
 
   const { xl } = ICON_SIZE;
 
-  const playPauseText = () => (props.play ? "pause" : "play");
+  const playPauseText = () => (props.play ? <p>pause</p> : <p>play</p>);
   const PlayPauseIcon = () => (
     <Show when={props.play} fallback={<Icon width={ICON_SIZE.xl} name="play" />}>
       <Icon width={ICON_SIZE.xl} name="pause" />
@@ -180,11 +180,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Group>
         <Item
           onClick={props.switchPlayPause}
-          tooltip={
-            <div class="w-fit pe-3 ps-3 flex place-items-center h-full bg-dw-500">
-              <p>{playPauseText()}</p>
-            </div>
-          }
+          tooltip={<StandardTooltip class="p-3">{playPauseText()}</StandardTooltip>}
         >
           <PlayPauseIcon />
         </Item>
@@ -205,7 +201,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         <Item
           showTooltipOnClick
           tooltip={
-            <StandardTooltip title={`speed`}>
+            <StandardTooltip title="speed">
               <p>change the delay between two frames affecting FPS</p>
               <SpeedTooltip />
             </StandardTooltip>
@@ -239,15 +235,16 @@ export default function Drawer(props: Prettify<DrawerProps>) {
 type StandardTooltipProps = {
   children: JSXElement;
   title?: JSXElement;
+  class?: string;
 };
-const StandardTooltip: Component<StandardTooltipProps> = (props) => (
-  <div class="flex h-fit w-fit p-5 bg-dw-500 flex-col">
+const StandardTooltip: Component<StandardTooltipProps> = (props) =>
+  // prettier-ignore
+  <div class={`flex h-fit w-fit p-5 bg-dw-500 flex-col ${props.class || ""}`}> 
     <Show when={!!props.title}>
       <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
     </Show>
     <div class="text-balance">{props.children}</div>
-  </div>
-);
+  </div>;
 
 type StatsTooltipData = { label: string; value: JSXElement; separator?: boolean };
 type StatsTooltipProps = {
