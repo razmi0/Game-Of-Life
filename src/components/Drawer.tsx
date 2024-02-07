@@ -1,4 +1,4 @@
-import { Show, createSignal, For, createMemo } from "solid-js";
+import { Show, createSignal, For, createMemo, Switch, Match } from "solid-js";
 import Wrapper from "./Drawer/Content";
 import Header from "./Drawer/Header";
 import Group from "./Drawer/Group";
@@ -9,6 +9,7 @@ import Icon from "./Icons";
 import { ICON_SIZE, MAX_ALIVE_RANDOM, MAX_DELAY, MIN_ALIVE_RANDOM, MIN_DELAY } from "../data";
 import type { Component, JSX, JSXElement, VoidComponent } from "solid-js";
 import useShorcuts, { Shortcut } from "../hooks/useShorcuts";
+import SimpleRange from "./Drawer/Range";
 
 type DrawerProps = {
   hasStarted: boolean;
@@ -85,9 +86,17 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       props.changeSpeed(newSpeed);
     };
     return (
-      <div class="mt-3 flex gap-2 items-center justify-center min-w-48 max-w-48">
-        <Range class="w-8/12" onChange={handleSpeedChange} value={props.speed} max={MAX_DELAY} min={MIN_DELAY} />
-        <span class="whitespace-nowrap text-dw-200 text-sm font-bold text-right translate-y-[2px]">{`${fps()} fps`}</span>
+      <div class="mt-3 flex gap-3 items-center min-w-48">
+        <SimpleRange
+          milestones
+          onChange={handleSpeedChange}
+          value={props.speed}
+          max={MAX_DELAY}
+          min={MIN_DELAY}
+          class="w-56"
+        />
+        {/* <Range class="w-8/12" onChange={handleSpeedChange} value={props.speed} max={MAX_DELAY} min={MIN_DELAY} /> */}
+        <div class="whitespace-nowrap text-yellow-400 text-sm font-bold translate-y-[-9px] h-full w-15 text-right">{`${fps()} fps`}</div>
       </div>
     );
   };
@@ -98,10 +107,21 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       props.randomize(newRandom);
     };
     return (
-      <div class="flex flex-col gap-4 mt-3 min-w-48 max-w-48">
-        <div class="flex gap-2 items-start justify-center">
-          <Range onChange={handleRandomChange} value={props.randomness} min={MIN_ALIVE_RANDOM} max={MAX_ALIVE_RANDOM} />
-          <span class="translate-y-[2px] text-dw-200 text-sm font-bold text-right">{props.randomness}</span>
+      <div class="flex flex-col gap-4 mt-3 min-w-48">
+        <div class="flex gap-2 items-start ">
+          {/* <Range onChange={handleRandomChange} value={props.randomness} min={MIN_ALIVE_RANDOM} max={MAX_ALIVE_RANDOM} /> */}
+          <SimpleRange
+            onChange={handleRandomChange}
+            value={props.randomness}
+            min={MIN_ALIVE_RANDOM}
+            max={MAX_ALIVE_RANDOM}
+            milestones
+            aria="randomness"
+            class="w-56"
+          />
+          <div class="translate-y-[1px] text-yellow-400 text-sm font-bold h-full w-8 text-right">
+            {props.randomness}
+          </div>
         </div>
         <SimpleButton class="bg-dw-300 w-full hover:bg-dw-200" handler={props.reset}>
           reset game
@@ -166,6 +186,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Separator />
       <Group>
         <Item
+          showTooltipOnClick
           tooltip={
             <StandardTooltip title={`speed`}>
               <p>change the delay between two frames affecting FPS</p>
@@ -176,6 +197,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           <Icon width={xl} name="speed" />
         </Item>
         <Item
+          showTooltipOnClick
           tooltip={
             <StandardTooltip title="randomness">
               <p>change the ratio between alive cells and dead cells when reseting the data</p>
@@ -188,7 +210,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       </Group>
       <Separator />
       <Group>
-        <Item tooltip={<StatsTooltip title={"Stats"} data={stats()} />}>
+        <Item showTooltipOnClick tooltip={<StatsTooltip title={"Stats"} data={stats()} />}>
           <Icon width={xl} name="wave" />
         </Item>
       </Group>
@@ -196,28 +218,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     </Wrapper>
   );
 }
-
-type RangeProps = {
-  onChange: (e: Event) => void;
-  value?: number;
-  min?: number;
-  max?: number;
-  class?: string;
-};
-const Range: VoidComponent<RangeProps> = (props) => {
-  const min = props.min === 0 ? 0 : props.min || 10;
-  const max = props.max || 1000;
-  return (
-    <input
-      type="range"
-      class={`w-full mt-2 ${props.class || ""}`}
-      onChange={(e) => props.onChange(e)}
-      max={max}
-      min={min}
-      value={props.value}
-    />
-  );
-};
 
 type StandardTooltipProps = {
   children: JSXElement;

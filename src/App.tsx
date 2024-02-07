@@ -43,9 +43,11 @@ const App = () => {
     run();
   });
 
+  const debug = false;
+
   return (
     <>
-      <Show when={import.meta.env.DEV}>
+      <Show when={import.meta.env.DEV && debug}>
         <DebuggerPanel>
           <SimpleButton handler={run}>run hash</SimpleButton>
           <SimpleButton handler={clock.switchPlayPause}>{clock.play ? "pause" : "play"}</SimpleButton>

@@ -30,7 +30,7 @@ const Item: Component<Prettify<ItemProps>> = (props) => {
 
   const onMouseEnter = withClick ? () => {} : ([setHovering, true] as const);
   const onMouseLeave = withClick ? () => {} : ([setHovering, false] as const);
-  const toggleOnClick = !withClick ? () => {} : ([setHovering, !hovering()] as const);
+  const toggleOnClick = !withClick ? () => {} : () => setHovering((p) => !p);
 
   return (
     <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onClick={toggleOnClick} ref={(el) => (itemRef = el)}>
