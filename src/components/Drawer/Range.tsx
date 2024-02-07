@@ -26,7 +26,7 @@ const SimpleRange = (props: RangeProps) => {
         value={props.value}
         min={min}
         max={max}
-        class={`w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-yellow-400 ${
+        class={`h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-yellow-400 ${
           props.class || ""
         }`}
         onChange={(e) => props.onChange(e)}
