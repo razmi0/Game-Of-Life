@@ -1,122 +1,184 @@
-import { Show, createSignal } from "solid-js";
+import { Show, createSignal, For, createMemo, Switch, Match } from "solid-js";
 import Wrapper from "./Drawer/Content";
 import Header from "./Drawer/Header";
 import Group from "./Drawer/Group";
 import Item from "./Drawer/Item";
 import Separator from "./Drawer/Separator";
-import { IconButton } from "./Buttons";
+import { IconButton, SimpleButton } from "./Buttons";
 import Icon from "./Icons";
 import { ICON_SIZE, MAX_ALIVE_RANDOM, MAX_DELAY, MIN_ALIVE_RANDOM, MIN_DELAY } from "../data";
-import type { Component, JSX, VoidComponent } from "solid-js";
+import type { Component, JSX, JSXElement, VoidComponent } from "solid-js";
+import useShorcuts, { Shortcut } from "../hooks/useShorcuts";
+import SimpleRange from "./Drawer/Range";
 
 type DrawerProps = {
-  clock: ClockState;
-  board: GridStoreState;
+  hasStarted: boolean;
+  play: boolean;
+  speed: number;
+  randomness: number;
+  generation: number;
+  nAlive: number;
+  nDead: number;
+  reset: () => void;
+  changeSpeed: (newTime: number) => void;
+  randomize: (newRandom: number) => void;
+  switchPlayPause: () => void;
 };
-type EvolutionIconProps = {
-  increaseType: boolean;
-};
-export default function Drawer(props: DrawerProps) {
+
+export default function Drawer(props: Prettify<DrawerProps>) {
   const [isOpen, setIsOpen] = createSignal(true);
   const trigger = () => setIsOpen((p) => !p);
-  const hasStarted = () => props.board.generation > 0;
 
-  const playPauseText = () => (props.clock.play ? "pause" : "play");
+  const shorcuts: Shortcut[] = [
+    {
+      key: " ",
+      action: () => props.switchPlayPause(),
+    },
+    {
+      key: "k",
+      action: () => props.switchPlayPause(),
+    },
+    {
+      key: "r",
+      action: () => props.reset(),
+    },
+    {
+      key: "ArrowUp",
+      action: () => props.changeSpeed(props.speed + 10),
+    },
+    {
+      key: "ArrowDown",
+      action: () => props.changeSpeed(props.speed - 10),
+    },
+    {
+      key: "ArrowRight",
+      action: () => props.randomize(props.randomness + 2),
+    },
+    {
+      key: "ArrowLeft",
+      action: () => props.randomize(props.randomness - 2),
+    },
+    {
+      key: "a",
+      action: () => trigger(),
+      ctrl: true,
+    },
+  ];
+  useShorcuts(shorcuts);
+
+  const fps = () => {
+    if (props.speed === 0) return "max";
+    return (1000 / props.speed).toFixed(2);
+  };
+
   const { xl } = ICON_SIZE;
 
+  const playPauseText = () => (props.play ? "pause" : "play");
   const PlayPauseIcon = () => (
-    <Show when={props.clock.play} fallback={<Icon width={ICON_SIZE.xl} name="play" />}>
+    <Show when={props.play} fallback={<Icon width={ICON_SIZE.xl} name="play" />}>
       <Icon width={ICON_SIZE.xl} name="pause" />
     </Show>
   );
 
-  const EvolutionIcon: Component<EvolutionIconProps> = (props) => (
-    <Show
-      when={hasStarted() && props.increaseType}
-      fallback={hasStarted() && <Icon width={ICON_SIZE.lg} name="arrowDown" />}
-    >
-      <Icon width={ICON_SIZE.lg} name="arrowUp" />
-    </Show>
-  );
-
-  const AliveEvolutionIcon = () => <EvolutionIcon increaseType={props.board.nAliveIncrease} />;
-  const DeadEvolutionIcon = () => <EvolutionIcon increaseType={props.board.nDeadIncrease} />;
-
-  const StatsTooltip: Component = () => {
+  const SpeedTooltip = () => {
+    const handleSpeedChange = (e: Event) => {
+      const newSpeed = (e.target as HTMLInputElement).valueAsNumber;
+      props.changeSpeed(newSpeed);
+    };
     return (
-      <div class="flex flex-col py-2 px-3 gap-1 w-44 bg-dw-500">
-        <div class="flex items-center justify-between z-10 w-full">
-          <span>generation : </span>
-          <span class="w-fit">{props.board.generation}</span>
-        </div>
-        <div class="flex items-center justify-between z-10 w-full">
-          <span>total cells : </span>
-          <span class="w-fit"> {props.board.nAlive + props.board.nDead}</span>
-        </div>
-        <div class="flex items-center justify-between z-10 w-full gap-2">
-          <span>deads : </span>
-          <span class="w-fit grid grid-row-1 grid-cols-2 items-center gap-1">
-            <DeadEvolutionIcon />
-            {props.board.nDead}
-          </span>
-        </div>
-        <div class="flex items-center justify-between z-10 w-full gap-2">
-          <span>alives : </span>
-          <span class="w-fit grid grid-row-1 grid-cols-2 items-center gap-1">
-            <AliveEvolutionIcon />
-            {props.board.nAlive}
-          </span>
-        </div>
+      <div class="mt-3 flex gap-3 items-center min-w-48">
+        <SimpleRange
+          milestones
+          onChange={handleSpeedChange}
+          value={props.speed}
+          max={MAX_DELAY}
+          min={MIN_DELAY}
+          class="w-56"
+        />
+        {/* <Range class="w-8/12" onChange={handleSpeedChange} value={props.speed} max={MAX_DELAY} min={MIN_DELAY} /> */}
+        <div class="whitespace-nowrap text-yellow-400 text-sm font-bold translate-y-[-9px] h-full w-15 text-right">{`${fps()} fps`}</div>
       </div>
     );
-  };
-
-  const DelayTooltip = () => {
-    const handleSpeedChange = (e: Event) => {
-      const newTime = (e.target as HTMLInputElement).valueAsNumber;
-      props.clock.changeSpeed(newTime);
-    };
-    return <Range onChange={handleSpeedChange} value={props.clock.speed} max={MAX_DELAY} min={MIN_DELAY} />;
   };
 
   const RandomTooltip = () => {
     const handleRandomChange = (e: Event) => {
       const newRandom = (e.target as HTMLInputElement).valueAsNumber;
-      props.board.changeRandomness(newRandom);
+      props.randomize(newRandom);
     };
     return (
-      <Range
-        onChange={handleRandomChange}
-        value={props.board.randomness}
-        min={MIN_ALIVE_RANDOM}
-        max={MAX_ALIVE_RANDOM}
-      />
+      <div class="flex flex-col gap-4 mt-3 min-w-48">
+        <div class="flex gap-2 items-start ">
+          {/* <Range onChange={handleRandomChange} value={props.randomness} min={MIN_ALIVE_RANDOM} max={MAX_ALIVE_RANDOM} /> */}
+          <SimpleRange
+            onChange={handleRandomChange}
+            value={props.randomness}
+            min={MIN_ALIVE_RANDOM}
+            max={MAX_ALIVE_RANDOM}
+            milestones
+            aria="randomness"
+            class="w-56"
+          />
+          <div class="translate-y-[1px] text-yellow-400 text-sm font-bold h-full w-8 text-right">
+            {props.randomness}
+          </div>
+        </div>
+        <SimpleButton class="bg-dw-300 w-full hover:bg-dw-200" handler={props.reset}>
+          reset game
+        </SimpleButton>
+      </div>
     );
   };
 
-  const StandardTooltip: Component<{ children: JSX.Element }> = (props) => (
-    <div class="flex h-fit w-40 p-2 bg-dw-500">
-      <span class="text-balance">{props.children}</span>
-    </div>
-  );
+  const stats = createMemo(() => [
+    {
+      label: "generation",
+      value: props.generation,
+    },
+    {
+      label: "speed",
+      value: props.speed,
+    },
+    {
+      label: "randomness",
+      value: props.randomness,
+      separator: true,
+    },
+    {
+      label: "total cells",
+      value: props.nAlive + props.nDead,
+    },
+    {
+      label: "alive cells",
+      value: `${props.nAlive} (${Math.floor((props.nAlive / (props.nAlive + props.nDead)) * 100)}%)`,
+    },
+  ]);
 
   return (
     <Wrapper trigger={trigger} open={isOpen()}>
       <Header>
-        <IconButton onClick={trigger} width={xl} name="chevron" classes="hover:bg-dw-300 p-1 rounded-full" />
+        <IconButton onClick={trigger} width={xl} name="chevron" class="hover:bg-dw-300 p-1 rounded-full" />
       </Header>
       <Separator />
       <Group>
         <Item
-          onClick={props.clock.playPause}
-          tooltip={<div class="w-fit pe-3 ps-3 flex place-items-center h-full bg-dw-500">{playPauseText()}</div>}
+          onClick={props.switchPlayPause}
+          tooltip={
+            <div class="w-fit pe-3 ps-3 flex place-items-center h-full bg-dw-500">
+              <p>{playPauseText()}</p>
+            </div>
+          }
         >
           <PlayPauseIcon />
         </Item>
 
         <Item
-          tooltip={<StandardTooltip>reset the board to a new original fresh random board</StandardTooltip>}
-          onClick={props.board.reset}
+          tooltip={
+            <StandardTooltip title="reset">
+              <p class="min-w-48">reset the data to a new original fresh random data</p>
+            </StandardTooltip>
+          }
+          onClick={props.reset}
         >
           <Icon width={xl} name="reset" />
         </Item>
@@ -124,24 +186,21 @@ export default function Drawer(props: DrawerProps) {
       <Separator />
       <Group>
         <Item
-          tooltip={<StandardTooltip>shuffle this board, randomly adding a pulse of life</StandardTooltip>}
-          onClick={props.board.shuffle}
-        >
-          <Icon width={xl} name={"baby"} />
-        </Item>
-        <Item
+          showTooltipOnClick
           tooltip={
-            <StandardTooltip>
-              change the speed of the simulation <DelayTooltip />
+            <StandardTooltip title={`speed`}>
+              <p>change the delay between two frames affecting FPS</p>
+              <SpeedTooltip />
             </StandardTooltip>
           }
         >
           <Icon width={xl} name="speed" />
         </Item>
         <Item
+          showTooltipOnClick
           tooltip={
-            <StandardTooltip>
-              change the ratio between alive cells and dead cells when reseting the board
+            <StandardTooltip title="randomness">
+              <p>change the ratio between alive cells and dead cells when reseting the data</p>
               <RandomTooltip />
             </StandardTooltip>
           }
@@ -151,7 +210,7 @@ export default function Drawer(props: DrawerProps) {
       </Group>
       <Separator />
       <Group>
-        <Item tooltip={<StatsTooltip />}>
+        <Item showTooltipOnClick tooltip={<StatsTooltip title={"Stats"} data={stats()} />}>
           <Icon width={xl} name="wave" />
         </Item>
       </Group>
@@ -160,18 +219,44 @@ export default function Drawer(props: DrawerProps) {
   );
 }
 
-type RangeProps = {
-  onChange: (e: Event) => void;
-  value?: number;
-  min?: number;
-  max?: number;
+type StandardTooltipProps = {
+  children: JSXElement;
+  title?: JSXElement;
 };
-const Range: VoidComponent<RangeProps> = (props) => {
-  const min = props.min === 0 ? 0 : props.min || 10;
-  const max = props.max || 1000;
+const StandardTooltip: Component<StandardTooltipProps> = (props) => (
+  <div class="flex h-fit w-fit p-5 bg-dw-500 flex-col">
+    <Show when={!!props.title}>
+      <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
+    </Show>
+    <div class="text-balance">{props.children}</div>
+  </div>
+);
+
+type StatsTooltipProps = {
+  data: { label: string; value: JSXElement; separator?: boolean }[];
+  title?: JSXElement;
+};
+const StatsTooltip: Component<StatsTooltipProps> = (props) => {
   return (
-    <input type="range" class="w-full" onChange={(e) => props.onChange(e)} max={max} min={min} value={props.value} />
+    <div class="flex flex-col p-5 w-fit bg-dw-500">
+      <Show when={!!props.title}>
+        <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
+      </Show>
+      <div class="gap-1">
+        <For each={props.data}>
+          {(data) => (
+            <>
+              <div class="flex items-center justify-between z-10 w-full flex-nowrap">
+                <span class="whitespace-nowrap w-20 text-left">{data.label}</span>
+                <span class="whitespace-nowrap w-20 text-right">{data.value}</span>
+              </div>
+              <Show when={data.separator}>
+                <Separator classes="w-full my-3 h-[2px]" />
+              </Show>
+            </>
+          )}
+        </For>
+      </div>
+    </div>
   );
 };
-
-const Spacer = () => <div class="flex-grow"></div>;

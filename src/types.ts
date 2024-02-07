@@ -11,52 +11,56 @@ type GridType = Cell[][];
 type ClockState = {
   play: boolean;
   speed: number;
-  tick: number;
   clocked: boolean;
+  tick: number;
   limiter: boolean;
   queue: number;
-  playPause: () => void;
   run: () => void;
   work: () => void;
-  changeSpeed: (speed: number) => void;
-  switchClocked: () => void;
-  addSpeed: () => void;
-  subSpeed: () => void;
+  switchPlayPause: () => void;
   queueTicks: (ticks: number) => void;
 };
+
+type ClockQueueTicksMode = "clocked" | "free";
 
 type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};
 
-type ScreenStoreState = {
-  width: number;
-  height: number;
-  nRow: () => number;
-  nCol: () => number;
-  nCell: () => number;
-  updateScreen: () => void;
-};
-
-type GridStoreState = {
-  grid: GridType;
+type DataStore = {
   generation: number;
+  incrementGeneration: () => void;
+
   nAlive: number;
-  nAliveIncrease: boolean;
+  setAlive: (value: number) => void;
+
   nDead: number;
-  nDeadIncrease: boolean;
+  setDead: (value: number) => void;
+
   randomness: number;
   randomChoice: () => boolean;
-  shuffle: () => void;
-  build: (random: boolean) => GridType;
-  draw: () => void;
-  nextGen: () => void;
-  reset: () => void;
-  changeRandomness: (value: number) => void;
-  initHash: () => Uint8Array;
-  updateHash: () => void;
-  // resize: () => void;
-  countAliveNeighbors: (row: number, col: number) => number;
-  judgement: (cell: Cell, neighbors: number) => boolean;
-  nextCycle: () => void;
+  setRandom: (value: number) => void;
 };
+
+// type GridStoreState = {
+//   grid: GridType;
+//   generation: number;
+//   nAlive: number;
+//   nAliveIncrease: boolean;
+//   nDead: number;
+//   nDeadIncrease: boolean;
+//   randomness: number;
+//   randomChoice: () => boolean;
+//   shuffle: () => void;
+//   build: (random: boolean) => GridType;
+//   draw: () => void;
+//   nextGen: () => void;
+//   reset: () => void;
+//   changeRandomness: (value: number) => void;
+//   initHash: () => Uint8Array;
+//   updateHash: () => void;
+//   // resize: () => void;
+//   countAliveNeighbors: (row: number, col: number) => number;
+//   judgement: (cell: Cell, neighbors: number) => boolean;
+//   nextCycle: () => void;
+// };

@@ -35,53 +35,8 @@
   margin: 1rem 0;
 }
 
-span {
+span,
+p {
   z-index: 1;
-}
-
-/*
-  Based on TailwindCSS recommendations,
-  consider using classes instead of the `@apply` directive
-  @see https://tailwindcss.com/docs/reusing-styles#avoiding-premature-abstraction
-*/
-/*********** Baseline, reset styles ***********/
-input[type="range"] {
-  @apply appearance-none cursor-pointer w-full;
-  appearance: none;
-  -webkit-appearance: none;
-  background: transparent;
-}
-
-/* Removes default focus */
-input[type="range"]:focus {
-  outline: none;
-}
-
-/******** Chrome, Safari, Opera and Edge Chromium styles ********/
-/* slider track */
-input[type="range"]::-webkit-slider-runnable-track {
-  @apply bg-[#85898a] h-1 rounded-none;
-}
-
-/* slider thumb */
-input[type="range"]::-webkit-slider-thumb {
-  @apply appearance-none bg-[#3e4554] h-4 w-8 -mt-[5px] rounded-[0.2rem] focus:outline-offset-2;
-  -webkit-appearance: none; /* Override default look */ /* Centers thumb on the track */
-}
-input[type="range"]:focus::-webkit-slider-thumb {
-  outline: 1px solid #3e4554;
-}
-
-/*********** Firefox styles ***********/
-/* slider track */
-input[type="range"]::-moz-range-track {
-  @apply bg-[#85898a] h-1 rounded-none;
-}
-
-/* slider thumb */
-input[type="range"]::-moz-range-thumb {
-  @apply bg-[#7e8baa] h-4 w-8 rounded-md border-[none] focus:outline-offset-2; /*Removes extra border that FF applies*/
-}
-input[type="range"]:focus::-moz-range-thumb {
-  outline: 1px solid #3e4554;
+  text-wrap: balance;
 }

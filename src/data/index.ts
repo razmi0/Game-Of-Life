@@ -1,44 +1,23 @@
 /** CONSTANTS */
 
-const DEFAULT_RANDOMNESS = 80;
-const DEFAULT_SPEED = 10 as const;
-const START_IMMEDIATELY = false as const;
-const START_CLOCKED = true as const;
-const CELL_WIDTH = 20 as const;
-const QUEUE_TICKS_QUANTITY = 25 as const;
-const MAX_DELAY = 1000 as const;
-const MIN_DELAY = 0 as const;
-const MAX_ALIVE_RANDOM = 100 as const;
-const MIN_ALIVE_RANDOM = 0 as const;
-const SHUFFLE_MAX_CONSECUTIVE_ALIVE = 3 as const;
-const SHUFFLE_MAX_CONSECUTIVE_DEAD = 10 as const;
-const SHOW_TOOLTIP_DEBUG = false;
-const BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP = "transparent"; // red
-const TOOLTIP_SPACING = 17 as const;
+export const DEFAULT_RANDOMNESS = 80;
+export const DEFAULT_SPEED = 10;
+export const START_IMMEDIATELY = false;
+export const START_CLOCKED = true;
+export const CELL_WIDTH = 5;
+export const QUEUE_TICKS_QUANTITY = 25;
+export const MAX_DELAY = 100 as const;
+export const MIN_DELAY = 0 as const;
+export const MAX_ALIVE_RANDOM = 100 as const;
+export const MIN_ALIVE_RANDOM = 0 as const;
+export const SHOW_TOOLTIP_DEBUG = false;
+export const BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP = "transparent"; // red
+export const TOOLTIP_SPACING = 17 as const;
 
-const ICON_SIZE = {
+export const ICON_SIZE = {
   xs: 15,
   sm: 20,
   md: 23,
   lg: 25,
   xl: 30,
 } as const;
-
-export {
-  TOOLTIP_SPACING,
-  BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP,
-  DEFAULT_RANDOMNESS,
-  CELL_WIDTH,
-  DEFAULT_SPEED,
-  START_IMMEDIATELY,
-  START_CLOCKED,
-  QUEUE_TICKS_QUANTITY,
-  MAX_DELAY,
-  MIN_DELAY,
-  MAX_ALIVE_RANDOM,
-  MIN_ALIVE_RANDOM,
-  SHUFFLE_MAX_CONSECUTIVE_ALIVE,
-  SHUFFLE_MAX_CONSECUTIVE_DEAD,
-  SHOW_TOOLTIP_DEBUG,
-  ICON_SIZE,
-};
