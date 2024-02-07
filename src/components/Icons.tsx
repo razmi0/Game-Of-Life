@@ -24,6 +24,8 @@ export type IconNames =
   | "pin"
   | "caret"
   | "arrowDown"
+  | "snail"
+  | "hare"
   | "wave";
 
 export type IconProps = {

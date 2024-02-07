@@ -66,7 +66,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   ];
   useShorcuts(shorcuts);
 
-  const { xl } = ICON_SIZE;
+  const { xl, sm, md } = ICON_SIZE;
 
   const playPauseText = () => (props.play ? "pause" : "play");
   const PlayPauseIcon = () => (
@@ -95,6 +95,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
 
     return (
       <div class="mt-3 flex items-center min-w-48">
+        <Icon width={md} name="snail" class="mb-5 me-2" />
         <SimpleRange
           milestones={["10", "20", "200"]}
           onChange={handleSpeedChange}
@@ -105,6 +106,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           class="w-56 rotate-180"
           aria="speed"
         />
+        <Icon width={md} name="hare" class="mb-5 ms-2" />
         <div class="whitespace-nowrap text-yellow-400 text-sm font-bold translate-y-[-9px] h-full w-16 tabular-nums text-right">
           {output()}
         </div>
@@ -128,6 +130,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     return (
       <div class="flex flex-col gap-4 mt-3 min-w-48">
         <div class="flex gap-2 items-start ">
+          <Icon width={md} name="skull" class="mb-5" />
           <SimpleRange
             milestones={["0", "50", "100"]}
             onChange={handleRandomChange}
@@ -138,6 +141,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             aria="randomness"
             class="w-56"
           />
+          <Icon width={md} name="baby" class="mb-5" />
           <div class="translate-y-[1px] text-yellow-400 text-sm font-bold h-full w-10 tabular-nums text-right">
             {output()}
           </div>
