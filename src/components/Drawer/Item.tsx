@@ -69,7 +69,9 @@ const Tooltip = (props: TooltipProps) => {
   const [open, setOpen] = createSignal(false);
   const [itemSize, setItemSize] = createStore({ width: 0, height: 0 });
   const [tooltipSize, setTooltipSize] = createStore({ width: 0, height: 0 });
-  const show = () => props.when || open();
+  const show = () => props.when || open() || pin();
+
+  const [pin, setPin] = createSignal(false);
 
   let tooltipRef: HTMLDivElement;
 
@@ -84,7 +86,11 @@ const Tooltip = (props: TooltipProps) => {
     }
   });
 
-  const spacing = () => itemSize.width + tooltipSize.width / 2 - TOOLTIP_SPACING * 2;
+  // prettier-ignore
+  const spacing = () =>
+    !pin()
+    ? itemSize.width + tooltipSize.width / 2 - TOOLTIP_SPACING * 2 
+    : itemSize.width + tooltipSize.width / 2 - TOOLTIP_SPACING
 
   const offsetY = () => {
     if (tooltipSize.height <= itemSize.height) return 0;
@@ -101,23 +107,30 @@ const Tooltip = (props: TooltipProps) => {
       ref={(el) => (tooltipRef = el)}
     >
       <Show when={show()}>
-        <div
-          // SAFE AREA
-          style={`
-          height : ${tooltipSize.height}px;
-          width: ${TOOLTIP_SPACING}px;
-          pointer-events: none;
-          background-color: ${BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP};
-          transform: translate(0px, 0px); 
+        <Show when={!pin()}>
+          <div
+            // SAFE AREA
+            style={`
+                height : ${tooltipSize.height}px;
+                width: ${TOOLTIP_SPACING}px;
+                pointer-events: none;
+                background-color: ${BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP};
+                transform: translate(0px, 0px); 
         `}
-          class="-z-10 grid items-center"
-        >
-          <Icon name="caret" width={30} />
-        </div>
-        <Draggable enabled>
-          <div class="w-full bg-dw-500" style={`min-height: ${itemSize.height}px `}>
-            <div class="w-full h-fit flex flex-row-reverse ">
-              <Icon name="pin" width={ICON_SIZE.sm} class="m-2 hover:bg-dw-200 rounded-full" />
+            class="-z-10 grid items-center"
+          >
+            <Icon name="caret" width={30} />
+          </div>
+        </Show>
+        <Draggable enabled={pin()}>
+          <div class="w-full bg-dw-500" style={`min-height: ${itemSize.height}px`}>
+            <div class="absolute right-0 mt-5 me-5" onClick={() => setPin((p) => !p)}>
+              <Icon
+                name="pin"
+                width={ICON_SIZE.sm}
+                class="hover:bg-dw-300 rounded-sm p-0.5"
+                classList={{ ["bg-dw-300"]: pin() }}
+              />
             </div>
             {props.children}
           </div>
