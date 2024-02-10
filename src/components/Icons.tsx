@@ -35,6 +35,7 @@ export type IconProps = {
   color?: string;
   class?: string;
   style?: string;
+  classList?: Record<string, boolean>;
 };
 /**
  * <svg>
@@ -45,7 +46,13 @@ export type IconProps = {
 export default function Icon(props: IconProps) {
   const height = props.height || props.width;
   return (
-    <svg width={props.width + "px"} height={height + "px"} class={props.class ?? ""} style={props.style ?? ""}>
+    <svg
+      width={props.width + "px"}
+      height={height + "px"}
+      class={props.class ?? ""}
+      style={props.style ?? ""}
+      classList={props.classList ?? { [""]: false }}
+    >
       <use href={`${spriteHref}#${props.name}`} />
     </svg>
   );
