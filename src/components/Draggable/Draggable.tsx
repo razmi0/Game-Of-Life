@@ -12,7 +12,6 @@ type DraggableProps = {
   onEnd?: () => void;
   /** Trigger reset position immediately when value change (strict equality by reference) */
   reset?: unknown;
-  startAtPosition?: CoordType;
 };
 
 type DragState = {
@@ -66,7 +65,7 @@ export default function Draggable(props: DraggableProps): JSXElement {
   if (!props.children) throw new Error("Draggable component must have children");
   let child: HTMLElement;
   let now = Date.now();
-  let initial: CoordType = props.startAtPosition ? props.startAtPosition : { x: 0, y: 0 };
+  let initial: CoordType = { x: 0, y: 0 };
   let diff: CoordType = { x: 0, y: 0 };
   let permanentlyAdded: CoordType = { x: 0, y: 0 };
   let rect: RectType = { x: 0, y: 0, width: 0, height: 0 };
