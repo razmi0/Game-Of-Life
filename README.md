@@ -27,12 +27,9 @@ param
 
 - size
 
-range Add to Queue (x) => button to add x to queue
+range Add to Queue (x) => button to add x to queue ?
 
 save file ?
-paint the grid?
-typology open closed wrap
-group => remarquable shapes + add it to grid
 
 Cells :
 Age => color
@@ -43,7 +40,14 @@ Age => color
 - [x] implement redraw only flipped ?
 - [ ] replace SafeArea Rect with safeArea trapezoid svg (left height === item height ; right height === tooltip height)
 - [ ] paint the grid
+- [ ] text to grid
+- [ ] img to grid
+- [ ] color picker for cells
+- [ ] shape picker for cells (common shapes + custom + remarquable shapes)
 - [ ] toroidal grid
 - [ ] implement remarquable shapes and add it to grid
-- [ ] tortue/escargot lapin icon pour speed range
+- [x] tortue/escargot lapin icon pour speed range
 - [ ] reset default params
+- [ ] implement action bar on drag with cross to close, pin to drag, +/- to minimize/maximize action bar, opacity to change opacity
+- [ ] replace pin icon with drag icon
+- [ ] full HTML for SEO presentation (what ? for what ? why ? how ? when ? )
