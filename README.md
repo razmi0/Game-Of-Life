@@ -54,3 +54,4 @@ Age => color
 - [ ] full HTML for SEO presentation (what ? for what ? why ? how ? when ? )
 - [ ] space between cells (new branch ) and background off cells grey
 - [ ] stats => add cell size
+- [ ] implement white theme
