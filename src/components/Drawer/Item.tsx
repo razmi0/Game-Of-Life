@@ -87,8 +87,7 @@ const Tooltip = (props: TooltipProps) => {
   const [itemSize, setItemSize] = createStore({ width: 0, height: 0 });
   const [tooltipSize, setTooltipSize] = createStore({ width: 0, height: 0 });
 
-  const showAttached = () => (props.when || open()) && !detached();
-  const showDetached = () => detached();
+  const attached = () => (props.when || open()) && !detached();
 
   const mouseEnter = () => {
     if (detached()) return;
@@ -100,11 +99,11 @@ const Tooltip = (props: TooltipProps) => {
     setOpen(false);
   };
 
-  // tooltip states :
-  // attached / detached
-  // attached => showAttached => vars ( props.when && open() mouseHovers )
-  // detached => showDetached (dragged) when hasMoved => vars (pin()) detached mouseHovers are disabled
-  // detached => showDetached (not dragged) when not hasMoved => vars (hasMoved() && !pin()) detached mouseHovers are disabled
+  // tooltip 4 states :
+  // closed : tooltip is closed
+  // attached (default) : tooltip is attached to the item
+  // detached : tooltip is detached from the item and can be moved
+  // detached and pinned : tooltip is detached and pinned to a position
 
   const closeTooltip = () => {
     setOpen(false);
@@ -121,7 +120,7 @@ const Tooltip = (props: TooltipProps) => {
   let debugRef: HTMLDivElement;
 
   createEffect(() => {
-    if (showAttached()) {
+    if (attached()) {
       if (props.itemRef) {
         setItemSize({ width: props.itemRef.offsetWidth, height: props.itemRef.offsetHeight });
       }
@@ -143,15 +142,15 @@ const Tooltip = (props: TooltipProps) => {
       class="fixed flex transition-opacity"
       style={`transform: translate(${spacing()}px, -${offsetY()}px);`}
       classList={{
-        ["opacity-0"]: !showAttached(),
-        ["opacity-100"]: showAttached() || showDetached(),
+        ["opacity-0"]: !attached(),
+        ["opacity-100"]: attached() || detached(),
       }}
       onMouseEnter={mouseEnter}
       onMouseLeave={mouseLeave}
       ref={(el) => (tooltipRef = el)}
     >
-      <Show when={showAttached() || showDetached()}>
-        <Show when={!showDetached()}>
+      <Show when={attached() || detached()}>
+        <Show when={!detached()}>
           <div
             // SAFE AREA
             style={`
