@@ -55,3 +55,5 @@ Age => color
 - [ ] space between cells (new branch ) and background off cells grey
 - [ ] stats => add cell size
 - [ ] implement white theme
+- [ ] add loader animation
+- [ ] tools => zoom on cursor
