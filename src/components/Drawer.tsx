@@ -10,7 +10,6 @@ import Separator from "./Drawer/Separator";
 import Icon from "./Icons";
 import type { Accessor, Component, JSXElement } from "solid-js";
 import useShorcuts, { type Shortcut } from "../hooks/useShorcuts";
-import Draggable from "./Draggable/Draggable";
 
 type DrawerProps = {
   hasStarted: boolean;
@@ -105,7 +104,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           max={MAX_DELAY}
           min={MIN_DELAY}
           class="w-56 rotate-180"
-          aria="speed"
+          aria="speed of the simulation"
         />
         <Icon width={md} name="hare" class="mb-5 ms-2" />
         <div class="whitespace-nowrap text-yellow-400 text-sm font-bold translate-y-[-9px] h-full w-16 tabular-nums text-right">
@@ -139,7 +138,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             value={props.randomness}
             min={MIN_ALIVE_RANDOM}
             max={MAX_ALIVE_RANDOM}
-            aria="randomness"
+            aria="randomness of the simulation"
             class="w-56"
           />
           <Icon width={md} name="skull" class="mb-5" />
@@ -212,7 +211,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Separator />
       <Group>
         <Item
-          showTooltipOnClick
           tooltip={
             <StandardTooltip title="speed">
               <p>change the delay between two frames thus affecting fps</p>
@@ -223,7 +221,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           <Icon width={xl} name="speed" />
         </Item>
         <Item
-          showTooltipOnClick
           tooltip={
             <StandardTooltip title="randomness">
               <p>
@@ -240,7 +237,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       </Group>
       <Separator />
       <Group>
-        <Item showTooltipOnClick tooltip={<StatsTooltip title={"Stats"} data={stats()} />}>
+        <Item tooltip={<StatsTooltip title={"Stats"} data={stats()} />}>
           <Icon width={xl} name="wave" />
         </Item>
       </Group>
@@ -256,7 +253,7 @@ type StandardTooltipProps = {
 };
 const StandardTooltip: Component<StandardTooltipProps> = (props) =>
   // prettier-ignore
-  <div class={`flex h-fit w-fit p-5 bg-dw-500 flex-col ${props.class || ""}`}> 
+  <div class={`flex h-fit w-fit p-5 pt-0 bg-dw-500 flex-col ${props.class || ""}`}> 
     <Show when={!!props.title}>
       <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
     </Show>
@@ -269,23 +266,11 @@ type StatsTooltipProps = {
   title?: JSXElement;
 };
 const StatsTooltip: Component<StatsTooltipProps> = (props) => {
-  // const [drag, setDrag] = createSignal(false);
-
-  // const toggleDrag = () => setDrag((p) => !p);
-
   return (
-    // <Draggable enabled={drag()}>
-    <div class="flex flex-col p-5 w-fit bg-dw-500 min-w-72">
+    <div class="flex flex-col p-5 pt-0 w-fit bg-dw-500 min-w-72">
       <Show when={!!props.title}>
         <div class="flex flex-row justify-between">
           <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
-          {/* <IconButton
-              width={ICON_SIZE.sm}
-              name="pin"
-              class="translate-y-[-4px] p-1 rounded-full"
-              onClick={toggleDrag}
-              classList={{ ["bg-dw-200"]: drag() }}
-            /> */}
         </div>
       </Show>
       <div class="gap-1">
@@ -304,6 +289,5 @@ const StatsTooltip: Component<StatsTooltipProps> = (props) => {
         </For>
       </div>
     </div>
-    // </Draggable>
   );
 };

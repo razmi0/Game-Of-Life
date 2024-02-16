@@ -10,7 +10,7 @@ type DraggableProps = {
   onStart?: () => void;
   onDrag?: () => void;
   onEnd?: () => void;
-  /** Trigger reset position immediately when value change (strict equality by reference) */
+  /** Trigger reset position immediately when value change whatever the value (strict equality by reference) */
   reset?: unknown;
 };
 
@@ -62,6 +62,7 @@ export default function Draggable(props: DraggableProps): JSXElement {
       setDrag("end", true);
     },
   });
+
   if (!props.children) throw new Error("Draggable component must have children");
   let child: HTMLElement;
   let now = Date.now();

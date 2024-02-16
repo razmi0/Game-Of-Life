@@ -5,6 +5,7 @@ import Icon from "../Icons";
 import type { JSX, Component } from "solid-js";
 import Draggable from "../Draggable/Draggable";
 import { ICON_SIZE } from "../../data/index";
+import IconButton from "../Buttons";
 
 type ItemProps = {
   children?: JSX.Element;
@@ -18,6 +19,8 @@ type ItemProps = {
   tooltip?: JSX.Element;
   showTooltipOnClick?: boolean;
 };
+
+const matrixRegex = /matrix.*\((.+)\)/g;
 
 const Item: Component<Prettify<ItemProps>> = (props) => {
   const [hovering, setHovering] = createSignal(SHOW_TOOLTIP_DEBUG);
@@ -38,15 +41,14 @@ const Item: Component<Prettify<ItemProps>> = (props) => {
     <div ref={(el) => (itemRef = el)} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onClick={toggleOnClick}>
       <Label show={hasLbl}>{props.label}</Label>
       <div
-        class={
-          "flex items-center justify-center text-sm text-dw-150 w-full cursor-pointer hover:bg-dw-300 hover:text-dw-100 py-2 " +
-          (props.classes || "")
-        }
+        class={"flex items-center justify-center text-sm text-dw-150 cursor-pointer" + (props.classes || "")}
         onClick={props.onClick}
       >
         <Left show={hasLeft}>{props.left}</Left>
         <Child show={hasChildren}>
-          <div>{props.children}</div>
+          <div class="hover:bg-dw-300 hover:text-dw-100 w-full h-full flex place-content-center py-2">
+            {props.children}
+          </div>
         </Child>
         <Right show={hasRight}>{props.right}</Right>
 
@@ -65,18 +67,61 @@ type TooltipProps = {
   when: boolean;
   itemRef: HTMLDivElement;
 };
+
 const Tooltip = (props: TooltipProps) => {
   const [open, setOpen] = createSignal(false);
-  const [itemSize, setItemSize] = createStore({ width: 0, height: 0 });
-  const [tooltipSize, setTooltipSize] = createStore({ width: 0, height: 0 });
-  const show = () => props.when || open() || pin();
-
+  const [detached, setDetached] = createSignal(false);
   const [pin, setPin] = createSignal(false);
 
+  const [translate, setTranslate] = createStore<any>({
+    formatRaw: (raw: Record<number, string>) => {
+      if (!raw) return;
+      const values = Object.values(raw).join("");
+      const matrixRaw = values.match(/matrix.*\((.+)\)/);
+      if (!matrixRaw) return;
+      const matrixValues = matrixRaw[1].split(", ");
+      setTranslate({ x: matrixValues[4], y: matrixValues[5] });
+    },
+  });
+
+  const [itemSize, setItemSize] = createStore({ width: 0, height: 0 });
+  const [tooltipSize, setTooltipSize] = createStore({ width: 0, height: 0 });
+
+  const showAttached = () => (props.when || open()) && !detached();
+  const showDetached = () => detached();
+
+  const mouseEnter = () => {
+    if (detached()) return;
+    setOpen(true);
+  };
+  const mouseLeave = () => {
+    if (detached()) return;
+    console.log("detached", detached());
+    setOpen(false);
+  };
+
+  // tooltip states :
+  // attached / detached
+  // attached => showAttached => vars ( props.when && open() mouseHovers )
+  // detached => showDetached (dragged) when hasMoved => vars (pin()) detached mouseHovers are disabled
+  // detached => showDetached (not dragged) when not hasMoved => vars (hasMoved() && !pin()) detached mouseHovers are disabled
+
+  const closeTooltip = () => {
+    setOpen(false);
+    setPin(false);
+    setDetached(false);
+  };
+
+  const triggerDrag = () => {
+    setPin((p) => !p);
+    setDetached(true);
+  };
+
   let tooltipRef: HTMLDivElement;
+  let debugRef: HTMLDivElement;
 
   createEffect(() => {
-    if (show()) {
+    if (showAttached()) {
       if (props.itemRef) {
         setItemSize({ width: props.itemRef.offsetWidth, height: props.itemRef.offsetHeight });
       }
@@ -86,11 +131,7 @@ const Tooltip = (props: TooltipProps) => {
     }
   });
 
-  // prettier-ignore
-  const spacing = () =>
-    !pin()
-    ? itemSize.width + tooltipSize.width / 2 - TOOLTIP_SPACING * 2 
-    : itemSize.width + tooltipSize.width / 2 - TOOLTIP_SPACING
+  const spacing = () => Math.floor(itemSize.width + tooltipSize.width / 2 - TOOLTIP_SPACING * 2);
 
   const offsetY = () => {
     if (tooltipSize.height <= itemSize.height) return 0;
@@ -101,35 +142,56 @@ const Tooltip = (props: TooltipProps) => {
     <div
       class="fixed flex transition-opacity"
       style={`transform: translate(${spacing()}px, -${offsetY()}px);`}
-      classList={{ ["opacity-0"]: !show(), ["opacity-100"]: show() }}
-      onMouseEnter={[setOpen, true]}
-      onMouseLeave={[setOpen, false]}
+      classList={{
+        ["opacity-0"]: !showAttached(),
+        ["opacity-100"]: showAttached() || showDetached(),
+      }}
+      onMouseEnter={mouseEnter}
+      onMouseLeave={mouseLeave}
       ref={(el) => (tooltipRef = el)}
     >
-      <Show when={show()}>
-        <Show when={!pin()}>
+      <Show when={showAttached() || showDetached()}>
+        <Show when={!showDetached()}>
           <div
             // SAFE AREA
             style={`
-                height : ${tooltipSize.height}px;
-                width: ${TOOLTIP_SPACING}px;
-                pointer-events: none;
-                background-color: ${BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP};
-                transform: translate(0px, 0px); 
-        `}
+            height : ${tooltipSize.height}px;
+            width: ${TOOLTIP_SPACING}px;
+            pointer-events: none;
+            background-color: ${BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP};
+            `}
             class="-z-10 grid items-center"
           >
             <Icon name="caret" width={30} />
           </div>
         </Show>
-        <Draggable enabled={pin()}>
-          <div class="w-full bg-dw-500" style={`min-height: ${itemSize.height}px`}>
-            <div class="absolute right-0 mt-5 me-5" onClick={() => setPin((p) => !p)}>
-              <Icon
-                name="pin"
+        <Draggable
+          enabled={pin()}
+          reset={open()}
+          /** on unmount (draggable disabled) the transform translate values are lost so we save them into translate state store */
+          onDrag={() => translate.formatRaw(window.getComputedStyle(debugRef).transform)}
+        >
+          <div
+            class="w-full bg-dw-500"
+            style={`min-height: ${itemSize.height}px; transform: translate(${translate.x}px, ${translate.y}px)`}
+            classList={{ ["cursor-move"]: pin() }}
+            ref={(el) => {
+              debugRef = el;
+            }}
+          >
+            <div class="flex flex-row-reverse p-1">
+              <IconButton
+                name="close"
                 width={ICON_SIZE.sm}
-                class="hover:bg-dw-300 rounded-sm p-0.5"
+                class="hover:bg-dw-300 rounded-sm p-[1px] items-center justify-center"
+                onClick={closeTooltip}
+              />
+              <IconButton
+                name="drag"
+                width={ICON_SIZE.sm}
+                class="hover:bg-dw-300 rounded-sm p-[1px]"
                 classList={{ ["bg-dw-300"]: pin() }}
+                onClick={triggerDrag}
               />
             </div>
             {props.children}
@@ -167,22 +229,14 @@ type LeftProps = {
   children: JSX.Element;
 };
 const Left = (props: LeftProps) => {
-  return (
-    <Show when={props.show}>
-      <div>{props.children}</div>
-    </Show>
-  );
+  return <Show when={props.show}>{props.children}</Show>;
 };
 type ChildProps = {
   show?: boolean;
   children: JSX.Element;
 };
 const Child = (props: ChildProps) => {
-  return (
-    <Show when={props.show}>
-      <div>{props.children}</div>
-    </Show>
-  );
+  return <Show when={props.show}>{props.children}</Show>;
 };
 
 //#endregion members
