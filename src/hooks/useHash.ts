@@ -12,7 +12,10 @@ export default function useHash(
   findColor: (i: number) => string,
   ctx: Accessor<CanvasRenderingContext2D | undefined>
 ) {
-  const initHash = () => new Uint8Array(screen.nCell()).map(() => (data.randomChoice() ? 1 : 0)) as Hash8;
+  const initHash = () => {
+    console.log("initHash", screen.nCell());
+    return new Uint8Array(screen.nCell()).map(() => (data.randomChoice() ? 1 : 0)) as Hash8;
+  };
 
   let hash = initHash();
   let flipIndexes: number[] = [];
@@ -29,7 +32,7 @@ export default function useHash(
     const pastSize = hash.length; // old screen.nCell()
     const newSize = screen.nCell(); // new screen.nCell()
     if (newSize === pastSize) return;
-    else if (newSize < pastSize) {
+    if (newSize < pastSize) {
       hash = hash.copyWithin(0, newSize);
     } else {
       const diff = newSize - pastSize;
