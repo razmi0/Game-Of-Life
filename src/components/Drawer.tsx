@@ -1,4 +1,4 @@
-import { For, Show, createMemo, createSignal } from "solid-js";
+import { Show, createMemo, createSignal } from "solid-js";
 import { ICON_SIZE, MAX_ALIVE_RANDOM, MAX_DELAY, MIN_ALIVE_RANDOM, MIN_DELAY } from "../data";
 import { IconButton, SimpleButton } from "./Buttons";
 import Wrapper from "./Drawer/Content";
@@ -8,7 +8,9 @@ import Item from "./Drawer/Item";
 import SimpleRange from "./Drawer/Range";
 import Separator from "./Drawer/Separator";
 import Icon from "./Icons";
-import type { Accessor, Component, JSXElement } from "solid-js";
+import { StatsTooltip, StandardTooltip } from "./Drawer/Tooltip";
+import type { StatsTooltipData } from "./Drawer/Tooltip";
+import type { Accessor } from "solid-js";
 import useShorcuts, { type Shortcut } from "../hooks/useShorcuts";
 
 type DrawerProps = {
@@ -106,8 +108,8 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           class="w-56 rotate-180"
           aria="speed of the simulation"
         />
-        <Icon width={md} name="hare" class="mb-5 ms-2" />
         <div class="whitespace-nowrap text-yellow-400 text-sm font-bold translate-y-[-9px] h-full w-16 tabular-nums text-right">
+          <Icon width={md} name="hare" class="mb-5 ms-2" />
           {output()}
         </div>
       </div>
@@ -245,49 +247,3 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     </Wrapper>
   );
 }
-
-type StandardTooltipProps = {
-  children: JSXElement;
-  title?: JSXElement;
-  class?: string;
-};
-const StandardTooltip: Component<StandardTooltipProps> = (props) =>
-  // prettier-ignore
-  <div class={`flex h-fit w-fit p-5 pt-0 bg-dw-500 flex-col ${props.class || ""}`}> 
-    <Show when={!!props.title}>
-      <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
-    </Show>
-    <div class="text-balance">{props.children}</div>
-  </div>;
-
-type StatsTooltipData = { label: string; value: JSXElement; separator?: boolean };
-type StatsTooltipProps = {
-  data: StatsTooltipData[];
-  title?: JSXElement;
-};
-const StatsTooltip: Component<StatsTooltipProps> = (props) => {
-  return (
-    <div class="flex flex-col p-5 pt-0 w-fit bg-dw-500 min-w-72">
-      <Show when={!!props.title}>
-        <div class="flex flex-row justify-between">
-          <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
-        </div>
-      </Show>
-      <div class="gap-1">
-        <For each={props.data}>
-          {(data) => (
-            <>
-              <div class="flex items-center justify-between z-10 w-full flex-nowrap">
-                <span class="w-20 text-left">{data.label}</span>
-                <span class="whitespace-nowrap w-24 text-right text-yellow-400 tabular-nums">{data.value}</span>
-              </div>
-              <Show when={data.separator}>
-                <Separator classes="w-full my-3 h-[2px]" />
-              </Show>
-            </>
-          )}
-        </For>
-      </div>
-    </div>
-  );
-};
