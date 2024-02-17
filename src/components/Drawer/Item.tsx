@@ -114,14 +114,12 @@ const Tooltip = (props: TooltipProps) => {
         >
           <Icon name="caret" width={30} />
         </div>
-        <Draggable enabled>
-          <div class="w-full bg-dw-500" style={`min-height: ${itemSize.height}px `}>
-            <div class="w-full h-fit flex flex-row-reverse ">
-              <Icon name="pin" width={ICON_SIZE.sm} class="m-2 hover:bg-dw-200 rounded-full" />
-            </div>
-            {props.children}
+        <div class="w-full bg-dw-500" style={`min-height: ${itemSize.height}px `}>
+          <div class="w-full h-fit flex flex-row-reverse ">
+            <Icon name="pin" width={ICON_SIZE.sm} class="m-2 hover:bg-dw-200 rounded-full" />
           </div>
-        </Draggable>
+          {props.children}
+        </div>
       </Show>
     </div>
   );
