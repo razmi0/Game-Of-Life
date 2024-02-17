@@ -36,10 +36,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       action: () => props.switchPlayPause(),
     },
     {
-      key: "k",
-      action: () => props.switchPlayPause(),
-    },
-    {
       key: "r",
       action: () => props.reset(),
     },
@@ -67,13 +63,41 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   ];
   useShorcuts(shorcuts);
 
-  const { xl, sm, md } = ICON_SIZE;
+  const { xl, sm, md, xs } = ICON_SIZE;
 
   const playPauseText = () => (props.play ? "pause" : "play");
   const PlayPauseIcon = () => (
     <Show when={props.play} fallback={<Icon width={ICON_SIZE.xl} name="play" />}>
       <Icon width={ICON_SIZE.xl} name="pause" />
     </Show>
+  );
+
+  const PlayPauseTitle = () => (
+    <div class="flex flex-row items-center justify-between translate-y-[5px]">
+      <div>{playPauseText()}</div>
+      <div class="text-3xs flex text-dw-100 gap-1 items-center">spacebar</div>
+    </div>
+  );
+
+  const ResetTitle = () => (
+    <div class="flex flex-row items-center justify-between translate-y-[5px]">
+      <div>reset</div>
+      <div class="text-3xs flex text-dw-100 gap-1 items-center">key R</div>
+    </div>
+  );
+
+  const SpeedTitle = () => (
+    <div class="flex flex-row items-center justify-between translate-y-[5px]">
+      <div>speed</div>
+      <div class="text-3xs flex text-dw-100 gap-1 items-center">arrow up/down</div>
+    </div>
+  );
+
+  const RandomTitle = () => (
+    <div class="flex flex-row items-center justify-between translate-y-[5px]">
+      <div>randomness</div>
+      <div class="text-3xs flex text-dw-100 gap-1 items-center">arrow left/right</div>
+    </div>
   );
 
   const fps = (speed: number) => {
@@ -188,11 +212,11 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         <Item
           onClick={props.switchPlayPause}
           tooltip={
-            <StandardTooltip class="p-3 w-16">
-              <div class="uppercase monserrat tracking-widest text-xs font-bold text-dw-200 translate-y-[2px]">
-                {playPauseText()}
-              </div>
-            </StandardTooltip>
+            <>
+              <StandardTooltip title={<PlayPauseTitle />}>
+                <p class="min-w-40"></p>
+              </StandardTooltip>
+            </>
           }
         >
           <PlayPauseIcon />
@@ -200,7 +224,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
 
         <Item
           tooltip={
-            <StandardTooltip title="reset">
+            <StandardTooltip title={<ResetTitle />}>
               <p class="min-w-48">reset to a new original fresh random game</p>
             </StandardTooltip>
           }
@@ -212,9 +236,8 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Separator />
       <Group>
         <Item
-          showTooltipOnClick
           tooltip={
-            <StandardTooltip title="speed">
+            <StandardTooltip title={<SpeedTitle />}>
               <p>change the delay between two frames thus affecting fps</p>
               <SpeedTooltip />
             </StandardTooltip>
@@ -223,10 +246,9 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           <Icon width={xl} name="speed" />
         </Item>
         <Item
-          showTooltipOnClick
           tooltip={
-            <StandardTooltip title="randomness">
-              <p>
+            <StandardTooltip title={<RandomTitle />}>
+              <p class="mt-2">
                 change the ratio between dead and alive cells, the higher the value the more dead cells generated on
                 reset
               </p>
@@ -240,7 +262,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       </Group>
       <Separator />
       <Group>
-        <Item showTooltipOnClick tooltip={<StatsTooltip title={"Stats"} data={stats()} />}>
+        <Item tooltip={<StatsTooltip title={"Stats"} data={stats()} />}>
           <Icon width={xl} name="wave" />
         </Item>
       </Group>

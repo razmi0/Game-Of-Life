@@ -28,6 +28,7 @@ const Item: Component<Prettify<ItemProps>> = (props) => {
   const hasLeft = !!props.left;
   const hasRight = !!props.right;
   const hasChildren = !!props.children;
+  const hasTooltip = !!props.tooltip;
   const withClick = !!props.showTooltipOnClick;
 
   const onMouseEnter = withClick ? () => {} : ([setHovering, true] as const);
@@ -50,7 +51,7 @@ const Item: Component<Prettify<ItemProps>> = (props) => {
         </Child>
         <Right show={hasRight}>{props.right}</Right>
 
-        <Tooltip when={hovering() && hasChildren} itemRef={itemRef!}>
+        <Tooltip when={hovering() && hasChildren && hasTooltip} itemRef={itemRef!}>
           {props.tooltip}
         </Tooltip>
       </div>
@@ -108,16 +109,12 @@ const Tooltip = (props: TooltipProps) => {
           width: ${TOOLTIP_SPACING}px;
           pointer-events: none;
           background-color: ${BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP};
-          transform: translate(0px, 0px); 
         `}
           class="-z-10 grid items-center"
         >
           <Icon name="caret" width={30} />
         </div>
         <div class="w-full bg-dw-500" style={`min-height: ${itemSize.height}px `}>
-          <div class="w-full h-fit flex flex-row-reverse ">
-            <Icon name="pin" width={ICON_SIZE.sm} class="m-2 hover:bg-dw-200 rounded-full" />
-          </div>
           {props.children}
         </div>
       </Show>
