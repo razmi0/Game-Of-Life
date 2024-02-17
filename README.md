@@ -43,7 +43,20 @@ Age => color
 - [x] implement redraw only flipped ?
 - [ ] replace SafeArea Rect with safeArea trapezoid svg (left height === item height ; right height === tooltip height)
 - [ ] paint the grid
+- [ ] text to grid
+- [ ] img to grid
+- [ ] color picker for cells
+- [ ] shape picker for draw (common shapes + custom + remarquable shapes)
+- [ ] shape picker for cells (circle, square, triangle, hexagon, octogon, star, heart, custom)
 - [ ] toroidal grid
 - [ ] implement remarquable shapes and add it to grid
-- [ ] tortue/escargot lapin icon pour speed range
+- [x] tortue/escargot lapin icon pour speed range
 - [ ] reset default params
+- [ ] implement action bar on drag with cross to close, pin to drag, +/- to minimize/maximize action bar, opacity to change opacity
+- [ ] replace pin icon with drag icon
+- [ ] full HTML for SEO presentation (what ? for what ? why ? how ? when ? )
+- [ ] space between cells (new branch ) and background off cells grey
+- [ ] stats => add cell size
+- [ ] implement white theme
+- [ ] add loader animation
+- [ ] tools => zoom on cursor
