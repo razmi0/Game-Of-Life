@@ -73,7 +73,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   );
 
   const PlayPauseTitle = () => (
-    <div class="flex flex-row items-center justify-between translate-y-[5px]">
+    <div class="flex flex-col items-center justify-between translate-y-[5px] w-fit">
       <div>{playPauseText()}</div>
       <div class="text-3xs flex text-dw-100 gap-1 items-center">spacebar</div>
     </div>
@@ -210,12 +210,11 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Separator />
       <Group>
         <Item
+          showTooltipOnClick
           onClick={props.switchPlayPause}
           tooltip={
             <>
-              <StandardTooltip title={<PlayPauseTitle />}>
-                <p class="min-w-40"></p>
-              </StandardTooltip>
+              <StandardTooltip title={<PlayPauseTitle />} />
             </>
           }
         >
@@ -272,17 +271,18 @@ export default function Drawer(props: Prettify<DrawerProps>) {
 }
 
 type StandardTooltipProps = {
-  children: JSXElement;
+  children?: JSXElement;
   title?: JSXElement;
   class?: string;
 };
 const StandardTooltip: Component<StandardTooltipProps> = (props) =>
   // prettier-ignore
-  <div class={`flex h-fit w-fit p-5 bg-dw-500 flex-col ${props.class || ""}`}> 
+  <div class={`flex h-fit w-fit py-3 px-4 bg-dw-500 flex-col ${props.class || ""}`}> 
     <Show when={!!props.title}>
       <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
     </Show>
-    <div class="text-balance">{props.children}</div>
+    <Show when={!!props.children}>
+    <div class="text-balance">{props.children}</div></Show>
   </div>;
 
 type StatsTooltipData = { label: string; value: JSXElement; separator?: boolean };
