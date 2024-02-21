@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import { DEFAULT_RANDOMNESS } from "../data";
+import { DEFAULT_RANDOMNESS, MAX_ALIVE_RANDOM, MIN_ALIVE_RANDOM } from "../data";
 
 export default function useData() {
   const [data, setData] = createStore({
@@ -23,8 +23,15 @@ export default function useData() {
 
     randomness: DEFAULT_RANDOMNESS,
     randomChoice: () => (Math.random() * 100 - data.randomness + 50 > 50 ? true : false),
-    setRandom: (value: number /** range 0 - 100 */) => {
+
+    tuneRandom: (value: number /** range 0 - 100 */) => {
       setData("randomness", value);
+    },
+
+    changeRandom: (addedRandom: number) => {
+      const newRandom = data.randomness + addedRandom;
+      if (newRandom < MIN_ALIVE_RANDOM || newRandom > MAX_ALIVE_RANDOM) return;
+      setData("randomness", newRandom);
     },
   });
 

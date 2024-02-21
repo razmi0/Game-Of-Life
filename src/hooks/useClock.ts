@@ -1,18 +1,11 @@
 import { type SetStoreFunction, Store, createStore } from "solid-js/store";
-import { DEFAULT_SPEED, START_CLOCKED, START_IMMEDIATELY } from "../data";
+import { DEFAULT_SPEED, MAX_DELAY, MIN_DELAY, START_CLOCKED, START_IMMEDIATELY } from "../data";
 
 /**
  * Gen playback controls
  * @returns
  */
 
-type ClockHook = {
-  clock: Store<Prettify<ClockState>>;
-  switchClocked: () => void;
-  changeSpeed: (speed: number) => void;
-  addSpeed: () => void;
-  subSpeed: () => void;
-};
 export default function useClock(fn: () => void) {
   const [clock, setClock] = createStore({
     play: START_IMMEDIATELY,
@@ -47,24 +40,21 @@ export default function useClock(fn: () => void) {
       setClock("limiter", true);
       clock.play && clock.switchPlayPause();
     },
+
+    tuneSpeed: (speed: number) => {
+      setClock("speed", speed);
+    },
+
+    changeSpeed: (addedSpeed: number) => {
+      const newSpeed = clock.speed + addedSpeed;
+      if (newSpeed < MIN_DELAY || newSpeed > MAX_DELAY) return;
+      setClock("speed", newSpeed);
+    },
+
+    switchClocked: () => {
+      setClock("clocked", !clock.clocked);
+    },
   });
 
-  const switchClocked = () => {
-    setClock("clocked", !clock.clocked);
-  };
-
-  const changeSpeed = (speed: number) => {
-    setClock("speed", speed);
-    console.log(clock.speed);
-  };
-
-  const addSpeed = () => {
-    setClock("speed", Math.min(Math.max(Math.floor(clock.speed / 2), 0), 100));
-  };
-
-  const subSpeed = () => {
-    setClock("speed", clock.speed + 100);
-  };
-
-  return { clock, switchClocked, changeSpeed, addSpeed, subSpeed } as Prettify<ClockHook>;
+  return clock;
 }

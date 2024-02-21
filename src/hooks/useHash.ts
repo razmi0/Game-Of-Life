@@ -1,5 +1,4 @@
-import { batch, createEffect } from "solid-js";
-import { CELL_WIDTH } from "../data";
+import { batch, createEffect, createMemo } from "solid-js";
 import type { Accessor } from "solid-js";
 import type { ScreenHook } from "./useScreen";
 
@@ -13,6 +12,7 @@ export default function useHash(
   ctx: Accessor<CanvasRenderingContext2D | undefined>
 ) {
   const initHash = () => new Uint8Array(screen.nCell()).map(() => (data.randomChoice() ? 1 : 0)) as Hash8;
+  // const screen.cellSize()= createMemo(() => screen.cellSize());
 
   let hash = initHash();
   let flipIndexes: number[] = [];
@@ -90,13 +90,13 @@ export default function useHash(
     const context = ctx();
     if (!context) return;
     while (i < flipIndexes.length) {
-      const x = Math.floor(flipIndexes[i] / rowSize) * CELL_WIDTH;
-      const y = (flipIndexes[i] % rowSize) * CELL_WIDTH;
+      const x = Math.floor(flipIndexes[i] / rowSize) * screen.cellSize();
+      const y = (flipIndexes[i] % rowSize) * screen.cellSize();
       if (hash[flipIndexes[i]]) {
         context.fillStyle = findColor(i);
-        context.fillRect(x, y, CELL_WIDTH, CELL_WIDTH);
+        context.fillRect(x, y, screen.cellSize(), screen.cellSize());
       } else {
-        context.clearRect(x, y, CELL_WIDTH, CELL_WIDTH);
+        context.clearRect(x, y, screen.cellSize(), screen.cellSize());
       }
 
       i++;
@@ -110,13 +110,13 @@ export default function useHash(
     const context = ctx();
     if (!context) return;
     while (i < hash.length) {
-      const x = Math.floor(i / rowSize) * CELL_WIDTH;
-      const y = (i % rowSize) * CELL_WIDTH;
+      const x = Math.floor(i / rowSize) * screen.cellSize();
+      const y = (i % rowSize) * screen.cellSize();
       if (hash[i]) {
         context.fillStyle = findColor(i);
-        context.fillRect(x, y, CELL_WIDTH, CELL_WIDTH);
+        context.fillRect(x, y, screen.cellSize(), screen.cellSize());
       } else {
-        context.clearRect(x, y, CELL_WIDTH, CELL_WIDTH);
+        context.clearRect(x, y, screen.cellSize(), screen.cellSize());
       }
 
       i++;
