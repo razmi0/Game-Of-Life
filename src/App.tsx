@@ -4,9 +4,9 @@ import useScreen from "./hooks/useScreen";
 import useHash from "./hooks/useHash";
 import useColors from "./hooks/useColors";
 import useClock from "./hooks/useClock";
+import useData from "./hooks/useData";
 import { SimpleButton } from "./components/Buttons";
 import DebuggerPanel from "./components/DebuggerPanel";
-import useData from "./hooks/useData";
 import Drawer from "./components/Drawer";
 import { getNavigatorInfo } from "./helpers";
 
@@ -35,11 +35,12 @@ const App = () => {
     data.resetGeneration();
   };
 
-  const changeRandomization = (newRandom: number) => {
-    data.setRandom(newRandom);
+  const changeCellSizeAndReset = (newSize: number) => {
+    screen.changeCellSize(newSize);
+    reset();
   };
 
-  const { clock, changeSpeed } = useClock(run);
+  const clock = useClock(run);
 
   onMount(() => {
     setCtx(canvas.getContext("2d")!);
@@ -47,8 +48,6 @@ const App = () => {
   });
 
   getNavigatorInfo().then((content) => setNavigatorInfo(content));
-
-  createEffect(() => console.log("navigatorInfo : ", navigatorInfo()));
 
   const debug = false;
 
@@ -70,16 +69,25 @@ const App = () => {
         </DebuggerPanel>
       </Show>
       <Drawer
+        /** data */
         generation={data.generation}
         nAlive={data.nAlive}
         nDead={data.nDead}
         randomness={data.randomness}
+        tuneRandom={data.tuneRandom}
+        changeRandom={data.changeRandom}
+        /** screen */
+        cellSize={screen.cellSize()}
+        tuneCellSize={screen.tuneCellSize}
+        changeCellSize={changeCellSizeAndReset}
+        /** clock */
         speed={clock.speed}
         play={clock.play}
-        randomize={changeRandomization}
+        tuneSpeed={clock.tuneSpeed}
+        changeSpeed={clock.changeSpeed}
         switchPlayPause={clock.switchPlayPause}
+        /** hash & misc */
         reset={reset}
-        changeSpeed={changeSpeed}
         hasStarted={hasStarted()}
         navigator={navigatorInfo()}
       />
