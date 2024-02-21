@@ -24,6 +24,7 @@ type DrawerProps = {
   changeSpeed: (newTime: number) => void;
   randomize: (newRandom: number) => void;
   switchPlayPause: () => void;
+  navigator: () => void;
 };
 
 export default function Drawer(props: Prettify<DrawerProps>) {
@@ -222,8 +223,9 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         </Item>
 
         <Item
+          showTooltipOnClick
           tooltip={
-            <StandardTooltip title={<ResetTitle />}>
+            <StandardTooltip title={<ResetTitle />} class="border-dw-200">
               <p class="min-w-48">reset to a new original fresh random game</p>
             </StandardTooltip>
           }
@@ -263,6 +265,9 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Group>
         <Item tooltip={<StatsTooltip title={"Stats"} data={stats()} />}>
           <Icon width={xl} name="wave" />
+        </Item>
+        <Item>
+          <Icon width={xl} name="screen_gear" />
         </Item>
       </Group>
       <Separator />
