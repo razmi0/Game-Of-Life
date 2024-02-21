@@ -17,6 +17,7 @@ export type IconNames =
   | "clock"
   | "controls"
   | "range"
+  | "screen_gear"
   | "reset"
   | "population"
   | "random"
