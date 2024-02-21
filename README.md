@@ -52,8 +52,6 @@ Age => color
 - [ ] implement remarquable shapes and add it to grid
 - [x] tortue/escargot lapin icon pour speed range
 - [ ] reset default params
-- [ ] implement action bar on drag with cross to close, pin to drag, +/- to minimize/maximize action bar, opacity to change opacity
-- [ ] replace pin icon with drag icon
 - [ ] full HTML for SEO presentation (what ? for what ? why ? how ? when ? )
 - [ ] space between cells (new branch ) and background off cells grey
 - [ ] stats => add cell size
