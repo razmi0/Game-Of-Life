@@ -23,6 +23,15 @@ type ClockState = {
 
 type ClockQueueTicksMode = "clocked" | "free";
 
+type UserAgentInfo = {
+  userAgent: string;
+  battery: number | null;
+  platform: string;
+  hardwareConcurrency: number;
+  deviceMemory: number;
+  availableThreads: number;
+};
+
 type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};
