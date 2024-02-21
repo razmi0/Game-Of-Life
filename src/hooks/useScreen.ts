@@ -1,10 +1,10 @@
 import type { Accessor } from "solid-js";
 import { batch, createMemo, createSignal, onCleanup, onMount } from "solid-js";
-import { CELL_WIDTH } from "../data";
+import { INITIAL_CELL_SIZE, MAX_CELL_SIZE, MIN_CELL_SIZE } from "../data";
 import { debounce } from "../helpers";
 
-const nRowInit = Math.floor(window.innerHeight / CELL_WIDTH) + 1;
-const nColInit = Math.floor(window.innerWidth / CELL_WIDTH) + 1;
+const nRowInit = Math.floor(window.innerHeight / INITIAL_CELL_SIZE) + 1;
+const nColInit = Math.floor(window.innerWidth / INITIAL_CELL_SIZE) + 1;
 const nCellInit = nRowInit * nColInit;
 
 export type ScreenHook = {
@@ -13,6 +13,9 @@ export type ScreenHook = {
   nCell: Accessor<number>;
   wW: Accessor<number>;
   wH: Accessor<number>;
+  cellSize: Accessor<number>;
+  changeCellSize: (newSize: number) => void;
+  tuneCellSize: (newSize: number) => void;
 };
 export default function useScreen() {
   const [wW, setWW] = createSignal(window.innerWidth);
@@ -20,18 +23,29 @@ export default function useScreen() {
   const [nRow, setnRow] = createSignal(nRowInit);
   const [nCol, setnCol] = createSignal(nColInit);
   const [nCell, setnCell] = createSignal(nCellInit);
+  const [cellSize, setCellSize] = createSignal(INITIAL_CELL_SIZE);
 
   const calcnRow = createMemo(() => {
-    setnRow(Math.floor(wH() / CELL_WIDTH) + 1);
+    setnRow(Math.floor(wH() / cellSize()) + 1);
   });
 
   const calcnCol = createMemo(() => {
-    setnCol(Math.floor(wW() / CELL_WIDTH) + 1);
+    setnCol(Math.floor(wW() / cellSize()) + 1);
   });
 
   const calcnCell = createMemo(() => {
     setnCell(nRow() * nCol());
   });
+
+  const changeCellSize = (addSize: number) => {
+    const newSize = cellSize() + addSize;
+    if (newSize < MIN_CELL_SIZE || newSize > MAX_CELL_SIZE) return;
+    setCellSize(newSize);
+  };
+
+  const tuneCellSize = (newSize: number) => {
+    setCellSize(newSize);
+  };
 
   const delayDebounce = 80;
   const updateSizes = debounce(() => {
@@ -52,5 +66,5 @@ export default function useScreen() {
     onCleanup(() => window.removeEventListener("resize", updateSizes));
   });
 
-  return { nRow, nCol, nCell, wW, wH } as Prettify<ScreenHook>;
+  return { nRow, nCol, nCell, wW, wH, cellSize, changeCellSize, tuneCellSize } as Prettify<ScreenHook>;
 }
