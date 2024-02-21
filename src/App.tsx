@@ -81,7 +81,7 @@ const App = () => {
         reset={reset}
         changeSpeed={changeSpeed}
         hasStarted={hasStarted()}
-        navigator={getNavigatorInfo}
+        navigator={navigatorInfo()}
       />
       <CanvasWrapper>
         <canvas class="bg-black" width={screen.wW()} height={screen.wH()} ref={canvas}></canvas>
