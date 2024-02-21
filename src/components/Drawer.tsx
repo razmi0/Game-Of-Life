@@ -10,7 +10,6 @@ import Separator from "./Drawer/Separator";
 import Icon from "./Icons";
 import type { Accessor, Component, JSXElement } from "solid-js";
 import useShorcuts, { type Shortcut } from "../hooks/useShorcuts";
-import Draggable from "./Draggable/Draggable";
 
 type DrawerProps = {
   hasStarted: boolean;
@@ -24,7 +23,7 @@ type DrawerProps = {
   changeSpeed: (newTime: number) => void;
   randomize: (newRandom: number) => void;
   switchPlayPause: () => void;
-  navigator: () => void;
+  navigator: UserAgentInfo | null;
 };
 
 export default function Drawer(props: Prettify<DrawerProps>) {
@@ -64,7 +63,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   ];
   useShorcuts(shorcuts);
 
-  const { xl, sm, md, xs } = ICON_SIZE;
+  const { xl, sm, md, xs, lg } = ICON_SIZE;
 
   const playPauseText = () => (props.play ? "pause" : "play");
   const PlayPauseIcon = () => (
@@ -179,7 +178,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     );
   };
 
-  const stats: Accessor<StatsTooltipData[]> = createMemo(() => [
+  const boardStats: Accessor<StatsTooltipData[]> = createMemo(() => [
     {
       label: "generation",
       value: props.generation,
@@ -203,6 +202,25 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     },
   ]);
 
+  const deviceStats: Accessor<StatsTooltipData[]> = createMemo(() => [
+    {
+      label: "platform",
+      value: props.navigator?.platform || "unknown",
+    },
+    {
+      label: "battery",
+      value: props.navigator?.battery || "unknown",
+    },
+    {
+      label: "threads per core",
+      value: props.navigator?.hardwareConcurrency || "unknown",
+    },
+    {
+      label: "available threads",
+      value: props.navigator?.availableThreads || "unknown",
+    },
+  ]);
+
   return (
     <Wrapper trigger={trigger} open={isOpen()}>
       <Header>
@@ -213,11 +231,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         <Item
           showTooltipOnClick
           onClick={props.switchPlayPause}
-          tooltip={
-            <>
-              <StandardTooltip title={<PlayPauseTitle />} />
-            </>
-          }
+          tooltip={<StandardTooltip title={<PlayPauseTitle />} />}
         >
           <PlayPauseIcon />
         </Item>
@@ -253,7 +267,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
                 change the ratio between dead and alive cells, the higher the value the more dead cells generated on
                 reset
               </p>
-
               <RandomTooltip />
             </StandardTooltip>
           }
@@ -263,10 +276,10 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       </Group>
       <Separator />
       <Group>
-        <Item tooltip={<StatsTooltip title={"Stats"} data={stats()} />}>
+        <Item tooltip={<StatsTooltip title={"board infos"} data={boardStats()} />}>
           <Icon width={xl} name="wave" />
         </Item>
-        <Item>
+        <Item tooltip={<StatsTooltip title={"Device Infos"} data={deviceStats()} />}>
           <Icon width={xl} name="screen_gear" />
         </Item>
       </Group>
@@ -296,23 +309,11 @@ type StatsTooltipProps = {
   title?: JSXElement;
 };
 const StatsTooltip: Component<StatsTooltipProps> = (props) => {
-  // const [drag, setDrag] = createSignal(false);
-
-  // const toggleDrag = () => setDrag((p) => !p);
-
   return (
-    // <Draggable enabled={drag()}>
     <div class="flex flex-col p-5 w-fit bg-dw-500 min-w-72">
       <Show when={!!props.title}>
         <div class="flex flex-row justify-between">
           <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
-          {/* <IconButton
-              width={ICON_SIZE.sm}
-              name="pin"
-              class="translate-y-[-4px] p-1 rounded-full"
-              onClick={toggleDrag}
-              classList={{ ["bg-dw-200"]: drag() }}
-            /> */}
         </div>
       </Show>
       <div class="gap-1">
@@ -320,7 +321,7 @@ const StatsTooltip: Component<StatsTooltipProps> = (props) => {
           {(data) => (
             <>
               <div class="flex items-center justify-between z-10 w-full flex-nowrap">
-                <span class="w-20 text-left">{data.label}</span>
+                <span class="w-fit text-left">{data.label}</span>
                 <span class="whitespace-nowrap w-24 text-right text-yellow-400 tabular-nums">{data.value}</span>
               </div>
               <Show when={data.separator}>
