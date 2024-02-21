@@ -19,6 +19,9 @@ type ClockState = {
   work: () => void;
   switchPlayPause: () => void;
   queueTicks: (ticks: number) => void;
+  tuneSpeed: (speed: number) => void;
+  changeSpeed: (addedSpeed: number) => void;
+  switchClocked: () => void;
 };
 
 type ClockQueueTicksMode = "clocked" | "free";
@@ -48,7 +51,8 @@ type DataStore = {
 
   randomness: number;
   randomChoice: () => boolean;
-  setRandom: (value: number) => void;
+  tuneRandom: (value: number) => void;
+  changeRandom: (addedRandom: number) => void;
 };
 
 // type GridStoreState = {
