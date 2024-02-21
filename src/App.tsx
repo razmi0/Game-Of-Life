@@ -1,5 +1,5 @@
 import { CanvasWrapper } from "./components/Wrappers";
-import { onMount, createSignal, Show } from "solid-js";
+import { onMount, createSignal, Show, createEffect } from "solid-js";
 import useScreen from "./hooks/useScreen";
 import useHash from "./hooks/useHash";
 import useColors from "./hooks/useColors";
@@ -8,8 +8,11 @@ import { SimpleButton } from "./components/Buttons";
 import DebuggerPanel from "./components/DebuggerPanel";
 import useData from "./hooks/useData";
 import Drawer from "./components/Drawer";
+import { getNavigatorInfo } from "./helpers";
 
 let canvas: HTMLCanvasElement;
+const [navigatorInfo, setNavigatorInfo] = createSignal<UserAgentInfo | null>(null); // context candidate
+
 const App = () => {
   const [ctx, setCtx] = createSignal<CanvasRenderingContext2D>();
   const [hasStarted, setHasStarted] = createSignal(false);
@@ -43,6 +46,10 @@ const App = () => {
     run();
   });
 
+  getNavigatorInfo().then((content) => setNavigatorInfo(content));
+
+  createEffect(() => console.log("navigatorInfo : ", navigatorInfo()));
+
   const debug = false;
 
   return (
@@ -74,6 +81,7 @@ const App = () => {
         reset={reset}
         changeSpeed={changeSpeed}
         hasStarted={hasStarted()}
+        navigator={getNavigatorInfo}
       />
       <CanvasWrapper>
         <canvas class="bg-black" width={screen.wW()} height={screen.wH()} ref={canvas}></canvas>
