@@ -1,5 +1,13 @@
-import { For, Show, createMemo, createSignal } from "solid-js";
-import { ICON_SIZE, MAX_ALIVE_RANDOM, MAX_DELAY, MIN_ALIVE_RANDOM, MIN_DELAY } from "../data";
+import { For, Show, createEffect, createMemo, createSignal } from "solid-js";
+import {
+  ICON_SIZE,
+  MAX_ALIVE_RANDOM,
+  MAX_CELL_SIZE,
+  MAX_DELAY,
+  MIN_ALIVE_RANDOM,
+  MIN_CELL_SIZE,
+  MIN_DELAY,
+} from "../data";
 import { IconButton, SimpleButton } from "./Buttons";
 import Wrapper from "./Drawer/Content";
 import Group from "./Drawer/Group";
@@ -19,11 +27,16 @@ type DrawerProps = {
   generation: number;
   nAlive: number;
   nDead: number;
+  navigator: UserAgentInfo | null;
+  cellSize: number;
   reset: () => void;
   changeSpeed: (newTime: number) => void;
-  randomize: (newRandom: number) => void;
+  changeRandom: (newRandom: number) => void;
+  changeCellSize: (newSize: number) => void;
+  tuneRandom: (newRandom: number) => void;
+  tuneSpeed: (newSpeed: number) => void;
+  tuneCellSize: (newSize: number) => void;
   switchPlayPause: () => void;
-  navigator: UserAgentInfo | null;
 };
 
 export default function Drawer(props: Prettify<DrawerProps>) {
@@ -40,20 +53,28 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       action: () => props.reset(),
     },
     {
+      key: "z",
+      action: () => props.changeCellSize(2),
+    },
+    {
+      key: "s",
+      action: () => props.changeCellSize(-2),
+    },
+    {
       key: "ArrowUp",
-      action: () => props.changeSpeed(props.speed + 10),
+      action: () => props.changeSpeed(10),
     },
     {
       key: "ArrowDown",
-      action: () => props.changeSpeed(props.speed - 10),
+      action: () => props.changeSpeed(-10),
     },
     {
       key: "ArrowRight",
-      action: () => props.randomize(props.randomness + 2),
+      action: () => props.changeRandom(2),
     },
     {
       key: "ArrowLeft",
-      action: () => props.randomize(props.randomness - 2),
+      action: () => props.changeRandom(-2),
     },
     {
       key: "a",
@@ -100,6 +121,53 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     </div>
   );
 
+  const CellSizeTitle = () => (
+    <div class="flex flex-row items-center justify-between translate-y-[5px]">
+      <div>cell size</div>
+      <div class="text-3xs flex text-dw-100 gap-1 items-center">z / s</div>
+    </div>
+  );
+
+  const CellSizeTooltip = () => {
+    const [output, setOutput] = createSignal(props.cellSize + "px");
+
+    createEffect(() => setOutput(props.cellSize + "px"));
+
+    /** UI (onInput) */
+    const handleInputOutput = (e: Event) => {
+      const newSize = (e.target as HTMLInputElement).valueAsNumber;
+      setOutput(newSize + "px");
+    };
+
+    /** internal logic (onChange) */
+    const handleCellSizeChange = (e: Event) => {
+      const newSize = (e.target as HTMLInputElement).valueAsNumber;
+      props.changeCellSize(newSize);
+    };
+
+    return (
+      <div class="flex flex-col gap-4 mt-3 min-w-48">
+        <div class="flex gap-2 items-start">
+          <Icon width={lg} name="two_by_two_squares" class="mb-5" />
+          <SimpleRange
+            milestones={[MIN_CELL_SIZE, Math.floor((MIN_CELL_SIZE + MAX_CELL_SIZE) / 2), MAX_CELL_SIZE]}
+            onChange={handleCellSizeChange}
+            onInput={handleInputOutput}
+            value={props.cellSize}
+            min={MIN_CELL_SIZE}
+            max={MAX_CELL_SIZE}
+            aria="cell-size"
+            class="w-56"
+          />
+          <Icon width={lg} name="two_by_three_squares" class="mb-5 rotate-90" />
+          <div class="translate-y-[1px] text-yellow-400 text-sm font-bold h-full w-16 tabular-nums text-right">
+            {output()}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const fps = (speed: number) => {
     if (speed === 0) return "max fps";
     const lbl = 1000 / speed;
@@ -108,6 +176,8 @@ export default function Drawer(props: Prettify<DrawerProps>) {
 
   const SpeedTooltip = () => {
     const [output, setOutput] = createSignal(fps(props.speed));
+
+    createEffect(() => setOutput(fps(props.speed)));
 
     const handleInputOutput = (e: Event) => {
       setOutput(fps((e.target as HTMLInputElement).valueAsNumber));
@@ -142,9 +212,11 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   const RandomTooltip = () => {
     const [output, setOutput] = createSignal<string>(props.randomness + " %");
 
+    createEffect(() => setOutput(props.randomness + " %"));
+
     const handleRandomChange = (e: Event) => {
       const newRandom = (e.target as HTMLInputElement).valueAsNumber;
-      props.randomize(newRandom);
+      props.changeRandom(newRandom);
     };
 
     const handleInputOutput = (e: Event) => {
@@ -157,7 +229,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         <div class="flex gap-2 items-start ">
           <Icon width={md} name="baby" class="mb-5" />
           <SimpleRange
-            milestones={["0", "50", "100"]}
+            milestones={[MIN_ALIVE_RANDOM, Math.floor((MIN_ALIVE_RANDOM + MAX_ALIVE_RANDOM) / 2), MAX_ALIVE_RANDOM]}
             onChange={handleRandomChange}
             onInput={handleInputOutput}
             value={props.randomness}
@@ -182,6 +254,11 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     {
       label: "generation",
       value: props.generation,
+    },
+    {
+      label: "cell size",
+      value: props.cellSize + "px",
+      separator: true,
     },
     {
       label: "delay",
@@ -250,6 +327,17 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       </Group>
       <Separator />
       <Group>
+        <Item
+          tooltip={
+            <StandardTooltip title={<CellSizeTitle />}>
+              <p>change the size of the cells</p>
+              <CellSizeTooltip />
+            </StandardTooltip>
+          }
+        >
+          <Icon width={xl} name="grid_square" />
+        </Item>
+
         <Item
           tooltip={
             <StandardTooltip title={<SpeedTitle />}>
