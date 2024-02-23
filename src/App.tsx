@@ -44,9 +44,8 @@ const App = () => {
   const { navInfo, refreshBatteryInfo } = useAgent();
 
   const batteryClock = useClock(refreshBatteryInfo);
-  batteryClock.changeMaxSpeed(BATTERY_REFRESH_INTERVAL + 1);
-  batteryClock.changeSpeed(BATTERY_REFRESH_INTERVAL);
-  // batteryClock.switchPlayPause(); // start the battery checking clock
+  batteryClock.tuneSpeed(BATTERY_REFRESH_INTERVAL);
+  batteryClock.switchPlayPause(); // start the battery checking clock
 
   const gameLoop = useClock(run);
 
@@ -55,7 +54,7 @@ const App = () => {
     run();
   });
 
-  const debug = true;
+  const debug = false;
 
   return (
     <>
