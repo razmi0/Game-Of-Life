@@ -39,6 +39,8 @@ type DrawerProps = {
   switchPlayPause: () => void;
 };
 
+const { xl, sm, md, xs, lg } = ICON_SIZE;
+
 export default function Drawer(props: Prettify<DrawerProps>) {
   const [isOpen, setIsOpen] = createSignal(true);
   const trigger = () => setIsOpen((p) => !p);
@@ -83,8 +85,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     },
   ];
   useShorcuts(shorcuts);
-
-  const { xl, sm, md, xs, lg } = ICON_SIZE;
 
   const playPauseText = () => (props.play ? "pause" : "play");
   const PlayPauseIcon = () => (
