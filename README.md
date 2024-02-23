@@ -41,8 +41,8 @@ Age => color
 
 - [ ] implement workers
 - [x] implement redraw only flipped ?
-- [ ] replace SafeArea Rect with safeArea trapezoid svg (left height === item height ; right height === tooltip height)
-- [ ] paint the grid
+- [ ] _replace SafeArea Rect with safeArea trapezoid svg (left height === item height ; right height === tooltip height)_
+- [ ] CURRENT TASK => paint the grid
 - [ ] text to grid
 - [ ] img to grid
 - [ ] color picker for cells
@@ -54,7 +54,7 @@ Age => color
 - [ ] reset default params
 - [ ] full HTML for SEO presentation (what ? for what ? why ? how ? when ? )
 - [ ] space between cells (new branch ) and background off cells grey
-- [ ] stats => add cell size
+- [x] stats => add cell size
 - [ ] implement white theme
 - [ ] add loader animation
 - [ ] tools => zoom on cursor
