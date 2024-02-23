@@ -23,10 +23,9 @@ export default function useHash(
   };
 
   /** hash change size if needed (copy) */
-
   const resizeHash = () => {
-    const pastSize = hash.length; // old screen.nCell()
-    const newSize = screen.nCell(); // new screen.nCell()
+    const pastSize = hash.length;
+    const newSize = screen.nCell();
     if (newSize === pastSize) return;
     else if (newSize < pastSize) {
       hash = hash.copyWithin(0, newSize);
@@ -125,7 +124,6 @@ export default function useHash(
   createEffect(() => {
     if (screen.nCell() !== hash.length) {
       resizeHash();
-      // updateHash();
       drawHashOnReset();
     }
   });
