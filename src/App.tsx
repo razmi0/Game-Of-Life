@@ -5,13 +5,12 @@ import useHash from "./hooks/useHash";
 import useColors from "./hooks/useColors";
 import useClock from "./hooks/useClock";
 import useData from "./hooks/useData";
+import useAgent from "./hooks/useAgent";
 import { SimpleButton } from "./components/Buttons";
 import DebuggerPanel from "./components/DebuggerPanel";
 import Drawer from "./components/Drawer";
-import { getNavigatorInfo } from "./helpers";
 
 let canvas: HTMLCanvasElement;
-const [navigatorInfo, setNavigatorInfo] = createSignal<UserAgentInfo | null>(null); // context candidate
 
 const App = () => {
   const [ctx, setCtx] = createSignal<CanvasRenderingContext2D>();
@@ -40,6 +39,10 @@ const App = () => {
     reset();
   };
 
+  const { navInfo, refreshBatteryInfo } = useAgent();
+  const batteryClock = useClock(refreshBatteryInfo);
+  batteryClock.changeMaxSpeed(3000);
+  batteryClock.changeSpeed(2000);
   const clock = useClock(run);
 
   onMount(() => {
@@ -47,14 +50,13 @@ const App = () => {
     run();
   });
 
-  getNavigatorInfo().then((content) => setNavigatorInfo(content));
-
-  const debug = false;
+  const debug = true;
 
   return (
     <>
       <Show when={import.meta.env.DEV && debug}>
         <DebuggerPanel>
+          <SimpleButton handler={batteryClock.switchPlayPause}>battery refresh : {batteryClock.speed}</SimpleButton>
           <SimpleButton handler={run}>run hash</SimpleButton>
           <SimpleButton handler={clock.switchPlayPause}>{clock.play ? "pause" : "play"}</SimpleButton>
           <SimpleButton
@@ -89,7 +91,7 @@ const App = () => {
         /** hash & misc */
         reset={reset}
         hasStarted={hasStarted()}
-        navigator={navigatorInfo()}
+        navigator={navInfo()}
       />
       <CanvasWrapper>
         <canvas class="bg-black" width={screen.wW()} height={screen.wH()} ref={canvas}></canvas>
