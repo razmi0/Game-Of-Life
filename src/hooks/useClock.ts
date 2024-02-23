@@ -10,10 +10,14 @@ export default function useClock(fn: () => void) {
   const [clock, setClock] = createStore({
     play: START_IMMEDIATELY,
     speed: DEFAULT_SPEED /** ms */,
+    maxSpeed: MAX_DELAY,
+    minSpeed: MIN_DELAY,
     clocked: START_CLOCKED,
     tick: 0,
     limiter: false,
     queue: 0,
+    changeMaxSpeed: (speed: number): void => setClock("maxSpeed", speed),
+    changeMinSpeed: (speed: number): void => setClock("minSpeed", speed),
     switchPlayPause: () => {
       setClock("play", !clock.play);
       clock.run();
@@ -47,7 +51,7 @@ export default function useClock(fn: () => void) {
 
     changeSpeed: (addedSpeed: number) => {
       const newSpeed = clock.speed + addedSpeed;
-      if (newSpeed < MIN_DELAY || newSpeed > MAX_DELAY) return;
+      if (newSpeed < clock.minSpeed || newSpeed > clock.maxSpeed) return;
       setClock("speed", newSpeed);
     },
 
