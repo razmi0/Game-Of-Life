@@ -23,9 +23,6 @@ const useAgent = () => {
       if (startBattery === null) startBattery = battery;
     }
 
-    console.log("battery : ", battery);
-    console.log("startBattery : ", startBattery);
-
     setNavInfo((p) => {
       if (p.battery !== battery && startBattery !== null && battery !== null) {
         const batteryChange = battery - startBattery;
