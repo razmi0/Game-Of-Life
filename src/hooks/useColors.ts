@@ -9,21 +9,28 @@ export default function useColors(nCell: Accessor<number>) {
   let colors = new Uint32Array(nCell()) as Hash32;
   const predefinedColors = ["#3B82F6", "#6366F1", "#EC4899", "#F59E0B"];
 
-  // const resizeColors = () => {
-  //   const pastSize = colors.length; // old screen.nCell()
-  //   const newSize = nCell(); // new screen.nCell()
-  //   if (newSize <= pastSize) return;
-  //   const diff = newSize - pastSize;
-  //   const newDiffColors = new Uint32Array(diff).map(() => packColor(randomColor())) as Hash32;
-  //   const newColors = new Uint32Array(diff + pastSize) as Hash32;
-  //   newColors.set(colors, 0);
-  //   newColors.set(newDiffColors, pastSize);
-  //   colors = newColors;
-  // };
+  createEffect(() => {
+    console.log(nCell());
+    console.log("colors length : ", colors.length);
+    resizeColors();
+  });
 
-  // createEffect(() => {
-  //   console.log("color : ", nCell());
-  // });
+  const resizeColors = () => {
+    const newSize = nCell();
+    const pastSize = colors.length;
+    if (newSize === pastSize) return;
+    else if (newSize < pastSize) {
+      colors = colors.copyWithin(0, newSize);
+    } else {
+      const diff = newSize - pastSize;
+      const newDiffColors = new Uint32Array(diff).map(() => packColor(randomColor())) as Hash32;
+      const newColors = new Uint32Array(diff + pastSize) as Hash32;
+
+      newColors.set(colors, 0);
+      newColors.set(newDiffColors, pastSize);
+      colors = newColors;
+    }
+  };
 
   const randomColor = () => {
     let color = "";

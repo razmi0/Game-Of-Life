@@ -12,7 +12,6 @@ export default function useHash(
   ctx: Accessor<CanvasRenderingContext2D | undefined>
 ) {
   const initHash = () => new Uint8Array(screen.nCell()).map(() => (data.randomChoice() ? 1 : 0)) as Hash8;
-  // const screen.cellSize()= createMemo(() => screen.cellSize());
 
   let hash = initHash();
   let flipIndexes: number[] = [];
@@ -124,10 +123,10 @@ export default function useHash(
   };
 
   createEffect(() => {
-    if (screen.nCell()) {
+    if (screen.nCell() !== hash.length) {
       resizeHash();
-      updateHash();
-      drawHash();
+      // updateHash();
+      drawHashOnReset();
     }
   });
 
