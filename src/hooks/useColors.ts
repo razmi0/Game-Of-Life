@@ -10,9 +10,7 @@ export default function useColors(nCell: Accessor<number>) {
   const predefinedColors = ["#3B82F6", "#6366F1", "#EC4899", "#F59E0B"];
 
   createEffect(() => {
-    console.log(nCell());
-    console.log("colors length : ", colors.length);
-    resizeColors();
+    if (nCell() !== colors.length) resizeColors();
   });
 
   const resizeColors = () => {
