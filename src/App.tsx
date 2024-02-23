@@ -1,6 +1,6 @@
 import { CanvasWrapper } from "./components/Wrappers";
 import { onMount, createSignal, Show, createEffect } from "solid-js";
-import useScreen from "./hooks/useScreen";
+import useGrid from "./hooks/useGrid";
 import useHash from "./hooks/useHash";
 import useColors from "./hooks/useColors";
 import useClock from "./hooks/useClock";
@@ -17,10 +17,10 @@ const App = () => {
   const [ctx, setCtx] = createSignal<CanvasRenderingContext2D>();
   const [hasStarted, setHasStarted] = createSignal(false);
 
-  const screen = useScreen(); // context candidate
+  const grid = useGrid(); // context candidate
   const data = useData();
-  const { findColor } = useColors(screen.nCell);
-  const { updateHash, drawHash, resetHash } = useHash(screen, data, findColor, ctx);
+  const { findColor } = useColors(grid.nCell);
+  const { updateHash, drawHash, resetHash } = useHash(grid, data, findColor, ctx);
 
   const run = () => {
     if (!hasStarted()) setHasStarted(true);
@@ -37,7 +37,7 @@ const App = () => {
   };
 
   const changeCellSizeAndReset = (newSize: number) => {
-    screen.changeCellSize(newSize);
+    grid.changeCellSize(newSize);
     reset();
   };
 
@@ -54,7 +54,7 @@ const App = () => {
     run();
   });
 
-  const debug = false;
+  const debug = true;
 
   return (
     <>
@@ -65,9 +65,9 @@ const App = () => {
           <SimpleButton handler={gameLoop.switchPlayPause}>{gameLoop.play ? "pause" : "play"}</SimpleButton>
           <SimpleButton
             handler={() => {
-              console.log("cells : ", screen.nCell());
-              console.log("rows : ", screen.nRow());
-              console.log("cols : ", screen.nCol());
+              console.log("cells : ", grid.nCell());
+              console.log("rows : ", grid.nRow());
+              console.log("cols : ", grid.nCol());
             }}
           >
             log
@@ -82,9 +82,9 @@ const App = () => {
         randomness={data.randomness}
         tuneRandom={data.tuneRandom}
         changeRandom={data.changeRandom}
-        /** screen */
-        cellSize={screen.cellSize()}
-        tuneCellSize={screen.tuneCellSize}
+        /** grid */
+        cellSize={grid.cellSize()}
+        tuneCellSize={grid.tuneCellSize}
         changeCellSize={changeCellSizeAndReset}
         /** gameLoop */
         speed={gameLoop.speed}
@@ -98,7 +98,7 @@ const App = () => {
         navigator={navInfo()}
       />
       <CanvasWrapper>
-        <canvas class="bg-black" width={screen.wW()} height={screen.wH()} ref={canvas}></canvas>
+        <canvas class="bg-black" width={grid.wW()} height={grid.wH()} ref={canvas}></canvas>
       </CanvasWrapper>
     </>
   );
