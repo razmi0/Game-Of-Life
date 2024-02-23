@@ -11,10 +11,14 @@ type GridType = Cell[][];
 type ClockState = {
   play: boolean;
   speed: number;
+  maxSpeed: number;
+  minSpeed: number;
   clocked: boolean;
   tick: number;
   limiter: boolean;
   queue: number;
+  changeMaxSpeed: (speed: number) => void;
+  changeMinSpeed: (speed: number) => void;
   run: () => void;
   work: () => void;
   switchPlayPause: () => void;
@@ -29,6 +33,7 @@ type ClockQueueTicksMode = "clocked" | "free";
 type UserAgentInfo = {
   userAgent: string;
   battery: number | null;
+  batteryChange: number;
   platform: string;
   hardwareConcurrency: number;
   deviceMemory: number;
