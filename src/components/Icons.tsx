@@ -15,14 +15,23 @@ export type IconNames =
   | "pause"
   | "speed"
   | "clock"
+  | "controls"
   | "range"
+  | "screen_gear"
   | "reset"
   | "population"
   | "random"
   | "queue"
+  | "grid_square"
+  | "two_by_two_squares"
+  | "two_by_three_squares"
   | "arrowUp"
   | "pin"
+  | "caret"
+  | "spacebar"
   | "arrowDown"
+  | "snail"
+  | "hare"
   | "wave";
 
 export type IconProps = {
@@ -30,6 +39,8 @@ export type IconProps = {
   height?: number;
   name: IconNames;
   color?: string;
+  class?: string;
+  style?: string;
 };
 /**
  * <svg>
@@ -40,7 +51,7 @@ export type IconProps = {
 export default function Icon(props: IconProps) {
   const height = props.height || props.width;
   return (
-    <svg width={props.width + "px"} height={height + "px"}>
+    <svg width={props.width + "px"} height={height + "px"} class={props.class ?? ""} style={props.style ?? ""}>
       <use href={`${spriteHref}#${props.name}`} />
     </svg>
   );

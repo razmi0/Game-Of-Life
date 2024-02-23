@@ -11,53 +11,74 @@ type GridType = Cell[][];
 type ClockState = {
   play: boolean;
   speed: number;
-  tick: number;
+  maxSpeed: number;
+  minSpeed: number;
   clocked: boolean;
+  tick: number;
   limiter: boolean;
   queue: number;
-  playPause: () => void;
+  changeMaxSpeed: (speed: number) => void;
+  changeMinSpeed: (speed: number) => void;
   run: () => void;
   work: () => void;
-  changeSpeed: (speed: number) => void;
-  switchClocked: () => void;
-  addSpeed: () => void;
-  subSpeed: () => void;
+  switchPlayPause: () => void;
   queueTicks: (ticks: number) => void;
-};
-type BuildCellParams =
-  | [mode: "random", x: number, y: number, width: number]
-  | [mode: "inherit", x: number, y: number, width: number, isAlive: boolean];
-type ScreenStoreState = {
-  width: number;
-  height: number;
-  nRow: () => number;
-  nCol: () => number;
-  nCell: () => number;
-  updateScreen: () => void;
+  tuneSpeed: (speed: number) => void;
+  changeSpeed: (addedSpeed: number) => void;
+  switchClocked: () => void;
 };
 
-type GridStoreState = {
-  grid: GridType;
+type ClockQueueTicksMode = "clocked" | "free";
+
+type UserAgentInfo = {
+  userAgent: string;
+  battery: number | null;
+  batteryChange: number;
+  platform: string;
+  hardwareConcurrency: number;
+  deviceMemory: number;
+  availableThreads: number;
+};
+
+type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
+
+type DataStore = {
   generation: number;
+  incrementGeneration: () => void;
+
   nAlive: number;
-  nAliveIncrease: boolean;
+  setAlive: (value: number) => void;
+
   nDead: number;
-  nDeadIncrease: boolean;
+  setDead: (value: number) => void;
+
   randomness: number;
   randomChoice: () => boolean;
-  shuffle: () => void;
-  build: (random: boolean) => GridType;
-  draw: () => void;
-  nextGen: () => void;
-  reset: () => void;
-  changeRandomness: (value: number) => void;
-  // resize: () => void;
-  countAliveNeighbors: (row: number, col: number) => number;
-  judgement: (cell: Cell, neighbors: number) => boolean;
-  nextCycle: () => void;
+  tuneRandom: (value: number) => void;
+  changeRandom: (addedRandom: number) => void;
 };
-type BuildCellMode = "random" | "inherit";
 
-type CanvasProps = {
-  screen: ScreenStoreState;
-};
+// type GridStoreState = {
+//   grid: GridType;
+//   generation: number;
+//   nAlive: number;
+//   nAliveIncrease: boolean;
+//   nDead: number;
+//   nDeadIncrease: boolean;
+//   randomness: number;
+//   randomChoice: () => boolean;
+//   shuffle: () => void;
+//   build: (random: boolean) => GridType;
+//   draw: () => void;
+//   nextGen: () => void;
+//   reset: () => void;
+//   changeRandomness: (value: number) => void;
+//   initHash: () => Uint8Array;
+//   updateHash: () => void;
+//   // resize: () => void;
+//   countAliveNeighbors: (row: number, col: number) => number;
+//   judgement: (cell: Cell, neighbors: number) => boolean;
+//   nextCycle: () => void;
+// };

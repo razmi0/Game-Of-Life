@@ -18,42 +18,43 @@
 
 #### Inputs
 
-pin group
+On group : // for stats ; ranges
+pin => trigger drag
++/- => minimilaze/maximilaze
+cross => close
 
-<ul>
+param
 
-</ul>
+- size
 
-nAlive nDead nGen nSpeed nRandomness population size
-
-// PlayPause => (play/pause switch icons)
-Speed => range input (0-100) + label at left
 range Add to Queue (x) => button to add x to queue
-randomness factor => range input
-
-button disabled Switch clocked => button & data
-
-// button reset => button is data
 
 save file ?
 paint the grid?
 typology open closed wrap
+group => remarquable shapes + add it to grid
 
 Cells :
 Age => color
 
-algo : read through hash to generate grid
-hash evolve and than buildFromhash fn
+#### TODO
 
-```mermaid
-graph LR
-A[hash] --evolve--> A[hash] --update--> B[grid]
-```
-
-```mermaid
-graph LR
-A[grid] --evolve--> A[grid]
-```
-
-evolve : count judge on hash and evolve hash mutate hash
-update : grid from hash 
+- [ ] implement workers
+- [x] implement redraw only flipped ?
+- [ ] _replace SafeArea Rect with safeArea trapezoid svg (left height === item height ; right height === tooltip height)_
+- [ ] CURRENT TASK => paint the grid
+- [ ] text to grid
+- [ ] img to grid
+- [ ] color picker for cells
+- [ ] shape picker for draw (common shapes + custom + remarquable shapes)
+- [ ] shape picker for cells (circle, square, triangle, hexagon, octogon, star, heart, custom)
+- [ ] toroidal grid
+- [ ] implement remarquable shapes and add it to grid
+- [x] tortue/escargot lapin icon pour speed range
+- [ ] reset default params
+- [ ] full HTML for SEO presentation (what ? for what ? why ? how ? when ? )
+- [ ] space between cells (new branch ) and background off cells grey
+- [x] stats => add cell size
+- [ ] implement white theme
+- [ ] add loader animation
+- [ ] tools => zoom on cursor

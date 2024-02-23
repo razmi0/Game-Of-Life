@@ -1,27 +1,104 @@
-import useScreen from "./useScreen";
-import Drawer from "./components/Drawer";
 import { CanvasWrapper } from "./components/Wrappers";
-import { onMount, createSignal } from "solid-js";
-import useClock from "./useClock";
-import useGameOfLife from "./useGameOfLife";
+import { onMount, createSignal, Show, createEffect } from "solid-js";
+import useScreen from "./hooks/useScreen";
+import useHash from "./hooks/useHash";
+import useColors from "./hooks/useColors";
+import useClock from "./hooks/useClock";
+import useData from "./hooks/useData";
+import useAgent from "./hooks/useAgent";
+import { SimpleButton } from "./components/Buttons";
+import DebuggerPanel from "./components/DebuggerPanel";
+import Drawer from "./components/Drawer";
+import { BATTERY_REFRESH_INTERVAL } from "./data";
 
 let canvas: HTMLCanvasElement;
+
 const App = () => {
   const [ctx, setCtx] = createSignal<CanvasRenderingContext2D>();
-  const screen = useScreen();
-  const board = useGameOfLife(screen, ctx);
-  const clock = useClock(board.nextCycle);
+  const [hasStarted, setHasStarted] = createSignal(false);
+
+  const screen = useScreen(); // context candidate
+  const data = useData();
+  const { findColor } = useColors(screen.nCell);
+  const { updateHash, drawHash, resetHash } = useHash(screen, data, findColor, ctx);
+
+  const run = () => {
+    if (!hasStarted()) setHasStarted(true);
+    updateHash();
+    drawHash();
+    data.incrementGeneration();
+  };
+
+  const reset = () => {
+    setHasStarted(false);
+    if (gameLoop.play) gameLoop.switchPlayPause();
+    resetHash();
+    data.resetGeneration();
+  };
+
+  const changeCellSizeAndReset = (newSize: number) => {
+    screen.changeCellSize(newSize);
+    reset();
+  };
+
+  const { navInfo, refreshBatteryInfo } = useAgent();
+
+  const batteryClock = useClock(refreshBatteryInfo);
+  batteryClock.tuneSpeed(BATTERY_REFRESH_INTERVAL);
+  batteryClock.switchPlayPause(); // start the battery checking clock
+
+  const gameLoop = useClock(run);
 
   onMount(() => {
     setCtx(canvas.getContext("2d")!);
-    board.draw();
+    run();
   });
+
+  const debug = false;
 
   return (
     <>
-      <Drawer clock={clock} board={board} />
+      <Show when={import.meta.env.DEV && debug}>
+        <DebuggerPanel>
+          <SimpleButton handler={batteryClock.switchPlayPause}>battery refresh : {batteryClock.speed}</SimpleButton>
+          <SimpleButton handler={run}>run hash</SimpleButton>
+          <SimpleButton handler={gameLoop.switchPlayPause}>{gameLoop.play ? "pause" : "play"}</SimpleButton>
+          <SimpleButton
+            handler={() => {
+              console.log("cells : ", screen.nCell());
+              console.log("rows : ", screen.nRow());
+              console.log("cols : ", screen.nCol());
+            }}
+          >
+            log
+          </SimpleButton>
+        </DebuggerPanel>
+      </Show>
+      <Drawer
+        /** data */
+        generation={data.generation}
+        nAlive={data.nAlive}
+        nDead={data.nDead}
+        randomness={data.randomness}
+        tuneRandom={data.tuneRandom}
+        changeRandom={data.changeRandom}
+        /** screen */
+        cellSize={screen.cellSize()}
+        tuneCellSize={screen.tuneCellSize}
+        changeCellSize={changeCellSizeAndReset}
+        /** gameLoop */
+        speed={gameLoop.speed}
+        play={gameLoop.play}
+        tuneSpeed={gameLoop.tuneSpeed}
+        changeSpeed={gameLoop.changeSpeed}
+        switchPlayPause={gameLoop.switchPlayPause}
+        /** hash & misc */
+        reset={reset}
+        hasStarted={hasStarted()}
+        navigator={navInfo()}
+      />
       <CanvasWrapper>
-        <canvas class="bg-slate-500" width={screen.width} height={screen.height} ref={canvas}></canvas>
+        <canvas class="bg-black" width={screen.wW()} height={screen.wH()} ref={canvas}></canvas>
       </CanvasWrapper>
     </>
   );

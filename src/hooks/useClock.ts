@@ -1,20 +1,24 @@
 import { type SetStoreFunction, Store, createStore } from "solid-js/store";
-import { DEFAULT_SPEED, START_CLOCKED, START_IMMEDIATELY } from "./data";
+import { DEFAULT_SPEED, MAX_DELAY, MIN_DELAY, START_CLOCKED, START_IMMEDIATELY } from "../data";
 
-type ClockQueueTicksMode = "clocked" | "free";
 /**
  * Gen playback controls
  * @returns
  */
+
 export default function useClock(fn: () => void) {
   const [clock, setClock] = createStore({
     play: START_IMMEDIATELY,
     speed: DEFAULT_SPEED /** ms */,
+    maxSpeed: MAX_DELAY,
+    minSpeed: MIN_DELAY,
     clocked: START_CLOCKED,
     tick: 0,
     limiter: false,
     queue: 0,
-    playPause: () => {
+    changeMaxSpeed: (speed: number): void => setClock("maxSpeed", speed),
+    changeMinSpeed: (speed: number): void => setClock("minSpeed", speed),
+    switchPlayPause: () => {
       setClock("play", !clock.play);
       clock.run();
     },
@@ -27,23 +31,34 @@ export default function useClock(fn: () => void) {
       if (!clock.play) return;
       if (clock.limiter && clock.queue <= 0) {
         setClock("limiter", false);
-        clock.playPause();
+        clock.switchPlayPause();
         return;
       }
+
       clock.work();
-      if (clock.clocked) setTimeout(clock.run, clock.speed);
-      else clock.run();
+
+      if (clock.clocked) setTimeout(() => requestAnimationFrame(clock.run), clock.speed);
     },
     queueTicks: (ticks: number) => {
       setClock("queue", ticks + clock.queue);
       setClock("limiter", true);
-      clock.play && clock.playPause();
+      clock.play && clock.switchPlayPause();
     },
-    changeSpeed: (speed: number) => setClock("speed", speed),
-    switchClocked: () => setClock("clocked", !clock.clocked),
-    addSpeed: () => setClock("speed", Math.min(Math.max(Math.floor(clock.speed / 2), 0), 100)),
-    subSpeed: () => setClock("speed", clock.speed + 100),
-  }) as [Store<ClockState>, SetStoreFunction<ClockState>];
+
+    tuneSpeed: (speed: number) => {
+      setClock("speed", speed);
+    },
+
+    changeSpeed: (addedSpeed: number) => {
+      const newSpeed = clock.speed + addedSpeed;
+      if (newSpeed < clock.minSpeed || newSpeed > clock.maxSpeed) return;
+      setClock("speed", newSpeed);
+    },
+
+    switchClocked: () => {
+      setClock("clocked", !clock.clocked);
+    },
+  });
 
   return clock;
 }
