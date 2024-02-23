@@ -39,7 +39,7 @@ Age => color
 
 #### TODO
 
-- [ ] implement workers
+- [ ] implement workers ( for resize colors too )
 - [x] implement redraw only flipped ?
 - [ ] _replace SafeArea Rect with safeArea trapezoid svg (left height === item height ; right height === tooltip height)_
 - [ ] CURRENT TASK => paint the grid
