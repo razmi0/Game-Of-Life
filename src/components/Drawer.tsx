@@ -286,7 +286,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     },
     {
       label: "battery",
-      value: props.navigator?.battery || "unknown",
+      value: `${props.navigator?.battery} (${props.navigator?.batteryChange})` || "unknown",
     },
     {
       label: "threads per core",
