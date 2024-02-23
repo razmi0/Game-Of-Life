@@ -56,11 +56,11 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     },
     {
       key: "z",
-      action: () => props.changeCellSize(2),
+      action: () => props.changeCellSize(1),
     },
     {
       key: "s",
-      action: () => props.changeCellSize(-2),
+      action: () => props.changeCellSize(-1),
     },
     {
       key: "ArrowUp",
