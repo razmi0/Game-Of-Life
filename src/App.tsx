@@ -9,12 +9,14 @@ import useAgent from "./hooks/useAgent";
 import { SimpleButton } from "./components/Buttons";
 import DebuggerPanel from "./components/DebuggerPanel";
 import Drawer from "./components/Drawer";
+import { BATTERY_REFRESH_INTERVAL } from "./data";
 
 let canvas: HTMLCanvasElement;
 
 const App = () => {
   const [ctx, setCtx] = createSignal<CanvasRenderingContext2D>();
   const [hasStarted, setHasStarted] = createSignal(false);
+
   const screen = useScreen(); // context candidate
   const data = useData();
   const { findColor } = useColors(screen.nCell);
@@ -29,7 +31,7 @@ const App = () => {
 
   const reset = () => {
     setHasStarted(false);
-    if (clock.play) clock.switchPlayPause();
+    if (gameLoop.play) gameLoop.switchPlayPause();
     resetHash();
     data.resetGeneration();
   };
@@ -40,10 +42,13 @@ const App = () => {
   };
 
   const { navInfo, refreshBatteryInfo } = useAgent();
+
   const batteryClock = useClock(refreshBatteryInfo);
-  batteryClock.changeMaxSpeed(3000);
-  batteryClock.changeSpeed(2000);
-  const clock = useClock(run);
+  batteryClock.changeMaxSpeed(BATTERY_REFRESH_INTERVAL + 1);
+  batteryClock.changeSpeed(BATTERY_REFRESH_INTERVAL);
+  // batteryClock.switchPlayPause(); // start the battery checking clock
+
+  const gameLoop = useClock(run);
 
   onMount(() => {
     setCtx(canvas.getContext("2d")!);
@@ -58,7 +63,7 @@ const App = () => {
         <DebuggerPanel>
           <SimpleButton handler={batteryClock.switchPlayPause}>battery refresh : {batteryClock.speed}</SimpleButton>
           <SimpleButton handler={run}>run hash</SimpleButton>
-          <SimpleButton handler={clock.switchPlayPause}>{clock.play ? "pause" : "play"}</SimpleButton>
+          <SimpleButton handler={gameLoop.switchPlayPause}>{gameLoop.play ? "pause" : "play"}</SimpleButton>
           <SimpleButton
             handler={() => {
               console.log("cells : ", screen.nCell());
@@ -82,12 +87,12 @@ const App = () => {
         cellSize={screen.cellSize()}
         tuneCellSize={screen.tuneCellSize}
         changeCellSize={changeCellSizeAndReset}
-        /** clock */
-        speed={clock.speed}
-        play={clock.play}
-        tuneSpeed={clock.tuneSpeed}
-        changeSpeed={clock.changeSpeed}
-        switchPlayPause={clock.switchPlayPause}
+        /** gameLoop */
+        speed={gameLoop.speed}
+        play={gameLoop.play}
+        tuneSpeed={gameLoop.tuneSpeed}
+        changeSpeed={gameLoop.changeSpeed}
+        switchPlayPause={gameLoop.switchPlayPause}
         /** hash & misc */
         reset={reset}
         hasStarted={hasStarted()}
