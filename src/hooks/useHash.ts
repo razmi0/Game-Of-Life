@@ -1,17 +1,18 @@
 import { batch, createEffect, createMemo } from "solid-js";
 import type { Accessor } from "solid-js";
-import type { ScreenHook } from "./useScreen";
+import type { GridHook } from "./useGrid";
+import { getCoordsFromIndex, getIndexFromCoords } from "../helpers";
 
 type Hash8Type = Uint8Array & { [index: number]: 0 | 1 };
 type Hash8 = Prettify<Hash8Type>;
 
 export default function useHash(
-  screen: ScreenHook,
+  grid: GridHook,
   data: Prettify<DataStore>,
   findColor: (i: number) => string,
   ctx: Accessor<CanvasRenderingContext2D | undefined>
 ) {
-  const initHash = () => new Uint8Array(screen.nCell()).map(() => (data.randomChoice() ? 1 : 0)) as Hash8;
+  const initHash = () => new Uint8Array(grid.nCell()).map(() => (data.randomChoice() ? 1 : 0)) as Hash8;
 
   let hash = initHash();
   let flipIndexes: number[] = [];
@@ -25,7 +26,7 @@ export default function useHash(
   /** hash change size if needed (copy) */
   const resizeHash = () => {
     const pastSize = hash.length;
-    const newSize = screen.nCell();
+    const newSize = grid.nCell();
     if (newSize === pastSize) return;
     else if (newSize < pastSize) {
       hash = hash.copyWithin(0, newSize);
@@ -44,7 +45,7 @@ export default function useHash(
   const updateHash = () => {
     let i = 0;
     flipIndexes = [];
-    const rowSize = screen.nRow();
+    const rowSize = grid.nRow();
     let zeros = 0;
     let ones = 0;
     while (i < hash.length) {
@@ -84,17 +85,17 @@ export default function useHash(
   /** draw only changed cells, doesn't read the entire hash (FAST) */
   const drawHash = () => {
     let i = 0;
-    const rowSize = screen.nRow();
+    const rowSize = grid.nRow();
     const context = ctx();
     if (!context) return;
     while (i < flipIndexes.length) {
-      const x = Math.floor(flipIndexes[i] / rowSize) * screen.cellSize();
-      const y = (flipIndexes[i] % rowSize) * screen.cellSize();
+      const [x, y] = getCoordsFromIndex(flipIndexes[i], rowSize, grid.cellSize());
+
       if (hash[flipIndexes[i]]) {
         context.fillStyle = findColor(i);
-        context.fillRect(x, y, screen.cellSize(), screen.cellSize());
+        context.fillRect(x, y, grid.cellSize(), grid.cellSize());
       } else {
-        context.clearRect(x, y, screen.cellSize(), screen.cellSize());
+        context.clearRect(x, y, grid.cellSize(), grid.cellSize());
       }
 
       i++;
@@ -104,25 +105,37 @@ export default function useHash(
   /** draw and read the entire hash (SLOW) */
   const drawHashOnReset = () => {
     let i = 0;
-    const rowSize = screen.nRow();
+    const rowSize = grid.nRow();
     const context = ctx();
     if (!context) return;
     while (i < hash.length) {
-      const x = Math.floor(i / rowSize) * screen.cellSize();
-      const y = (i % rowSize) * screen.cellSize();
+      const x = Math.floor(i / rowSize) * grid.cellSize();
+      const y = (i % rowSize) * grid.cellSize();
       if (hash[i]) {
         context.fillStyle = findColor(i);
-        context.fillRect(x, y, screen.cellSize(), screen.cellSize());
+        context.fillRect(x, y, grid.cellSize(), grid.cellSize());
       } else {
-        context.clearRect(x, y, screen.cellSize(), screen.cellSize());
+        context.clearRect(x, y, grid.cellSize(), grid.cellSize());
       }
 
       i++;
     }
   };
 
+  const paintCell = (x: number, y: number) => {
+    // get index from coords
+    const index = getIndexFromCoords(x, y, grid.nRow(), grid.cellSize());
+    if (hash[index]) return; // if already alive, return early because we don't want to draw it again
+    hash[index] = 1; // set cell alive
+    // draw cell
+    const context = ctx();
+    if (!context) return;
+    context.fillStyle = findColor(index);
+    context.fillRect(x, y, grid.cellSize(), grid.cellSize());
+  };
+
   createEffect(() => {
-    if (screen.nCell() !== hash.length) {
+    if (grid.nCell() !== hash.length) {
       resizeHash();
       drawHashOnReset();
     }
