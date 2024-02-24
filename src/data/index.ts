@@ -1,10 +1,10 @@
 /** CONSTANTS */
 
 export const DEFAULT_RANDOMNESS = 80;
-export const DEFAULT_SPEED = 1000;
+export const DEFAULT_SPEED = 10;
 export const START_IMMEDIATELY = false;
 export const START_CLOCKED = true;
-export const INITIAL_CELL_SIZE = 25;
+export const INITIAL_CELL_SIZE = 2;
 export const QUEUE_TICKS_QUANTITY = 25;
 export const BATTERY_REFRESH_INTERVAL = 3000;
 export const MAX_DELAY = 100;
