@@ -8,6 +8,7 @@ export type Shortcut = {
 
 const useShorcuts = (shortcuts: Shortcut[]) => {
   const handleKeyDown = (event: KeyboardEvent) => {
+    event.preventDefault();
     shortcuts.map((shortcut) => {
       if (shortcut.ctrl && !event.ctrlKey) return;
       if (event.key === shortcut.key) {
@@ -17,7 +18,7 @@ const useShorcuts = (shortcuts: Shortcut[]) => {
   };
 
   onMount(() => {
-    window.addEventListener("keydown", handleKeyDown, { passive: true });
+    window.addEventListener("keydown", handleKeyDown);
     onCleanup(() => window.removeEventListener("keydown", handleKeyDown));
   });
 };
