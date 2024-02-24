@@ -1,8 +1,8 @@
-import { CanvasWrapper } from "./components/Wrappers";
-import { onMount, createSignal, Show, createEffect } from "solid-js";
+import { onMount, createSignal, Show } from "solid-js";
 import useGrid from "./hooks/useGrid";
 import useHash from "./hooks/useHash";
 import useColors from "./hooks/useColors";
+import usePainter from "./hooks/usePainter";
 import useClock from "./hooks/useClock";
 import useData from "./hooks/useData";
 import useAgent from "./hooks/useAgent";
@@ -20,7 +20,7 @@ const App = () => {
   const grid = useGrid(); // context candidate
   const data = useData();
   const { findColor } = useColors(grid.nCell);
-  const { updateHash, drawHash, resetHash } = useHash(grid, data, findColor, ctx);
+  const { updateHash, drawHash, resetHash, paintCell } = useHash(grid, data, findColor, ctx);
 
   const run = () => {
     if (!hasStarted()) setHasStarted(true);
@@ -51,6 +51,7 @@ const App = () => {
 
   onMount(() => {
     setCtx(canvas.getContext("2d")!);
+    usePainter(canvas, paintCell);
     run();
   });
 
@@ -97,9 +98,7 @@ const App = () => {
         hasStarted={hasStarted()}
         navigator={navInfo()}
       />
-      <CanvasWrapper>
-        <canvas class="bg-black" width={grid.wW()} height={grid.wH()} ref={canvas}></canvas>
-      </CanvasWrapper>
+      <canvas class="bg-black" width={grid.wW()} height={grid.wH()} ref={canvas}></canvas>
     </>
   );
 };
