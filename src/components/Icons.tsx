@@ -32,7 +32,7 @@ export type IconNames =
   | "arrowDown"
   | "snail"
   | "hare"
-  | "wave";
+  | "stats";
 
 export type IconProps = {
   width: number;
