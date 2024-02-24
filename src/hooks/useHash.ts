@@ -75,11 +75,16 @@ export default function useHash(
       data.setDead(zeros);
     });
 
-    let j = 0;
-    while (j < flipIndexes.length) {
-      hash[flipIndexes[j]] ^= 1;
-      j++;
+    flipHashAtIndexes(flipIndexes);
+  };
+
+  const flipHashAtIndexes = (intArr: number[]) => {
+    let i = 0;
+    while (i < intArr.length) {
+      hash[intArr[i]] ^= 1;
+      i++;
     }
+    return intArr;
   };
 
   /** draw only changed cells, doesn't read the entire hash (FAST) */
@@ -125,13 +130,14 @@ export default function useHash(
   const paintCell = (x: number, y: number) => {
     // get index from coords
     const index = getIndexFromCoords(x, y, grid.nRow(), grid.cellSize());
+    const gridCoord = getCoordsFromIndex(index, grid.nRow(), grid.cellSize());
     if (hash[index]) return; // if already alive, return early because we don't want to draw it again
     hash[index] = 1; // set cell alive
     // draw cell
     const context = ctx();
     if (!context) return;
     context.fillStyle = findColor(index);
-    context.fillRect(x, y, grid.cellSize(), grid.cellSize());
+    context.fillRect(gridCoord[0], gridCoord[1], grid.cellSize(), grid.cellSize());
   };
 
   createEffect(() => {
@@ -141,5 +147,5 @@ export default function useHash(
     }
   });
 
-  return { updateHash, drawHash, resetHash };
+  return { updateHash, drawHash, resetHash, paintCell };
 }
