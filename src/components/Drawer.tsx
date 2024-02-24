@@ -1,5 +1,7 @@
 import { For, Show, createEffect, createMemo, createSignal } from "solid-js";
 import {
+  CELL_SIZE_STEP,
+  DELAY_STEP,
   ICON_SIZE,
   MAX_ALIVE_RANDOM,
   MAX_CELL_SIZE,
@@ -7,6 +9,7 @@ import {
   MIN_ALIVE_RANDOM,
   MIN_CELL_SIZE,
   MIN_DELAY,
+  RANDOM_STEP,
 } from "../data";
 import { IconButton, SimpleButton } from "./Buttons";
 import Wrapper from "./Drawer/Content";
@@ -29,6 +32,7 @@ type DrawerProps = {
   nDead: number;
   navigator: UserAgentInfo | null;
   cellSize: number;
+  gridInfo: { width: number; height: number };
   reset: () => void;
   changeSpeed: (newTime: number) => void;
   changeRandom: (newRandom: number) => void;
@@ -56,27 +60,27 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     },
     {
       key: "z",
-      action: () => props.changeCellSize(1),
+      action: () => props.changeCellSize(CELL_SIZE_STEP),
     },
     {
       key: "s",
-      action: () => props.changeCellSize(-1),
+      action: () => props.changeCellSize(-CELL_SIZE_STEP),
     },
     {
       key: "ArrowUp",
-      action: () => props.changeSpeed(10),
+      action: () => props.changeSpeed(DELAY_STEP),
     },
     {
       key: "ArrowDown",
-      action: () => props.changeSpeed(-10),
+      action: () => props.changeSpeed(-DELAY_STEP),
     },
     {
       key: "ArrowRight",
-      action: () => props.changeRandom(2),
+      action: () => props.changeRandom(RANDOM_STEP),
     },
     {
       key: "ArrowLeft",
-      action: () => props.changeRandom(-2),
+      action: () => props.changeRandom(-RANDOM_STEP),
     },
     {
       key: "a",
@@ -142,7 +146,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     /** internal logic (onChange) */
     const handleCellSizeChange = (e: Event) => {
       const newSize = (e.target as HTMLInputElement).valueAsNumber;
-      props.changeCellSize(newSize);
+      props.tuneCellSize(newSize);
     };
 
     return (
@@ -158,6 +162,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             max={MAX_CELL_SIZE}
             aria="cell-size"
             class="w-56"
+            step={CELL_SIZE_STEP}
           />
           <Icon width={lg} name="two_by_three_squares" class="mb-5 rotate-90" />
           <div class="translate-y-[1px] text-yellow-400 text-sm font-bold h-full w-16 tabular-nums text-right">
@@ -185,7 +190,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
 
     const handleSpeedChange = (e: Event) => {
       const newSpeed = (e.target as HTMLInputElement).valueAsNumber;
-      props.changeSpeed(newSpeed);
+      props.tuneSpeed(newSpeed);
     };
 
     return (
@@ -200,6 +205,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           min={MIN_DELAY}
           class="w-56 rotate-180"
           aria="speed"
+          step={DELAY_STEP}
         />
         <Icon width={md} name="hare" class="mb-5 ms-2" />
         <div class="whitespace-nowrap text-yellow-400 text-sm font-bold translate-y-[-9px] h-full w-16 tabular-nums text-right">
@@ -216,7 +222,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
 
     const handleRandomChange = (e: Event) => {
       const newRandom = (e.target as HTMLInputElement).valueAsNumber;
-      props.changeRandom(newRandom);
+      props.tuneRandom(newRandom);
     };
 
     const handleInputOutput = (e: Event) => {
@@ -237,6 +243,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             max={MAX_ALIVE_RANDOM}
             aria="randomness"
             class="w-56"
+            step={RANDOM_STEP}
           />
           <Icon width={md} name="skull" class="mb-5" />
           <div class="translate-y-[1px] text-yellow-400 text-sm font-bold h-full w-10 tabular-nums text-right">
@@ -281,12 +288,22 @@ export default function Drawer(props: Prettify<DrawerProps>) {
 
   const deviceStats: Accessor<StatsTooltipData[]> = createMemo(() => [
     {
+      label: "width",
+      value: `${props.gridInfo.width} px` || "unknown",
+    },
+    {
+      label: "height",
+      value: `${props.gridInfo.height} px` || "unknown",
+      separator: true,
+    },
+    {
       label: "platform",
       value: props.navigator?.platform || "unknown",
     },
     {
       label: "battery",
-      value: `${props.navigator?.battery} (${props.navigator?.batteryChange})` || "unknown",
+      value: `${props.navigator?.battery} % (${props.navigator?.batteryChange})` || "unknown",
+      separator: true,
     },
     {
       label: "threads per core",
@@ -314,7 +331,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         </Item>
 
         <Item
-          showTooltipOnClick
           tooltip={
             <StandardTooltip title={<ResetTitle />} class="border-dw-200">
               <p class="min-w-48">reset to a new original fresh random game</p>
@@ -365,7 +381,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Separator />
       <Group>
         <Item tooltip={<StatsTooltip title={"board infos"} data={boardStats()} />}>
-          <Icon width={xl} name="wave" />
+          <Icon width={xl} name="stats" />
         </Item>
         <Item tooltip={<StatsTooltip title={"Device Infos"} data={deviceStats()} />}>
           <Icon width={xl} name="screen_gear" />

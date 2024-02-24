@@ -1,10 +1,10 @@
-import { onMount, createSignal, Show } from "solid-js";
+import { onMount, createSignal, Show, createMemo } from "solid-js";
 import useGrid from "./hooks/useGrid";
 import useHash from "./hooks/useHash";
 import useColors from "./hooks/useColors";
 import usePainter from "./hooks/usePainter";
 import useClock from "./hooks/useClock";
-import useData from "./hooks/useData";
+import useBoardData from "./hooks/useBoardData";
 import useAgent from "./hooks/useAgent";
 import { SimpleButton } from "./components/Buttons";
 import DebuggerPanel from "./components/DebuggerPanel";
@@ -18,22 +18,22 @@ const App = () => {
   const [hasStarted, setHasStarted] = createSignal(false);
 
   const grid = useGrid(); // context candidate
-  const data = useData();
+  const boardData = useBoardData();
   const { findColor } = useColors(grid.nCell);
-  const { updateHash, drawHash, resetHash, paintCell } = useHash(grid, data, findColor, ctx);
+  const { updateHash, drawHash, resetHash, paintCell } = useHash(grid, boardData, findColor, ctx);
 
   const run = () => {
     if (!hasStarted()) setHasStarted(true);
     updateHash();
     drawHash();
-    data.incrementGeneration();
+    boardData.incrementGeneration();
   };
 
   const reset = () => {
     setHasStarted(false);
     if (gameLoop.play) gameLoop.switchPlayPause();
     resetHash();
-    data.resetGeneration();
+    boardData.resetGeneration();
   };
 
   const changeCellSizeAndReset = (newSize: number) => {
@@ -55,7 +55,11 @@ const App = () => {
     run();
   });
 
-  const debug = true;
+  const gridInfo = createMemo(() => {
+    return { width: grid.wH(), height: grid.wW() };
+  });
+
+  const debug = false;
 
   return (
     <>
@@ -76,13 +80,13 @@ const App = () => {
         </DebuggerPanel>
       </Show>
       <Drawer
-        /** data */
-        generation={data.generation}
-        nAlive={data.nAlive}
-        nDead={data.nDead}
-        randomness={data.randomness}
-        tuneRandom={data.tuneRandom}
-        changeRandom={data.changeRandom}
+        /** boardData */
+        generation={boardData.generation}
+        nAlive={boardData.nAlive}
+        nDead={boardData.nDead}
+        randomness={boardData.randomness}
+        tuneRandom={boardData.tuneRandom}
+        changeRandom={boardData.changeRandom}
         /** grid */
         cellSize={grid.cellSize()}
         tuneCellSize={grid.tuneCellSize}
@@ -97,6 +101,7 @@ const App = () => {
         reset={reset}
         hasStarted={hasStarted()}
         navigator={navInfo()}
+        gridInfo={gridInfo()}
       />
       <canvas class="bg-black" width={grid.wW()} height={grid.wH()} ref={canvas}></canvas>
     </>
