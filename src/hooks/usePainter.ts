@@ -1,55 +1,54 @@
 import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
-
-const MAX_PEN_SIZE = 50;
-const MIN_PEN_SIZE = 1;
+import { MAX_PEN_SIZE, MIN_PEN_SIZE } from "../data";
 
 enum Painter {
   IDLE = "idle",
   PAINTING = "painting",
-  ERASING = "erasing",
 }
 
-type PenShape = "round" | "square";
+export enum Tools {
+  PEN = "pen",
+  ERASER = "eraser",
+  NONE = "none",
+}
 
-type PaintTools = {
-  pen: () => void;
-  eraser: () => void;
-};
-
-const usePainter = (work: (x: number, y: number, paintSize: number) => void) => {
-  const [painter, setPainter] = createSignal(Painter.IDLE);
-  const [penShape, setPenShape] = createSignal<PenShape>("square");
-  const [penSizeMultiplicator, setPenSizeMultiplicator] = createSignal(1);
+const usePainter = (work: (x: number, y: number, paintSize: number, tool: Tools) => void) => {
+  const [painterState, setPainter] = createSignal(Painter.IDLE);
+  const [userPaint, setUserPaint] = createSignal(false);
+  const [tool, setTool] = createSignal<Tools>(Tools.NONE);
+  const [penSize, setPenSize] = createSignal(1);
   const [canvasRef, setCanvasRef] = createSignal<HTMLCanvasElement>();
 
-  const switchShape = () => setPenShape((p) => (p === "round" ? "square" : "round"));
+  const setEraser = () => setTool(Tools.ERASER);
+  const setPen = () => setTool(Tools.PEN);
+  const unsetTool = () => setTool(Tools.NONE);
 
-  const tunePenSizeMultiplicator = (size: number) => {
-    setPenSizeMultiplicator(size);
+  const tunePenSize = (size: number) => {
+    setPenSize(size);
   };
 
-  const changePenSizeMultiplicator = (addSize: number) => {
-    const newSize = penSizeMultiplicator() + addSize;
+  const changePenSize = (addSize: number) => {
+    const newSize = penSize() + addSize;
     if (newSize < MIN_PEN_SIZE || newSize > MAX_PEN_SIZE) return;
-    setPenSizeMultiplicator(newSize);
+    setPenSize(newSize);
   };
 
-  const startErasing = () => {
-    setPainter(Painter.ERASING);
+  const switchPainting = () => {
+    setUserPaint((p) => !p);
   };
 
   const startPainting = () => {
-    setPainter(Painter.PAINTING);
+    if (userPaint()) setPainter(Painter.PAINTING);
   };
 
   const paint = (e: MouseEvent) => {
     const canvas = canvasRef();
-    if (painter() === Painter.PAINTING && canvas)
-      work(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop, penSizeMultiplicator());
+    if (painterState() === Painter.PAINTING && canvas)
+      work(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop, penSize(), tool());
   };
 
   const stopPainting = () => {
-    if (painter() === Painter.PAINTING || painter() === Painter.ERASING) setPainter(Painter.IDLE);
+    if (painterState() === Painter.PAINTING) setPainter(Painter.IDLE);
   };
 
   createEffect(() => {
@@ -73,6 +72,18 @@ const usePainter = (work: (x: number, y: number, paintSize: number) => void) => 
     }
   });
 
-  return { penSizeMultiplicator, tunePenSizeMultiplicator, changePenSizeMultiplicator, setCanvasRef, switchShape };
+  return {
+    penSize,
+    tunePenSize,
+    changePenSize,
+    setCanvasRef,
+    switchPainting,
+    painterState,
+    userPaint,
+    setEraser,
+    setPen,
+    unsetTool,
+    tool,
+  };
 };
 export default usePainter;
