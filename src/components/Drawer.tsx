@@ -6,9 +6,12 @@ import {
   MAX_ALIVE_RANDOM,
   MAX_CELL_SIZE,
   MAX_DELAY,
+  MAX_PEN_SIZE,
   MIN_ALIVE_RANDOM,
   MIN_CELL_SIZE,
   MIN_DELAY,
+  MIN_PEN_SIZE,
+  PEN_SIZE_STEP,
   RANDOM_STEP,
 } from "../data";
 import { IconButton, SimpleButton } from "./Buttons";
@@ -18,11 +21,14 @@ import Header from "./Drawer/Header";
 import Item from "./Drawer/Item";
 import SimpleRange from "./Drawer/Range";
 import Separator from "./Drawer/Separator";
+
 import Icon from "./Icons";
 import type { Accessor, Component, JSXElement } from "solid-js";
 import useShorcuts, { type Shortcut } from "../hooks/useShorcuts";
+import type { Tools } from "../hooks/usePainter";
 
 type DrawerProps = {
+  /** STATES */
   hasStarted: boolean;
   play: boolean;
   speed: number;
@@ -33,6 +39,10 @@ type DrawerProps = {
   navigator: UserAgentInfo | null;
   cellSize: number;
   gridInfo: { width: number; height: number };
+  penSize: number;
+  paintingState: boolean;
+  selectedTool: Tools;
+  /** ACTIONS */
   reset: () => void;
   changeSpeed: (newTime: number) => void;
   changeRandom: (newRandom: number) => void;
@@ -41,6 +51,12 @@ type DrawerProps = {
   tuneSpeed: (newSpeed: number) => void;
   tuneCellSize: (newSize: number) => void;
   switchPlayPause: () => void;
+  switchPainting: () => void;
+  tunePenSize: (newSize: number) => void;
+  changePenSize: (newSize: number) => void;
+  setEraser: () => void;
+  setPen: () => void;
+  unsetTool: () => void;
 };
 
 const { xl, sm, md, xs, lg } = ICON_SIZE;
@@ -111,6 +127,87 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     </div>
   );
 
+  const PaintingTooltip = () => {
+    const [output, setOutput] = createSignal(props.penSize);
+
+    createEffect(() => setOutput(props.penSize));
+
+    const handleInputOutput = (e: Event) => {
+      setOutput((e.target as HTMLInputElement).valueAsNumber);
+    };
+
+    const handlePenSizeChange = (e: Event) => {
+      const newSize = (e.target as HTMLInputElement).valueAsNumber;
+      props.tunePenSize(newSize);
+    };
+
+    const handlePenClick = () => {
+      if (isPen()) {
+        props.unsetTool();
+      } else {
+        props.setPen();
+      }
+      togglePainting();
+    };
+
+    const togglePainting = () => {
+      if ((isPen() || isErase()) && !props.paintingState) {
+        props.switchPainting();
+      }
+    };
+
+    const handleEraserClick = () => {
+      if (isErase()) {
+        props.unsetTool();
+      } else {
+        props.setEraser();
+      }
+      togglePainting();
+    };
+
+    const isErase = () => props.selectedTool === "eraser";
+    const isPen = () => props.selectedTool === "pen";
+
+    return (
+      <div class="flex flex-col gap-4 mt-3 min-w-48">
+        <div class="flex gap-2 items-start">
+          <IconButton
+            width={md}
+            name="pen"
+            onClick={handlePenClick}
+            class="hover:border-dw-100  p-2 border-2 rounded-full"
+            classList={{ ["border-dw-100"]: isPen(), [" border-transparent"]: !isPen() }}
+          />
+          <IconButton
+            width={md}
+            name="eraser"
+            onClick={handleEraserClick}
+            class=" hover:border-dw-100 p-2 border-2 rounded-full"
+            classList={{ ["border-dw-100"]: isErase(), [" border-transparent"]: !isErase() }}
+          />
+        </div>
+        <div class="flex gap-2 items-start">
+          <IconButton width={md} name="minus_circle" class="mb-5" onClick={() => props.changePenSize(-PEN_SIZE_STEP)} />
+          <SimpleRange
+            milestones={[MIN_PEN_SIZE, Math.floor((MIN_PEN_SIZE + MAX_PEN_SIZE) / 2), MAX_PEN_SIZE]}
+            onChange={handlePenSizeChange}
+            onInput={handleInputOutput}
+            value={props.penSize}
+            min={MIN_PEN_SIZE}
+            max={MAX_PEN_SIZE}
+            aria="pen-size"
+            class="w-56"
+            step={PEN_SIZE_STEP}
+          />
+          <IconButton width={md} name="plus_circle" class="mb-5" onClick={() => props.changePenSize(PEN_SIZE_STEP)} />
+          <div class="translate-y-[1px] text-yellow-400 text-sm font-bold h-full w-10 tabular-nums text-right">
+            {output()}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const SpeedTitle = () => (
     <div class="flex flex-row items-center justify-between translate-y-[5px]">
       <div>speed</div>
@@ -152,7 +249,12 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     return (
       <div class="flex flex-col gap-4 mt-3 min-w-48">
         <div class="flex gap-2 items-start">
-          <Icon width={lg} name="two_by_two_squares" class="mb-5" />
+          <IconButton
+            onClick={() => props.changeCellSize(-CELL_SIZE_STEP)}
+            width={lg}
+            name="two_by_two_squares"
+            class="mb-5"
+          />
           <SimpleRange
             milestones={[MIN_CELL_SIZE, Math.floor((MIN_CELL_SIZE + MAX_CELL_SIZE) / 2), MAX_CELL_SIZE]}
             onChange={handleCellSizeChange}
@@ -164,7 +266,12 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             class="w-56"
             step={CELL_SIZE_STEP}
           />
-          <Icon width={lg} name="two_by_three_squares" class="mb-5 rotate-90" />
+          <IconButton
+            onClick={() => props.changeCellSize(CELL_SIZE_STEP)}
+            width={lg}
+            name="two_by_three_squares"
+            class="mb-5 rotate-90"
+          />
           <div class="translate-y-[1px] text-yellow-400 text-sm font-bold h-full w-16 tabular-nums text-right">
             {output()}
           </div>
@@ -195,7 +302,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
 
     return (
       <div class="mt-3 flex items-center min-w-48">
-        <Icon width={md} name="snail" class="mb-5 me-2" />
+        <IconButton onClick={() => props.changeSpeed(DELAY_STEP)} width={md} name="snail" class="mb-5 me-2" />
         <SimpleRange
           milestones={["10", "20", "200"]}
           onChange={handleSpeedChange}
@@ -207,7 +314,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           aria="speed"
           step={DELAY_STEP}
         />
-        <Icon width={md} name="hare" class="mb-5 ms-2" />
+        <IconButton onClick={() => props.changeSpeed(-DELAY_STEP)} width={md} name="hare" class="mb-5 ms-2" />
         <div class="whitespace-nowrap text-yellow-400 text-sm font-bold translate-y-[-9px] h-full w-16 tabular-nums text-right">
           {output()}
         </div>
@@ -233,7 +340,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     return (
       <div class="flex flex-col gap-4 mt-3 min-w-48">
         <div class="flex gap-2 items-start ">
-          <Icon width={md} name="baby" class="mb-5" />
+          <IconButton onClick={() => props.changeRandom(-RANDOM_STEP)} width={md} name="baby" class="mb-5" />
           <SimpleRange
             milestones={[MIN_ALIVE_RANDOM, Math.floor((MIN_ALIVE_RANDOM + MAX_ALIVE_RANDOM) / 2), MAX_ALIVE_RANDOM]}
             onChange={handleRandomChange}
@@ -245,7 +352,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             class="w-56"
             step={RANDOM_STEP}
           />
-          <Icon width={md} name="skull" class="mb-5" />
+          <IconButton onClick={() => props.changeRandom(RANDOM_STEP)} width={md} name="skull" class="mb-5" />
           <div class="translate-y-[1px] text-yellow-400 text-sm font-bold h-full w-10 tabular-nums text-right">
             {output()}
           </div>
@@ -341,6 +448,18 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           onClick={props.reset}
         >
           <Icon width={xl} name="reset" />
+        </Item>
+      </Group>
+      <Separator />
+      <Group>
+        <Item
+          tooltip={
+            <StandardTooltip title={"painting tools"}>
+              <PaintingTooltip />
+            </StandardTooltip>
+          }
+        >
+          <Icon width={xl} name="painting_tools" />
         </Item>
       </Group>
       <Separator />
