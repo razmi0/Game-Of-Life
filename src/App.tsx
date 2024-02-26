@@ -99,7 +99,6 @@ const App = () => {
         changeSpeed={gameLoop.changeSpeed}
         switchPlayPause={gameLoop.switchPlayPause}
         /** painter */
-
         selectedTool={painter.tool()}
         setEraser={painter.setEraser}
         setPen={painter.setPen}
