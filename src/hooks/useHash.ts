@@ -78,13 +78,12 @@ export default function useHash(
     flipHashAtIndexes(flipIndexes);
   };
 
-  const flipHashAtIndexes = (intArr: number[]) => {
+  const flipHashAtIndexes = (indexesArr: number[]) => {
     let i = 0;
-    while (i < intArr.length) {
-      hash[intArr[i]] ^= 1;
+    while (i < indexesArr.length) {
+      hash[indexesArr[i]] ^= 1;
       i++;
     }
-    return intArr;
   };
 
   /** draw only changed cells, doesn't read the entire hash (FAST) */
@@ -127,17 +126,29 @@ export default function useHash(
     }
   };
 
-  const paintCell = (x: number, y: number) => {
-    // get index from coords
-    const index = getIndexFromCoords(x, y, grid.nRow(), grid.cellSize());
-    const gridCoord = getCoordsFromIndex(index, grid.nRow(), grid.cellSize());
-    if (hash[index]) return; // if already alive, return early because we don't want to draw it again
-    hash[index] = 1; // set cell alive
-    // draw cell
-    const context = ctx();
-    if (!context) return;
-    context.fillStyle = findColor(index);
-    context.fillRect(gridCoord[0], gridCoord[1], grid.cellSize(), grid.cellSize());
+  const paintCell = (x: number, y: number, paintSizeMultiplicator: number) => {
+    const rowSize = grid.nRow();
+
+    const offsetXPainted = paintSizeMultiplicator - 1;
+    const offsetYPainted = offsetXPainted * rowSize;
+
+    const index = getIndexFromCoords(x, y, rowSize, grid.cellSize()); // center index
+
+    for (let row = -offsetYPainted; row <= offsetYPainted; row += rowSize) {
+      for (let col = -offsetXPainted; col <= offsetXPainted; col++) {
+        const paintedIndex = index + row + col;
+        if (paintedIndex < 0 || paintedIndex > hash.length) return;
+        if (hash[paintedIndex]) continue;
+
+        hash[paintedIndex] = 1;
+        const gridCoord = getCoordsFromIndex(paintedIndex, rowSize, grid.cellSize());
+
+        const context = ctx();
+        if (!context) return;
+        context.fillStyle = findColor(paintedIndex);
+        context.fillRect(gridCoord[0], gridCoord[1], grid.cellSize(), grid.cellSize());
+      }
+    }
   };
 
   createEffect(() => {

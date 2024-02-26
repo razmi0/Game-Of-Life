@@ -1,18 +1,38 @@
 import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
 
+const MAX_PEN_SIZE = 50;
+const MIN_PEN_SIZE = 1;
+
 enum Painter {
   IDLE = "idle",
   PAINTING = "painting",
   ERASING = "erasing",
 }
 
+type PenShape = "round" | "square";
+
 type PaintTools = {
   pen: () => void;
   eraser: () => void;
 };
 
-const usePainter = (canvasRef: HTMLCanvasElement | null, work: (x: number, y: number) => void) => {
+const usePainter = (work: (x: number, y: number, paintSize: number) => void) => {
   const [painter, setPainter] = createSignal(Painter.IDLE);
+  const [penShape, setPenShape] = createSignal<PenShape>("square");
+  const [penSizeMultiplicator, setPenSizeMultiplicator] = createSignal(1);
+  const [canvasRef, setCanvasRef] = createSignal<HTMLCanvasElement>();
+
+  const switchShape = () => setPenShape((p) => (p === "round" ? "square" : "round"));
+
+  const tunePenSizeMultiplicator = (size: number) => {
+    setPenSizeMultiplicator(size);
+  };
+
+  const changePenSizeMultiplicator = (addSize: number) => {
+    const newSize = penSizeMultiplicator() + addSize;
+    if (newSize < MIN_PEN_SIZE || newSize > MAX_PEN_SIZE) return;
+    setPenSizeMultiplicator(newSize);
+  };
 
   const startErasing = () => {
     setPainter(Painter.ERASING);
@@ -23,8 +43,9 @@ const usePainter = (canvasRef: HTMLCanvasElement | null, work: (x: number, y: nu
   };
 
   const paint = (e: MouseEvent) => {
-    if (painter() === Painter.PAINTING && canvasRef)
-      work(e.pageX - canvasRef?.offsetLeft, e.pageY - canvasRef?.offsetTop);
+    const canvas = canvasRef();
+    if (painter() === Painter.PAINTING && canvas)
+      work(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop, penSizeMultiplicator());
   };
 
   const stopPainting = () => {
@@ -32,22 +53,26 @@ const usePainter = (canvasRef: HTMLCanvasElement | null, work: (x: number, y: nu
   };
 
   createEffect(() => {
-    if (canvasRef) {
+    const canvas = canvasRef();
+    if (canvas) {
       console.log("effect");
-      canvasRef.addEventListener("mousedown", startPainting);
-      canvasRef.addEventListener("mousemove", paint);
-      canvasRef.addEventListener("mouseup", stopPainting);
-      canvasRef.addEventListener("mouseleave", stopPainting);
+      canvas.addEventListener("mousedown", startPainting);
+      canvas.addEventListener("mousemove", paint);
+      canvas.addEventListener("mouseup", stopPainting);
+      canvas.addEventListener("mouseleave", stopPainting);
     }
   });
 
   onCleanup(() => {
-    if (canvasRef) {
-      canvasRef.removeEventListener("mousedown", startPainting);
-      canvasRef.removeEventListener("mousemove", paint);
-      canvasRef.removeEventListener("mouseup", stopPainting);
-      canvasRef.removeEventListener("mouseleave", stopPainting);
+    const canvas = canvasRef();
+    if (canvas) {
+      canvas.removeEventListener("mousedown", startPainting);
+      canvas.removeEventListener("mousemove", paint);
+      canvas.removeEventListener("mouseup", stopPainting);
+      canvas.removeEventListener("mouseleave", stopPainting);
     }
   });
+
+  return { penSizeMultiplicator, tunePenSizeMultiplicator, changePenSizeMultiplicator, setCanvasRef, switchShape };
 };
 export default usePainter;

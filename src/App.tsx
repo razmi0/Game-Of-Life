@@ -21,6 +21,8 @@ const App = () => {
   const boardData = useBoardData();
   const { findColor } = useColors(grid.nCell);
   const { updateHash, drawHash, resetHash, paintCell } = useHash(grid, boardData, findColor, ctx);
+  const { changePenSizeMultiplicator, tunePenSizeMultiplicator, penSizeMultiplicator, setCanvasRef } =
+    usePainter(paintCell);
 
   const run = () => {
     if (!hasStarted()) setHasStarted(true);
@@ -51,7 +53,7 @@ const App = () => {
 
   onMount(() => {
     setCtx(canvas.getContext("2d")!);
-    usePainter(canvas, paintCell);
+    setCanvasRef(canvas);
     run();
   });
 
