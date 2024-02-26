@@ -42,7 +42,8 @@ Age => color
 - [ ] implement workers ( for resize colors too )
 - [x] implement redraw only flipped ?
 - [ ] _replace SafeArea Rect with safeArea trapezoid svg (left height === item height ; right height === tooltip height)_
-- [ ] CURRENT TASK => paint the grid
+- [x] paint the grid / erase the grid (with size)
+- [ ] add color picker to paint tools
 - [ ] text to grid
 - [ ] img to grid
 - [ ] color picker for cells
