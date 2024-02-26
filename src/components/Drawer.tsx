@@ -332,9 +332,11 @@ export default function Drawer(props: Prettify<DrawerProps>) {
 
         <Item
           tooltip={
-            <StandardTooltip title={<ResetTitle />} class="border-dw-200">
-              <p class="min-w-48">reset to a new original fresh random game</p>
-            </StandardTooltip>
+            <>
+              <StandardTooltip title={<ResetTitle />}>
+                <p class="min-w-48">reset to a new original fresh random game</p>
+              </StandardTooltip>
+            </>
           }
           onClick={props.reset}
         >
