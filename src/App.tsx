@@ -21,8 +21,7 @@ const App = () => {
   const boardData = useBoardData();
   const { findColor } = useColors(grid.nCell);
   const { updateHash, drawHash, resetHash, paintCell } = useHash(grid, boardData, findColor, ctx);
-  const { changePenSizeMultiplicator, tunePenSizeMultiplicator, penSizeMultiplicator, setCanvasRef } =
-    usePainter(paintCell);
+  const painter = usePainter(paintCell);
 
   const run = () => {
     if (!hasStarted()) setHasStarted(true);
@@ -53,7 +52,7 @@ const App = () => {
 
   onMount(() => {
     setCtx(canvas.getContext("2d")!);
-    setCanvasRef(canvas);
+    painter.setCanvasRef(canvas);
     run();
   });
 
@@ -99,6 +98,17 @@ const App = () => {
         tuneSpeed={gameLoop.tuneSpeed}
         changeSpeed={gameLoop.changeSpeed}
         switchPlayPause={gameLoop.switchPlayPause}
+        /** painter */
+
+        selectedTool={painter.tool()}
+        setEraser={painter.setEraser}
+        setPen={painter.setPen}
+        unsetTool={painter.unsetTool}
+        paintingState={painter.userPaint()}
+        switchPainting={painter.switchPainting}
+        penSize={painter.penSize()}
+        tunePenSize={painter.tunePenSize}
+        changePenSize={painter.changePenSize}
         /** hash & misc */
         reset={reset}
         hasStarted={hasStarted()}
