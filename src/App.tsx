@@ -57,7 +57,7 @@ const App = () => {
   });
 
   const gridInfo = createMemo(() => {
-    return { width: grid.wH(), height: grid.wW() };
+    return { width: grid.wW(), height: grid.wH() };
   });
 
   const debug = false;
