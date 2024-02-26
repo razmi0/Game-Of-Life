@@ -19,6 +19,10 @@ export type IconNames =
   | "range"
   | "screen_gear"
   | "reset"
+  | "minus_circle"
+  | "plus_circle"
+  | "pen"
+  | "eraser"
   | "population"
   | "random"
   | "queue"
@@ -32,7 +36,8 @@ export type IconNames =
   | "arrowDown"
   | "snail"
   | "hare"
-  | "stats";
+  | "stats"
+  | "painting_tools";
 
 export type IconProps = {
   width: number;
