@@ -1,10 +1,10 @@
-import { CanvasWrapper } from "./components/Wrappers";
-import { onMount, createSignal, Show, createEffect } from "solid-js";
-import useScreen from "./hooks/useScreen";
+import { onMount, createSignal, Show, createMemo } from "solid-js";
+import useGrid from "./hooks/useGrid";
 import useHash from "./hooks/useHash";
 import useColors from "./hooks/useColors";
+import usePainter from "./hooks/usePainter";
 import useClock from "./hooks/useClock";
-import useData from "./hooks/useData";
+import useBoardData from "./hooks/useBoardData";
 import useAgent from "./hooks/useAgent";
 import { SimpleButton } from "./components/Buttons";
 import DebuggerPanel from "./components/DebuggerPanel";
@@ -17,27 +17,28 @@ const App = () => {
   const [ctx, setCtx] = createSignal<CanvasRenderingContext2D>();
   const [hasStarted, setHasStarted] = createSignal(false);
 
-  const screen = useScreen(); // context candidate
-  const data = useData();
-  const { findColor } = useColors(screen.nCell);
-  const { updateHash, drawHash, resetHash } = useHash(screen, data, findColor, ctx);
+  const grid = useGrid(); // context candidate
+  const boardData = useBoardData();
+  const { findColor } = useColors(grid.nCell);
+  const { updateHash, drawHash, resetHash, paintCell } = useHash(grid, boardData, findColor, ctx);
+  const painter = usePainter(paintCell);
 
   const run = () => {
     if (!hasStarted()) setHasStarted(true);
     updateHash();
     drawHash();
-    data.incrementGeneration();
+    boardData.incrementGeneration();
   };
 
   const reset = () => {
     setHasStarted(false);
     if (gameLoop.play) gameLoop.switchPlayPause();
     resetHash();
-    data.resetGeneration();
+    boardData.resetGeneration();
   };
 
   const changeCellSizeAndReset = (newSize: number) => {
-    screen.changeCellSize(newSize);
+    grid.changeCellSize(newSize);
     reset();
   };
 
@@ -51,7 +52,12 @@ const App = () => {
 
   onMount(() => {
     setCtx(canvas.getContext("2d")!);
+    painter.setCanvasRef(canvas);
     run();
+  });
+
+  const gridInfo = createMemo(() => {
+    return { width: grid.wH(), height: grid.wW() };
   });
 
   const debug = false;
@@ -65,9 +71,9 @@ const App = () => {
           <SimpleButton handler={gameLoop.switchPlayPause}>{gameLoop.play ? "pause" : "play"}</SimpleButton>
           <SimpleButton
             handler={() => {
-              console.log("cells : ", screen.nCell());
-              console.log("rows : ", screen.nRow());
-              console.log("cols : ", screen.nCol());
+              console.log("cells : ", grid.nCell());
+              console.log("rows : ", grid.nRow());
+              console.log("cols : ", grid.nCol());
             }}
           >
             log
@@ -75,16 +81,16 @@ const App = () => {
         </DebuggerPanel>
       </Show>
       <Drawer
-        /** data */
-        generation={data.generation}
-        nAlive={data.nAlive}
-        nDead={data.nDead}
-        randomness={data.randomness}
-        tuneRandom={data.tuneRandom}
-        changeRandom={data.changeRandom}
-        /** screen */
-        cellSize={screen.cellSize()}
-        tuneCellSize={screen.tuneCellSize}
+        /** boardData */
+        generation={boardData.generation}
+        nAlive={boardData.nAlive}
+        nDead={boardData.nDead}
+        randomness={boardData.randomness}
+        tuneRandom={boardData.tuneRandom}
+        changeRandom={boardData.changeRandom}
+        /** grid */
+        cellSize={grid.cellSize()}
+        tuneCellSize={grid.tuneCellSize}
         changeCellSize={changeCellSizeAndReset}
         /** gameLoop */
         speed={gameLoop.speed}
@@ -92,14 +98,24 @@ const App = () => {
         tuneSpeed={gameLoop.tuneSpeed}
         changeSpeed={gameLoop.changeSpeed}
         switchPlayPause={gameLoop.switchPlayPause}
+        /** painter */
+
+        selectedTool={painter.tool()}
+        setEraser={painter.setEraser}
+        setPen={painter.setPen}
+        unsetTool={painter.unsetTool}
+        paintingState={painter.userPaint()}
+        switchPainting={painter.switchPainting}
+        penSize={painter.penSize()}
+        tunePenSize={painter.tunePenSize}
+        changePenSize={painter.changePenSize}
         /** hash & misc */
         reset={reset}
         hasStarted={hasStarted()}
         navigator={navInfo()}
+        gridInfo={gridInfo()}
       />
-      <CanvasWrapper>
-        <canvas class="bg-black" width={screen.wW()} height={screen.wH()} ref={canvas}></canvas>
-      </CanvasWrapper>
+      <canvas class="bg-black" width={grid.wW()} height={grid.wH()} ref={canvas}></canvas>
     </>
   );
 };

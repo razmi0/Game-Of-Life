@@ -23,6 +23,7 @@ export type RangeProps = {
   class?: string;
   aria?: string;
   milestones?: boolean | Partial<Milestones>;
+  step?: number;
 };
 
 const SimpleRange = (props: RangeProps) => {
@@ -40,6 +41,7 @@ const SimpleRange = (props: RangeProps) => {
         Labels range
       </label>
       <input
+        step={props.step || 1}
         id={props.aria}
         type="range"
         value={props.value}

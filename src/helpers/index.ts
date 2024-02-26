@@ -7,3 +7,13 @@ export const debounce = (fn: Function, delay: number) => {
     }, delay);
   };
 };
+
+export const getCoordsFromIndex = (index: number, rowSize: number, cellSize: number) => {
+  const x = Math.floor(index / rowSize) * cellSize;
+  const y = (index % rowSize) * cellSize;
+  return [x, y];
+};
+
+export const getIndexFromCoords = (x: number, y: number, rowSize: number, cellSize: number) => {
+  return Math.floor(x / cellSize) * rowSize + Math.floor(y / cellSize);
+};

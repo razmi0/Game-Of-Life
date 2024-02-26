@@ -7,7 +7,7 @@ const nRowInit = Math.floor(window.innerHeight / INITIAL_CELL_SIZE) + 1;
 const nColInit = Math.floor(window.innerWidth / INITIAL_CELL_SIZE) + 1;
 const nCellInit = nRowInit * nColInit;
 
-export type ScreenHook = {
+export type GridHook = {
   nRow: Accessor<number>;
   nCol: Accessor<number>;
   nCell: Accessor<number>;
@@ -17,7 +17,7 @@ export type ScreenHook = {
   changeCellSize: (newSize: number) => void;
   tuneCellSize: (newSize: number) => void;
 };
-export default function useScreen() {
+export default function useGrid() {
   const [wW, setWW] = createSignal(window.innerWidth);
   const [wH, setWH] = createSignal(window.innerHeight);
   const [nRow, setnRow] = createSignal(nRowInit);
@@ -49,7 +49,7 @@ export default function useScreen() {
 
   const delayDebounce = 80;
   const updateSizes = debounce(() => {
-    console.log("Resizing screen & cells in useScreen");
+    console.log("Resizing grid & cells in useGrid");
     batch(() => {
       setWW(window.innerWidth);
       setWH(window.innerHeight);
@@ -66,5 +66,5 @@ export default function useScreen() {
     onCleanup(() => window.removeEventListener("resize", updateSizes));
   });
 
-  return { nRow, nCol, nCell, wW, wH, cellSize, changeCellSize, tuneCellSize } as Prettify<ScreenHook>;
+  return { nRow, nCol, nCell, wW, wH, cellSize, changeCellSize, tuneCellSize } as Prettify<GridHook>;
 }
