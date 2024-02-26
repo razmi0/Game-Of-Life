@@ -1,7 +1,8 @@
 import { batch, createEffect, createMemo } from "solid-js";
+import { getCoordsFromIndex, getIndexFromCoords } from "../helpers";
 import type { Accessor } from "solid-js";
 import type { GridHook } from "./useGrid";
-import { getCoordsFromIndex, getIndexFromCoords } from "../helpers";
+import type { Tools } from "./usePainter";
 
 type Hash8Type = Uint8Array & { [index: number]: 0 | 1 };
 type Hash8 = Prettify<Hash8Type>;
@@ -126,27 +127,43 @@ export default function useHash(
     }
   };
 
-  const paintCell = (x: number, y: number, paintSizeMultiplicator: number) => {
-    const rowSize = grid.nRow();
+  const paintCell = (x: number, y: number, paintSize: number, tool: Tools) => {
+    const context = ctx();
+    if (!context) return;
 
-    const offsetXPainted = paintSizeMultiplicator - 1;
+    const rowSize = grid.nRow();
+    const cellSize = grid.cellSize();
+
+    const offsetXPainted = paintSize - 1;
     const offsetYPainted = offsetXPainted * rowSize;
 
-    const index = getIndexFromCoords(x, y, rowSize, grid.cellSize()); // center index
+    const index = getIndexFromCoords(x, y, rowSize, cellSize); // center index
 
     for (let row = -offsetYPainted; row <= offsetYPainted; row += rowSize) {
       for (let col = -offsetXPainted; col <= offsetXPainted; col++) {
         const paintedIndex = index + row + col;
         if (paintedIndex < 0 || paintedIndex > hash.length) return;
-        if (hash[paintedIndex]) continue;
 
-        hash[paintedIndex] = 1;
-        const gridCoord = getCoordsFromIndex(paintedIndex, rowSize, grid.cellSize());
+        switch (tool) {
+          case "pen": {
+            if (hash[paintedIndex]) continue;
+            hash[paintedIndex] = 1;
+            const [x, y] = getCoordsFromIndex(paintedIndex, rowSize, cellSize);
 
-        const context = ctx();
-        if (!context) return;
-        context.fillStyle = findColor(paintedIndex);
-        context.fillRect(gridCoord[0], gridCoord[1], grid.cellSize(), grid.cellSize());
+            context.fillStyle = findColor(paintedIndex);
+            context.fillRect(x, y, cellSize, cellSize);
+            break;
+          }
+
+          case "eraser":
+            if (!hash[paintedIndex]) continue;
+            hash[paintedIndex] = 0;
+            const [x, y] = getCoordsFromIndex(paintedIndex, rowSize, cellSize);
+
+            context.clearRect(x, y, cellSize, cellSize);
+
+            break;
+        }
       }
     }
   };
