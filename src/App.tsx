@@ -19,7 +19,7 @@ const App = () => {
 
   const grid = useGrid(); // context candidate
   const boardData = useBoardData();
-  const { findColor } = useColors(grid.nCell);
+  const { findColor, palette } = useColors(grid.nCell);
   const { updateHash, drawHash, resetHash, paintCell } = useHash(grid, boardData, findColor, ctx);
   const painter = usePainter(paintCell);
 
@@ -108,6 +108,8 @@ const App = () => {
         penSize={painter.penSize()}
         tunePenSize={painter.tunePenSize}
         changePenSize={painter.changePenSize}
+        /** colors */
+        palette={palette}
         /** hash & misc */
         reset={reset}
         hasStarted={hasStarted()}
