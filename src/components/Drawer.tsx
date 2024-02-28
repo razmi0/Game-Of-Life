@@ -169,8 +169,8 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     const isPen = () => props.selectedTool === "pen";
 
     return (
-      <div class="flex flex-col gap-4 mt-3 min-w-48">
-        <div class="flex gap-2 items-start">
+      <div class="flex flex-col gap-2 mt-3 min-w-40">
+        <div class="flex items-start gap-1">
           <IconButton
             width={md}
             name="pen"
@@ -186,6 +186,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             classList={{ ["border-dw-100"]: isErase(), [" border-transparent"]: !isErase() }}
           />
         </div>
+        <p>brush size : </p>
         <div class="flex gap-2 items-start">
           <IconButton width={md} name="minus_circle" class="mb-5" onClick={() => props.changePenSize(-PEN_SIZE_STEP)} />
           <SimpleRange
@@ -449,22 +450,41 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         >
           <Icon width={xl} name="reset" />
         </Item>
+        <Item
+          tooltip={
+            <StandardTooltip title={<RandomTitle />}>
+              <p class="mt-2">
+                change the ratio between dead and alive cells, the higher the value the more dead cells generated on
+                reset
+              </p>
+              <RandomTooltip />
+            </StandardTooltip>
+          }
+        >
+          <Icon width={xl} name="random" />
+        </Item>
       </Group>
       <Separator />
       <Group>
         <Item
+          indicator={props.penSize}
+          showTooltipOnClick
           tooltip={
-            <StandardTooltip title={"painting tools"}>
+            <StandardTooltip title="painting tools">
               <PaintingTooltip />
             </StandardTooltip>
           }
         >
           <Icon width={xl} name="painting_tools" />
         </Item>
+        <Item>
+          <Icon width={xl} name="color_picker" />
+        </Item>
       </Group>
       <Separator />
       <Group>
         <Item
+          indicator={props.cellSize}
           tooltip={
             <StandardTooltip title={<CellSizeTitle />}>
               <p>change the size of the cells</p>
@@ -484,19 +504,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           }
         >
           <Icon width={xl} name="speed" />
-        </Item>
-        <Item
-          tooltip={
-            <StandardTooltip title={<RandomTitle />}>
-              <p class="mt-2">
-                change the ratio between dead and alive cells, the higher the value the more dead cells generated on
-                reset
-              </p>
-              <RandomTooltip />
-            </StandardTooltip>
-          }
-        >
-          <Icon width={xl} name="random" />
         </Item>
       </Group>
       <Separator />
@@ -522,7 +529,8 @@ const StandardTooltip: Component<StandardTooltipProps> = (props) =>
   // prettier-ignore
   <div class={`flex h-fit w-fit py-3 px-4 bg-dw-500 flex-col ${props.class || ""}`}> 
     <Show when={!!props.title}>
-      <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
+      <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-1 text-dw-200">{props.title}</h4>
+      <Separator class="w-full h-[1px]"/>
     </Show>
     <Show when={!!props.children}>
     <div class="text-balance">{props.children}</div></Show>
@@ -539,6 +547,7 @@ const StatsTooltip: Component<StatsTooltipProps> = (props) => {
       <Show when={!!props.title}>
         <div class="flex flex-row justify-between">
           <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
+          <Separator class="w-full h-[1px]" />
         </div>
       </Show>
       <div class="gap-1">
@@ -550,7 +559,7 @@ const StatsTooltip: Component<StatsTooltipProps> = (props) => {
                 <span class="whitespace-nowrap w-24 text-right text-yellow-400 tabular-nums">{data.value}</span>
               </div>
               <Show when={data.separator}>
-                <Separator classes="w-full my-3 h-[2px]" />
+                <Separator class="w-full my-3 h-[1px]" />
               </Show>
             </>
           )}
