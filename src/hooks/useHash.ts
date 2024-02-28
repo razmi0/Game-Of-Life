@@ -21,7 +21,7 @@ export default function useHash(
   /** hash is totally regenerated and draw (SLOW) */
   const resetHash = () => {
     hash = initHash();
-    drawHashOnReset();
+    drawAllHash();
   };
 
   /** hash change size if needed (copy) */
@@ -108,14 +108,13 @@ export default function useHash(
   };
 
   /** draw and read the entire hash (SLOW) */
-  const drawHashOnReset = () => {
+  const drawAllHash = () => {
     let i = 0;
     const rowSize = grid.nRow();
     const context = ctx();
     if (!context) return;
     while (i < hash.length) {
-      const x = Math.floor(i / rowSize) * grid.cellSize();
-      const y = (i % rowSize) * grid.cellSize();
+      const [x, y] = getCoordsFromIndex(i, rowSize, grid.cellSize());
       if (hash[i]) {
         context.fillStyle = findColor(i);
         context.fillRect(x, y, grid.cellSize(), grid.cellSize());
@@ -171,9 +170,9 @@ export default function useHash(
   createEffect(() => {
     if (grid.nCell() !== hash.length) {
       resizeHash();
-      drawHashOnReset();
+      drawAllHash();
     }
   });
 
-  return { updateHash, drawHash, resetHash, paintCell };
+  return { updateHash, drawHash, resetHash, paintCell, drawAllHash };
 }

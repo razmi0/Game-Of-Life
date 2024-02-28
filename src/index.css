@@ -45,45 +45,52 @@ p {
 /** */
 
 input[type="color" i]::-webkit-color-swatch-wrapper {
+  @apply rounded-s-md;
   padding: 0;
-  border: none;
-  border-radius: 20%;
+  border: 1px solid #efeff3;
+  border-right: none;
 }
 
 input[type="color" i]::-webkit-color-swatch-wrapper:hover {
-  border: 1px solid #1d1f25;
+  border: 1px solid transparent;
+  border-right: none;
 }
 
 input[type="color" i]::-webkit-color-swatch-wrapper:focus {
-  border: 1px solid #1d1f25;
+  border: 1px solid transparent;
+  border-right: none;
 }
 
 /** */
 
 input[type="color" i]::-webkit-color-swatch {
+  @apply rounded-s-md;
   border: none;
-  border-radius: 20%;
 }
 input[type="color" i]::-webkit-color-swatch:hover {
-  border: 1px solid #1d1f25;
+  border: 1px solid transparent;
+  border-right: none;
 }
 input[type="color" i]::-webkit-color-swatch:focus {
-  border: 1px solid #1d1f25;
+  border: 1px solid transparent;
+  border-right: none;
 }
 
 /** */
 
 input[type="color" i] {
+  @apply rounded-s-md;
   appearance: none;
   -webkit-appearance: none;
   border: none;
-  border-radius: 20%;
 }
 
 input[type="color" i]:hover {
-  border: 1px solid #1d1f25;
+  border: 1px solid transparent;
+  border-right: none;
 }
 
 input[type="color" i]:focus {
-  border: 1px solid #1d1f25;
+  border: 1px solid transparent;
+  border-right: none;
 }

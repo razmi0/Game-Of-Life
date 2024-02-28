@@ -10,6 +10,7 @@ import { SimpleButton } from "./components/Buttons";
 import DebuggerPanel from "./components/DebuggerPanel";
 import Drawer from "./components/Drawer";
 import { BATTERY_REFRESH_INTERVAL } from "./data";
+import { unwrap } from "solid-js/store";
 
 let canvas: HTMLCanvasElement;
 
@@ -19,8 +20,8 @@ const App = () => {
 
   const grid = useGrid(); // context candidate
   const boardData = useBoardData();
-  const { findColor, palette } = useColors(grid.nCell);
-  const { updateHash, drawHash, resetHash, paintCell } = useHash(grid, boardData, findColor, ctx);
+  const { findColor, palette, addColor, patchColor, removeColor, applyRandomColors } = useColors(grid.nCell);
+  const { updateHash, drawHash, resetHash, paintCell, drawAllHash } = useHash(grid, boardData, findColor, ctx);
   const painter = usePainter(paintCell);
 
   const run = () => {
@@ -28,6 +29,11 @@ const App = () => {
     updateHash();
     drawHash();
     boardData.incrementGeneration();
+  };
+
+  const applyColors = () => {
+    applyRandomColors();
+    drawAllHash();
   };
 
   const reset = () => {
@@ -60,7 +66,7 @@ const App = () => {
     return { width: grid.wW(), height: grid.wH() };
   });
 
-  const debug = false;
+  const debug = true;
 
   return (
     <>
@@ -78,6 +84,7 @@ const App = () => {
           >
             log
           </SimpleButton>
+          <SimpleButton handler={() => console.log(unwrap(palette))}>log palette</SimpleButton>
         </DebuggerPanel>
       </Show>
       <Drawer
@@ -110,6 +117,10 @@ const App = () => {
         changePenSize={painter.changePenSize}
         /** colors */
         palette={palette}
+        addColor={addColor}
+        patchColor={patchColor}
+        removeColor={removeColor}
+        applyColors={applyColors}
         /** hash & misc */
         reset={reset}
         hasStarted={hasStarted()}

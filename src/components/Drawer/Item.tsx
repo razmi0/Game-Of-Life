@@ -42,15 +42,13 @@ const Item: Component<Prettify<ItemProps>> = (props) => {
       </Indicator>
       <div
         class={
-          "flex items-center justify-center text-sm text-dw-150 w-full cursor-pointer hover:bg-dw-300 hover:text-dw-100 py-2 " +
+          "flex items-center justify-center text-sm text-dw-150 w-full hover:bg-dw-300 hover:text-dw-100 py-2 " +
           (props.classes || "")
         }
         onClick={props.onClick}
       >
         <Left show={hasLeft}>{props.left}</Left>
-        <Child show={hasChildren}>
-          <div>{props.children}</div>
-        </Child>
+        <Child show={hasChildren}>{props.children}</Child>
         <Right show={hasRight}>{props.right}</Right>
 
         <Tooltip when={hovering() && hasChildren && hasTooltip} itemRef={itemRef!}>

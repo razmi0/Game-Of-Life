@@ -59,6 +59,10 @@ type DrawerProps = {
   setEraser: () => void;
   setPen: () => void;
   unsetTool: () => void;
+  addColor: (color: string) => void;
+  patchColor: (color: string, index: number) => void;
+  removeColor: (index: number) => void;
+  applyColors: () => void;
 };
 
 const { xl, sm, md, xs, lg } = ICON_SIZE;
@@ -212,38 +216,79 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   };
 
   const ColorPaletteTooltip = () => {
-    const ColorItem: ParentComponent = (local) => (
-      <div class="flex justify-between items-center cursor-pointer">{local.children}</div>
-    );
+    const [newColor, setNewColor] = createSignal("#FFF");
 
-    const newColorLabel = () => `Color ${props.palette.length + 1}`;
+    const ColorSection: ParentComponent = (local) => (
+      <div
+        class="flex flex-col gap-1 max-h-40 flex-wrap "
+        id="section_color"
+        classList={{ ["items-center"]: props.palette.length > 3, ["-translate-x-[5px]"]: props.palette.length > 7 }}
+      >
+        {local.children}
+      </div>
+    );
+    const ColorItem: ParentComponent = (local) => <div class="flex flex-row items-center">{local.children}</div>;
+
+    const formatIdToLabel = (label: string) => label.replace(/_/g, " ").replace(/color/, "Color");
 
     return (
-      <div class="flex flex-col gap-2 mt-3 min-w-48">
+      <div class="flex flex-col gap-3 mt-3 min-w-48">
         <p>Choose an unlimited set of colors : </p>
-        <div class="flex flex-row gap-1">
+        <ColorSection>
           <For each={props.palette}>
             {(color, i) => {
               const id = `color_${i()}`;
 
+              const changeColor = (e: Event) => {
+                const newColor = (e.target as HTMLInputElement).value;
+                props.patchColor(newColor, i());
+              };
+
               return (
                 <>
                   <ColorItem>
-                    <InputColor id={id} value={color} label={id} hiddenLabel />
+                    <InputColor id={id} value={color} label={formatIdToLabel(id)} onChange={changeColor} hiddenLabel />
+                    <IconButton
+                      onClick={() => props.removeColor(i())}
+                      width={sm}
+                      name="minus_circle"
+                      class="border-[1px] border-dw-100 rounded-e-md hover:bg-dw-300 w-8 h-8 flex items-center justify-center"
+                    />
                   </ColorItem>
                 </>
               );
             }}
           </For>
-        </div>
-        <ColorItem>
-          <InputColor
-            value="#000"
-            id={newColorLabel().toLowerCase().replace(" ", "_")}
-            label={newColorLabel()}
-            hiddenLabel={false}
-          />
-        </ColorItem>
+          <ColorItem>
+            <InputColor
+              id="add_color"
+              value={newColor()}
+              label="add color"
+              hiddenLabel
+              onChange={(e) => {
+                const newColor = (e.target as HTMLInputElement).value;
+                setNewColor(newColor);
+              }}
+            />
+            <IconButton
+              onClick={() => {
+                props.addColor(newColor());
+                setNewColor("");
+              }}
+              name="plus_circle"
+              width={sm}
+              class="border-[1px] border-dw-100 rounded-e-md hover:bg-dw-300 w-8 h-8 flex items-center justify-center"
+            />
+          </ColorItem>
+        </ColorSection>
+        <SimpleButton
+          class="bg-dw-300 w-full hover:bg-dw-200"
+          handler={() => {
+            props.applyColors();
+          }}
+        >
+          apply colors
+        </SimpleButton>
       </div>
     );
   };

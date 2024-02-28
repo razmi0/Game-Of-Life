@@ -1,5 +1,5 @@
 import { Accessor, createEffect } from "solid-js";
-import { createStore } from "solid-js/store";
+import { createStore, produce } from "solid-js/store";
 import { DEFAULT_PALETTE } from "../data";
 
 type Hash32Type = Uint32Array & { [index: number]: number };
@@ -8,6 +8,24 @@ type Hash32 = Prettify<Hash32Type>;
 export default function useColors(nCell: Accessor<number>) {
   const [palette, setPalette] = createStore({
     randomColors: DEFAULT_PALETTE, // colors
+    addColor: (color: string) => {
+      setPalette(
+        "randomColors",
+        produce((p: string[]) => p.push(color))
+      );
+    },
+    removeColor: (index: number) => {
+      setPalette(
+        "randomColors",
+        produce((p: string[]) => p.splice(index, 1))
+      );
+    },
+    patchColor: (color: string, index: number) => {
+      setPalette(
+        "randomColors",
+        produce((p: string[]) => (p[index] = color))
+      );
+    },
   });
 
   /**
@@ -48,13 +66,9 @@ export default function useColors(nCell: Accessor<number>) {
    * @returns hex color
    */
   const randomColor = () => {
-    let color = "";
     const random = Math.random() * 100;
-    if (random <= 25) color = palette.randomColors[0];
-    if (random > 25 && random <= 50) color = palette.randomColors[1];
-    if (random > 50 && random <= 75) color = palette.randomColors[2];
-    if (random > 75) color = palette.randomColors[3];
-    return color;
+    const index = Math.floor(random / (100 / palette.randomColors.length));
+    return palette.randomColors[index];
   };
 
   /**
@@ -98,5 +112,12 @@ export default function useColors(nCell: Accessor<number>) {
 
   initColors();
 
-  return { findColor, palette: palette.randomColors };
+  return {
+    palette: palette.randomColors,
+    findColor,
+    addColor: palette.addColor,
+    removeColor: palette.removeColor,
+    patchColor: palette.patchColor,
+    applyRandomColors: initColors,
+  };
 }

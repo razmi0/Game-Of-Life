@@ -5,6 +5,9 @@ type InputColorProps = {
   id: string;
   class?: string;
   hiddenLabel: boolean;
+  onInput?: (e: Event) => void;
+  onChange?: (e: Event) => void;
+  onBlur?: (e: Event) => void;
 };
 export const InputColor = (props: InputColorProps) => {
   return (
@@ -19,6 +22,9 @@ export const InputColor = (props: InputColorProps) => {
         name={props.id}
         value={props.value}
         disabled={props.disabled ?? false}
+        onInput={props.onInput}
+        onChange={props.onChange}
+        onBlur={props.onBlur}
       />
     </>
   );
