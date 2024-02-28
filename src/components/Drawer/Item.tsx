@@ -1,4 +1,4 @@
-import { Show, createSignal, createEffect } from "solid-js";
+import { Show, createSignal, createEffect, onMount } from "solid-js";
 import { BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP, SHOW_TOOLTIP_DEBUG, TOOLTIP_SPACING } from "../../data";
 import { createStore } from "solid-js/store";
 import Icon from "../Icons";
@@ -10,7 +10,7 @@ type ItemProps = {
   children?: JSX.Element;
   right?: JSX.Element;
   left?: JSX.Element;
-  label?: JSX.Element;
+  indicator?: JSX.Element;
   onClick?: () => void;
   classes?: string;
   hover?: boolean;
@@ -24,7 +24,7 @@ const Item: Component<Prettify<ItemProps>> = (props) => {
 
   let itemRef: HTMLDivElement;
 
-  const hasLbl = !!props.label;
+  const hasIndicator = !!props.indicator;
   const hasLeft = !!props.left;
   const hasRight = !!props.right;
   const hasChildren = !!props.children;
@@ -37,7 +37,9 @@ const Item: Component<Prettify<ItemProps>> = (props) => {
 
   return (
     <div ref={(el) => (itemRef = el)} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onClick={toggleOnClick}>
-      <Label show={hasLbl}>{props.label}</Label>
+      <Indicator show={hasIndicator} itemRef={itemRef!}>
+        {props.indicator}
+      </Indicator>
       <div
         class={
           "flex items-center justify-center text-sm text-dw-150 w-full cursor-pointer hover:bg-dw-300 hover:text-dw-100 py-2 " +
@@ -125,11 +127,25 @@ const Tooltip = (props: TooltipProps) => {
 type LabelProps = {
   show?: boolean;
   children: JSX.Element;
+  itemRef: HTMLDivElement;
 };
-const Label = (props: LabelProps) => {
+const Indicator = (props: LabelProps) => {
+  const [itemHeight, setItemHeight] = createSignal(0);
+
+  onMount(() => {
+    if (props.itemRef && itemHeight() !== props.itemRef.offsetHeight) {
+      setItemHeight(props.itemRef.offsetHeight);
+    }
+  });
+
   return (
     <Show when={props.show}>
-      <label class="text-sm w-full mt-2">{props.children}</label>
+      <label
+        class="absolute right-0 text-sm text-yellow-400 font-bold"
+        style={`transform: translate(2px,${(itemHeight() + 10) / 2}px);`}
+      >
+        {props.children}
+      </label>
     </Show>
   );
 };

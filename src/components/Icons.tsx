@@ -23,6 +23,7 @@ export type IconNames =
   | "plus_circle"
   | "pen"
   | "eraser"
+  | "color_picker"
   | "population"
   | "random"
   | "queue"
