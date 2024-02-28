@@ -1,5 +1,5 @@
 import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
-import { MAX_PEN_SIZE, MIN_PEN_SIZE } from "../data";
+import { INITIAL_CELL_SIZE, INITIAL_PEN_SIZE, MAX_PEN_SIZE, MIN_PEN_SIZE } from "../data";
 
 enum Painter {
   IDLE = "idle",
@@ -16,7 +16,7 @@ const usePainter = (work: (x: number, y: number, paintSize: number, tool: Tools)
   const [painterState, setPainter] = createSignal(Painter.IDLE);
   const [userPaint, setUserPaint] = createSignal(false);
   const [tool, setTool] = createSignal<Tools>(Tools.NONE);
-  const [penSize, setPenSize] = createSignal(1);
+  const [penSize, setPenSize] = createSignal(INITIAL_PEN_SIZE);
   const [canvasRef, setCanvasRef] = createSignal<HTMLCanvasElement>();
 
   const setEraser = () => setTool(Tools.ERASER);
