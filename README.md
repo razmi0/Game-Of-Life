@@ -46,7 +46,7 @@ Age => color
 - [ ] add color picker to paint tools
 - [ ] text to grid
 - [ ] img to grid
-- [ ] color picker for cells
+- [ ] color picker for cells (alive, dead, background)
 - [ ] shape picker for draw (common shapes + custom + remarquable shapes)
 - [ ] shape picker for cells (circle, square, triangle, hexagon, octogon, star, heart, custom)
 - [ ] toroidal grid
