@@ -23,9 +23,10 @@ import SimpleRange from "./Drawer/Range";
 import Separator from "./Drawer/Separator";
 
 import Icon from "./Icons";
-import type { Accessor, Component, JSXElement } from "solid-js";
+import type { Accessor, Component, JSXElement, ParentComponent } from "solid-js";
 import useShorcuts, { type Shortcut } from "../hooks/useShorcuts";
 import type { Tools } from "../hooks/usePainter";
+import { InputColor } from "./Input";
 
 type DrawerProps = {
   /** STATES */
@@ -42,6 +43,7 @@ type DrawerProps = {
   penSize: number;
   paintingState: boolean;
   selectedTool: Tools;
+  palette: string[];
   /** ACTIONS */
   reset: () => void;
   changeSpeed: (newTime: number) => void;
@@ -205,6 +207,43 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             {output()}
           </div>
         </div>
+      </div>
+    );
+  };
+
+  const ColorPaletteTooltip = () => {
+    const ColorItem: ParentComponent = (local) => (
+      <div class="flex justify-between items-center cursor-pointer">{local.children}</div>
+    );
+
+    const newColorLabel = () => `Color ${props.palette.length + 1}`;
+
+    return (
+      <div class="flex flex-col gap-2 mt-3 min-w-48">
+        <p>Choose an unlimited set of colors : </p>
+        <div class="flex flex-row gap-1">
+          <For each={props.palette}>
+            {(color, i) => {
+              const id = `color_${i()}`;
+
+              return (
+                <>
+                  <ColorItem>
+                    <InputColor id={id} value={color} label={id} hiddenLabel />
+                  </ColorItem>
+                </>
+              );
+            }}
+          </For>
+        </div>
+        <ColorItem>
+          <InputColor
+            value="#000"
+            id={newColorLabel().toLowerCase().replace(" ", "_")}
+            label={newColorLabel()}
+            hiddenLabel={false}
+          />
+        </ColorItem>
       </div>
     );
   };
@@ -468,7 +507,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Group>
         <Item
           indicator={props.penSize}
-          showTooltipOnClick
           tooltip={
             <StandardTooltip title="painting tools">
               <PaintingTooltip />
@@ -477,7 +515,14 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         >
           <Icon width={xl} name="painting_tools" />
         </Item>
-        <Item>
+        <Item
+          showTooltipOnClick
+          tooltip={
+            <StandardTooltip title="color palette">
+              <ColorPaletteTooltip />
+            </StandardTooltip>
+          }
+        >
           <Icon width={xl} name="color_picker" />
         </Item>
       </Group>
