@@ -98,5 +98,5 @@ export default function useColors(nCell: Accessor<number>) {
 
   initColors();
 
-  return { findColor };
+  return { findColor, palette: palette.randomColors };
 }
