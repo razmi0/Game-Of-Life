@@ -18,15 +18,17 @@ import { IconButton, SimpleButton } from "./Buttons";
 import Wrapper from "./Drawer/Content";
 import Group from "./Drawer/Group";
 import Header, { TooltipTitle } from "./Drawer/Headers";
+import StandardTooltip, { StatsTooltip } from "./Drawer/Tooltips";
 import Item from "./Drawer/Item";
 import SimpleRange from "./Drawer/Range";
 import Separator from "./Drawer/Separator";
+import { InputColor } from "./Input";
 
 import Icon from "./Icons";
-import type { Accessor, Component, JSXElement, ParentComponent } from "solid-js";
 import useShorcuts, { type Shortcut } from "../hooks/useShorcuts";
+import type { Accessor, ParentComponent } from "solid-js";
 import type { Tools } from "../hooks/usePainter";
-import { InputColor } from "./Input";
+import type { StatsTooltipData } from "./Drawer/Tooltips";
 
 type DrawerProps = {
   /** STATES */
@@ -578,53 +580,3 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     </Wrapper>
   );
 }
-
-type StandardTooltipProps = {
-  children?: JSXElement;
-  title?: JSXElement;
-  class?: string;
-};
-const StandardTooltip: Component<StandardTooltipProps> = (props) =>
-  // prettier-ignore
-  <div class={`flex h-fit w-fit py-3 px-4 bg-dw-500 flex-col ${props.class || ""}`}> 
-    <Show when={!!props.title}>
-      <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-1 text-dw-200">{props.title}</h4>
-      <Separator class="w-full h-[1px]"/>
-    </Show>
-    <Show when={!!props.children}>
-    <div class="text-balance">{props.children}</div></Show>
-  </div>;
-
-type StatsTooltipData = { label: string; value: JSXElement; separator?: boolean };
-type StatsTooltipProps = {
-  data: StatsTooltipData[];
-  title?: JSXElement;
-};
-const StatsTooltip: Component<StatsTooltipProps> = (props) => {
-  return (
-    <div class="flex flex-col p-5 w-fit bg-dw-500 min-w-72">
-      <Show when={!!props.title}>
-        <div class="flex flex-row justify-between">
-          <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
-          <Separator class="w-full h-[1px]" />
-        </div>
-      </Show>
-      <div class="gap-1">
-        <For each={props.data}>
-          {(data) => (
-            <>
-              <div class="flex items-center justify-between z-10 w-full flex-nowrap">
-                <span class="w-fit text-left">{data.label}</span>
-                <span class="whitespace-nowrap w-24 text-right text-yellow-400 tabular-nums">{data.value}</span>
-              </div>
-              <Show when={data.separator}>
-                <Separator class="w-full my-3 h-[1px]" />
-              </Show>
-            </>
-          )}
-        </For>
-      </div>
-    </div>
-    // </Draggable>
-  );
-};
