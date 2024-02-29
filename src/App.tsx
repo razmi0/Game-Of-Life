@@ -66,7 +66,7 @@ const App = () => {
     return { width: grid.wW(), height: grid.wH() };
   });
 
-  const debug = true;
+  const debug = false;
 
   return (
     <>
