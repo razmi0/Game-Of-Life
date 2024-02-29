@@ -65,7 +65,7 @@ type DrawerProps = {
   applyColors: () => void;
 };
 
-const { xl, sm, md, xs, lg } = ICON_SIZE;
+const { xs, sm, md, lg, xl } = ICON_SIZE;
 
 export default function Drawer(props: Prettify<DrawerProps>) {
   const [isOpen, setIsOpen] = createSignal(true);
