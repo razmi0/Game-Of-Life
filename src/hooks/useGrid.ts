@@ -49,7 +49,6 @@ export default function useGrid() {
 
   const delayDebounce = 80;
   const updateSizes = debounce(() => {
-    console.log("Resizing grid & cells in useGrid");
     batch(() => {
       setWW(window.innerWidth);
       setWH(window.innerHeight);

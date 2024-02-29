@@ -54,7 +54,6 @@ const usePainter = (work: (x: number, y: number, paintSize: number, tool: Tools)
   createEffect(() => {
     const canvas = canvasRef();
     if (canvas) {
-      console.log("effect");
       canvas.addEventListener("mousedown", startPainting);
       canvas.addEventListener("mousemove", paint);
       canvas.addEventListener("mouseup", stopPainting);
