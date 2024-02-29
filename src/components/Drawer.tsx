@@ -17,7 +17,7 @@ import {
 import { IconButton, SimpleButton } from "./Buttons";
 import Wrapper from "./Drawer/Content";
 import Group from "./Drawer/Group";
-import Header from "./Drawer/Header";
+import Header, { TooltipTitle } from "./Drawer/Headers";
 import Item from "./Drawer/Item";
 import SimpleRange from "./Drawer/Range";
 import Separator from "./Drawer/Separator";
@@ -117,20 +117,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     <Show when={props.play} fallback={<Icon width={ICON_SIZE.xl} name="play" />}>
       <Icon width={ICON_SIZE.xl} name="pause" />
     </Show>
-  );
-
-  const PlayPauseTitle = () => (
-    <div class="flex flex-col items-center justify-between translate-y-[5px] w-fit">
-      <div>{playPauseText()}</div>
-      <div class="text-3xs flex text-dw-100 gap-1 items-center">spacebar</div>
-    </div>
-  );
-
-  const ResetTitle = () => (
-    <div class="flex flex-row items-center justify-between translate-y-[5px]">
-      <div>reset</div>
-      <div class="text-3xs flex text-dw-100 gap-1 items-center">key R</div>
-    </div>
   );
 
   const PaintingTooltip = () => {
@@ -292,27 +278,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       </div>
     );
   };
-
-  const SpeedTitle = () => (
-    <div class="flex flex-row items-center justify-between translate-y-[5px]">
-      <div>speed</div>
-      <div class="text-3xs flex text-dw-100 gap-1 items-center">arrow up/down</div>
-    </div>
-  );
-
-  const RandomTitle = () => (
-    <div class="flex flex-row items-center justify-between translate-y-[5px]">
-      <div>randomness</div>
-      <div class="text-3xs flex text-dw-100 gap-1 items-center">arrow left/right</div>
-    </div>
-  );
-
-  const CellSizeTitle = () => (
-    <div class="flex flex-row items-center justify-between translate-y-[5px]">
-      <div>cell size</div>
-      <div class="text-3xs flex text-dw-100 gap-1 items-center">z / s</div>
-    </div>
-  );
 
   const CellSizeTooltip = () => {
     const [output, setOutput] = createSignal(props.cellSize + "px");
@@ -517,7 +482,11 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         <Item
           showTooltipOnClick
           onClick={props.switchPlayPause}
-          tooltip={<StandardTooltip title={<PlayPauseTitle />} />}
+          tooltip={
+            <StandardTooltip
+              title={<TooltipTitle title={playPauseText()} keyCmd="spacebar" class="w-fit flex-col" />}
+            />
+          }
         >
           <PlayPauseIcon />
         </Item>
@@ -525,7 +494,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         <Item
           tooltip={
             <>
-              <StandardTooltip title={<ResetTitle />}>
+              <StandardTooltip title={<TooltipTitle title="reset" keyCmd="key R" />}>
                 <p class="min-w-48">reset to a new original fresh random game</p>
               </StandardTooltip>
             </>
@@ -536,7 +505,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         </Item>
         <Item
           tooltip={
-            <StandardTooltip title={<RandomTitle />}>
+            <StandardTooltip title={<TooltipTitle title="randomness" keyCmd="arrow left/right" />}>
               <p class="mt-2">
                 change the ratio between dead and alive cells, the higher the value the more dead cells generated on
                 reset
@@ -576,7 +545,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         <Item
           indicator={props.cellSize}
           tooltip={
-            <StandardTooltip title={<CellSizeTitle />}>
+            <StandardTooltip title={<TooltipTitle title="cell size" keyCmd="key Z/S" />}>
               <p>change the size of the cells</p>
               <CellSizeTooltip />
             </StandardTooltip>
@@ -587,7 +556,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
 
         <Item
           tooltip={
-            <StandardTooltip title={<SpeedTitle />}>
+            <StandardTooltip title={<TooltipTitle title="speed" keyCmd="arrow down/up" />}>
               <p>change the delay between two frames thus affecting fps</p>
               <SpeedTooltip />
             </StandardTooltip>
