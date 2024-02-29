@@ -225,7 +225,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
 
     return (
       <div class="flex flex-col gap-3 mt-3 min-w-48">
-        <p>Choose an unlimited set of colors : </p>
         <ColorSection>
           <For each={props.palette}>
             {(color, i) => {
@@ -533,6 +532,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           showTooltipOnClick
           tooltip={
             <StandardTooltip title="color palette">
+              <p>choose an unlimited set of colors : </p>
               <ColorPaletteTooltip />
             </StandardTooltip>
           }
