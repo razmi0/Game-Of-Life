@@ -71,6 +71,12 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   const [isOpen, setIsOpen] = createSignal(true);
   const trigger = () => setIsOpen((p) => !p);
 
+  const fps = (speed: number) => {
+    if (speed === 0) return "max fps";
+    const lbl = 1000 / speed;
+    return lbl > 200 ? "200 fps" : Math.floor(lbl) + " fps";
+  };
+
   const shorcuts: Shortcut[] = [
     {
       key: " ",
@@ -328,12 +334,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         </div>
       </div>
     );
-  };
-
-  const fps = (speed: number) => {
-    if (speed === 0) return "max fps";
-    const lbl = 1000 / speed;
-    return lbl > 200 ? "200 fps" : Math.floor(lbl) + " fps";
   };
 
   const SpeedTooltip = () => {
