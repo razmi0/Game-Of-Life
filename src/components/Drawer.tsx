@@ -47,8 +47,11 @@ type DrawerProps = {
   selectedTool: Tools;
   palette: string[];
   penColor: string;
+  backgroundColor: string;
+  shape: "square" | "circle";
   /** ACTIONS */
   reset: () => void;
+  resetBlank: () => void;
   changeSpeed: (newTime: number) => void;
   changeRandom: (newRandom: number) => void;
   changeCellSize: (newSize: number) => void;
@@ -67,6 +70,9 @@ type DrawerProps = {
   removeColor: (index: number) => void;
   applyColors: () => void;
   changePenColor: (color: string) => void;
+  changeBackgroundColor: (color: string) => void;
+  setShapeSquare: () => void;
+  setShapeCircle: () => void;
 };
 
 const { xs, sm, md, lg, xl } = ICON_SIZE;
@@ -291,14 +297,53 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             />
           </ColorItem>
         </ColorSection>
-        {/* <div class="flex-grow"></div> */}
-        <SimpleButton
-          class="bg-dw-300 w-full hover:bg-dw-200"
-          handler={() => {
-            props.applyColors();
-          }}
-        >
-          apply colors
+      </div>
+    );
+  };
+
+  const BackgroundColor = () => {
+    return (
+      <div class="flex items-center justify-center h-7 w-11 mt-2">
+        <InputColor
+          id="background_color"
+          label="background color"
+          value={props.backgroundColor}
+          onChange={(e) => props.changeBackgroundColor((e.target as HTMLInputElement).value)}
+          class="input-color-rounded-full w-6 h-6"
+          hiddenLabel
+        />
+      </div>
+    );
+  };
+
+  const ShapeTooltip = () => {
+    const isSquare = () => props.shape === "square";
+    const isCircle = () => props.shape === "circle";
+
+    return (
+      <div class="flex flex-col gap-1 h-full w-full min-w-48 mt-3">
+        <div class="flex flex-row w-full items-center justify-between">
+          <span classList={{ ["text-yellow-400 text-sm "]: isSquare() }}>Square</span>
+          <IconButton
+            onClick={props.setShapeSquare}
+            width={md}
+            name="square_shape"
+            class="hover:bg-dw-300 p-1 rounded-full"
+            classList={{ ["bg-dw-300"]: isSquare() }}
+          />
+        </div>
+        <div class="flex flex-row w-full items-center justify-between">
+          <span classList={{ ["text-yellow-400 text-sm "]: isCircle() }}>Circle</span>
+          <IconButton
+            onClick={props.setShapeCircle}
+            width={md}
+            name="circle_shape"
+            class="hover:bg-dw-300 p-1 rounded-full"
+            classList={{ ["bg-dw-300"]: isCircle() }}
+          />
+        </div>
+        <SimpleButton class="bg-dw-300 w-full hover:bg-dw-200" handler={props.reset}>
+          reset game
         </SimpleButton>
       </div>
     );
@@ -351,6 +396,9 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             {output()}
           </div>
         </div>
+        <SimpleButton class="bg-dw-300 w-full hover:bg-dw-200" handler={props.reset}>
+          reset
+        </SimpleButton>
       </div>
     );
   };
@@ -515,6 +563,14 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             <>
               <StandardTooltip title={<TooltipTitle title="reset" keyCmd="key R" />}>
                 <p class="min-w-48">reset to a new original fresh random game</p>
+                <div class="flex gap-2 mt-2">
+                  <SimpleButton class="bg-dw-300 w-full hover:bg-dw-200 whitespace-nowrap" handler={props.resetBlank}>
+                    reset blank
+                  </SimpleButton>
+                  <SimpleButton class="bg-dw-300 w-full hover:bg-dw-200  whitespace-nowrap" handler={props.reset}>
+                    reset game
+                  </SimpleButton>
+                </div>
               </StandardTooltip>
             </>
           }
@@ -555,10 +611,28 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             <StandardTooltip title="color palette" class="h-full" innerContentClass="flex flex-col justify-between">
               <p>paint the whole board with an unlimited set of colors : </p>
               <ColorPaletteTooltip />
+              <Separator class="w-full h-[1px] my-3" />
+              <div class="flex">
+                <p>change the board background color : </p>
+                <BackgroundColor />
+              </div>
+              <SimpleButton class="bg-dw-300 mt-4 w-full hover:bg-dw-200" handler={props.applyColors}>
+                apply new colors
+              </SimpleButton>
             </StandardTooltip>
           }
         >
           <Icon width={xl} name="color_picker" />
+        </Item>
+        <Item
+          tooltip={
+            <StandardTooltip title={<TooltipTitle title="shape" />}>
+              <p>change the shape of the cells</p>
+              <ShapeTooltip />
+            </StandardTooltip>
+          }
+        >
+          <Icon width={xl} name="shape_picker" />
         </Item>
       </Group>
       <Separator />
