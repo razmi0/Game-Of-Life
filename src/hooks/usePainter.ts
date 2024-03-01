@@ -1,5 +1,5 @@
 import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
-import { INITIAL_CELL_SIZE, INITIAL_PEN_SIZE, MAX_PEN_SIZE, MIN_PEN_SIZE } from "../data";
+import { DEFAULT_PALETTE, INITIAL_CELL_SIZE, INITIAL_PEN_SIZE, MAX_PEN_SIZE, MIN_PEN_SIZE } from "../data";
 
 enum Painter {
   IDLE = "idle",
@@ -12,12 +12,13 @@ export enum Tools {
   NONE = "none",
 }
 
-const usePainter = (work: (x: number, y: number, paintSize: number, tool: Tools) => void) => {
+const usePainter = (work: (x: number, y: number, paintSize: number, tool: Tools, penColor: string) => void) => {
   const [painterState, setPainter] = createSignal(Painter.IDLE);
   const [userPaint, setUserPaint] = createSignal(false);
   const [tool, setTool] = createSignal<Tools>(Tools.NONE);
   const [penSize, setPenSize] = createSignal(INITIAL_PEN_SIZE);
   const [canvasRef, setCanvasRef] = createSignal<HTMLCanvasElement>();
+  const [penColor, setPenColor] = createSignal<string>(DEFAULT_PALETTE[0]);
 
   const setEraser = () => setTool(Tools.ERASER);
   const setPen = () => setTool(Tools.PEN);
@@ -44,11 +45,13 @@ const usePainter = (work: (x: number, y: number, paintSize: number, tool: Tools)
   const paint = (e: MouseEvent) => {
     const canvas = canvasRef();
     if (painterState() === Painter.PAINTING && canvas)
-      work(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop, penSize(), tool());
+      work(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop, penSize(), tool(), penColor());
   };
 
   const stopPainting = () => {
-    if (painterState() === Painter.PAINTING) setPainter(Painter.IDLE);
+    if (painterState() === Painter.PAINTING) {
+      setPainter(Painter.IDLE);
+    }
   };
 
   createEffect(() => {
@@ -83,6 +86,8 @@ const usePainter = (work: (x: number, y: number, paintSize: number, tool: Tools)
     setPen,
     unsetTool,
     tool,
+    penColor,
+    setPenColor,
   };
 };
 export default usePainter;

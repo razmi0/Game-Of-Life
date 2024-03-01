@@ -20,23 +20,36 @@ const App = () => {
 
   const grid = useGrid(); // context candidate
   const boardData = useBoardData();
-  const { findColor, palette, addColor, patchColor, removeColor, applyRandomColors } = useColors(grid.nCell);
-  const { updateHash, drawHash, resetHash, paintCell, drawAllHash } = useHash(grid, boardData, findColor, ctx);
+  const { findColor, palette, addColor, patchColor, removeColor, applyRandomColors, changeColorAtIndex } = useColors(
+    grid.nCell
+  );
+  const { updateHash, drawHash, resetHash, paintCell, drawAllHash } = useHash(
+    grid,
+    boardData,
+    findColor,
+    changeColorAtIndex,
+    ctx
+  );
   const painter = usePainter(paintCell);
 
   const run = () => {
+    // app signal + 2 hash methods + 1 boardData method
     if (!hasStarted()) setHasStarted(true);
     updateHash();
     drawHash();
     boardData.incrementGeneration();
   };
 
+  const gameLoop = useClock(run);
+
   const applyColors = () => {
+    // 1 color method + 1 hash method
     applyRandomColors();
     drawAllHash();
   };
 
   const reset = () => {
+    // 1 app signal + 1 clock method + 1 hash method +  1 boardData method ##A##
     setHasStarted(false);
     if (gameLoop.play) gameLoop.switchPlayPause();
     resetHash();
@@ -44,6 +57,7 @@ const App = () => {
   };
 
   const changeCellSizeAndReset = (newSize: number) => {
+    // 1 grid method + 1 app integration method (##A##)
     grid.changeCellSize(newSize);
     reset();
   };
@@ -53,8 +67,6 @@ const App = () => {
   const batteryClock = useClock(refreshBatteryInfo);
   batteryClock.tuneSpeed(BATTERY_REFRESH_INTERVAL);
   batteryClock.switchPlayPause(); // start the battery checking clock
-
-  const gameLoop = useClock(run);
 
   onMount(() => {
     setCtx(canvas.getContext("2d")!);
@@ -115,6 +127,8 @@ const App = () => {
         penSize={painter.penSize()}
         tunePenSize={painter.tunePenSize}
         changePenSize={painter.changePenSize}
+        penColor={painter.penColor()}
+        changePenColor={painter.setPenColor}
         /** colors */
         palette={palette}
         addColor={addColor}

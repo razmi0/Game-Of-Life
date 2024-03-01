@@ -11,6 +11,7 @@ export default function useHash(
   grid: GridHook,
   data: Prettify<DataStore>,
   findColor: (i: number) => string,
+  changeColorAtIndex: (color: string, index: number) => void,
   ctx: Accessor<CanvasRenderingContext2D | undefined>
 ) {
   const initHash = () => new Uint8Array(grid.nCell()).map(() => (data.randomChoice() ? 1 : 0)) as Hash8;
@@ -126,7 +127,7 @@ export default function useHash(
     }
   };
 
-  const paintCell = (x: number, y: number, paintSize: number, tool: Tools) => {
+  const paintCell = (x: number, y: number, paintSize: number, tool: Tools, penColor: string) => {
     const context = ctx();
     if (!context) return;
 
@@ -149,7 +150,13 @@ export default function useHash(
             hash[paintedIndex] = 1;
             const [x, y] = getCoordsFromIndex(paintedIndex, rowSize, cellSize);
 
-            context.fillStyle = findColor(paintedIndex);
+            if (penColor) {
+              context.fillStyle = penColor;
+              changeColorAtIndex(penColor, paintedIndex);
+            } else {
+              context.fillStyle = findColor(paintedIndex);
+            }
+
             context.fillRect(x, y, cellSize, cellSize);
             break;
           }

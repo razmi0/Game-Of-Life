@@ -46,6 +46,7 @@ type DrawerProps = {
   paintingState: boolean;
   selectedTool: Tools;
   palette: string[];
+  penColor: string;
   /** ACTIONS */
   reset: () => void;
   changeSpeed: (newTime: number) => void;
@@ -65,6 +66,7 @@ type DrawerProps = {
   patchColor: (color: string, index: number) => void;
   removeColor: (index: number) => void;
   applyColors: () => void;
+  changePenColor: (color: string) => void;
 };
 
 const { xs, sm, md, lg, xl } = ICON_SIZE;
@@ -78,6 +80,8 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     const lbl = 1000 / speed;
     return lbl > 200 ? "200 fps" : Math.floor(lbl) + " fps";
   };
+
+  const formatIdToLabel = (label: string) => label.replace(/_/g, " ").replace(/color/, "Color");
 
   const shorcuts: Shortcut[] = [
     {
@@ -165,6 +169,11 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       togglePainting();
     };
 
+    const handlePenColorChange = (e: Event) => {
+      const val = (e.target as HTMLInputElement).value;
+      props.changePenColor(val);
+    };
+
     const isErase = () => props.selectedTool === "eraser";
     const isPen = () => props.selectedTool === "pen";
 
@@ -182,9 +191,19 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             width={md}
             name="eraser"
             onClick={handleEraserClick}
-            class=" hover:border-dw-100 p-2 border-2 rounded-full"
+            class="hover:border-dw-100 p-2 border-2 rounded-full"
             classList={{ ["border-dw-100"]: isErase(), [" border-transparent"]: !isErase() }}
           />
+          <div class="flex items-center justify-center h-11 w-11 ">
+            <InputColor
+              id="color_brush"
+              label="pen color"
+              hiddenLabel
+              value={props.penColor}
+              onChange={handlePenColorChange}
+              class="input-color-rounded-full w-6 h-6"
+            />
+          </div>
         </div>
         <p>brush size : </p>
         <div class="flex gap-2 items-start">
@@ -223,10 +242,8 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     );
     const ColorItem: ParentComponent = (local) => <div class="flex flex-row items-center">{local.children}</div>;
 
-    const formatIdToLabel = (label: string) => label.replace(/_/g, " ").replace(/color/, "Color");
-
     return (
-      <div class="flex flex-col gap-3 mt-3 min-w-48">
+      <div class="flex flex-col gap-3 mt-3 min-w-48 justify-between h-full">
         <ColorSection>
           <For each={props.palette}>
             {(color, i) => {
@@ -274,6 +291,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             />
           </ColorItem>
         </ColorSection>
+        {/* <div class="flex-grow"></div> */}
         <SimpleButton
           class="bg-dw-300 w-full hover:bg-dw-200"
           handler={() => {
@@ -521,6 +539,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Separator />
       <Group>
         <Item
+          showTooltipOnClick
           indicator={props.penSize}
           tooltip={
             <StandardTooltip title="painting tools">
@@ -533,8 +552,8 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         <Item
           showTooltipOnClick
           tooltip={
-            <StandardTooltip title="color palette">
-              <p>choose an unlimited set of colors : </p>
+            <StandardTooltip title="color palette" class="h-full" innerContentClass="flex flex-col justify-between">
+              <p>paint the whole board with an unlimited set of colors : </p>
               <ColorPaletteTooltip />
             </StandardTooltip>
           }

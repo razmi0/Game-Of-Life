@@ -110,6 +110,13 @@ export default function useColors(nCell: Accessor<number>) {
     }
   };
 
+  const changeColorAtIndex = (color: string, index: number) => {
+    // copy colors array and change the color at index
+    const newColors = new Uint32Array(colors);
+    newColors[index] = packColor(color);
+    colors = newColors;
+  };
+
   initColors();
 
   return {
@@ -119,5 +126,6 @@ export default function useColors(nCell: Accessor<number>) {
     removeColor: palette.removeColor,
     patchColor: palette.patchColor,
     applyRandomColors: initColors,
+    changeColorAtIndex,
   };
 }
