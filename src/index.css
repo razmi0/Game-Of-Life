@@ -94,3 +94,57 @@ input[type="color" i]:focus {
   border: 1px solid transparent;
   border-right: none;
 }
+
+/** ROUNDED-FULL */
+
+input[type="color" i]::-webkit-color-swatch-wrapper.input-color-rounded-full {
+  @apply rounded-full;
+  padding: 0;
+  border: 1px solid #efeff3;
+  border-right: 1px solid #efeff3;
+}
+
+input[type="color" i]::-webkit-color-swatch-wrapper.input-color-rounded-full:hover {
+  border: 1px solid transparent;
+  border-right: 1px solid transparent;
+}
+
+input[type="color" i]::-webkit-color-swatch-wrapper.input-color-rounded-full:focus {
+  border: 1px solid transparent;
+  border-right: 1px solid transparent;
+}
+
+/** */
+
+input[type="color" i]::-webkit-color-swatch.input-color-rounded-full {
+  @apply rounded-full;
+  border: none;
+}
+input[type="color" i]::-webkit-color-swatch.input-color-rounded-full:hover {
+  border: 1px solid transparent;
+  border-right: 1px solid transparent;
+}
+input[type="color" i]::-webkit-color-swatch.input-color-rounded-full:focus {
+  border: 1px solid transparent;
+  border-right: 1px solid transparent;
+}
+
+/** */
+
+input[type="color" i].input-color-rounded-full {
+  @apply rounded-full;
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  border-right: 1px solid transparent;
+}
+
+input[type="color" i].input-color-rounded-full:hover {
+  border: 1px solid transparent;
+  border-right: 1px solid transparent;
+}
+
+input[type="color" i].input-color-rounded-full:focus {
+  border: 1px solid transparent;
+  border-right: 1px solid transparent;
+}
