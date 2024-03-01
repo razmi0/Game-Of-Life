@@ -14,17 +14,23 @@ const useAgent = () => {
   const [navInfo, setNavInfo] = createSignal<UserAgentInfo>(userAgentInit);
 
   const getBatteryInfo = async () => {
-    let battery: null | number = null;
+    let battery: null | number | string = null;
     let startBattery: null | number = null;
 
     if ("getBattery" in navigator) {
       const batteryInfo = await (navigator as any).getBattery();
       battery = batteryInfo ? batteryInfo.level * 100 : null;
       if (startBattery === null) startBattery = battery;
+    } else if ("battery" in navigator) {
+      const batteryInfo = (navigator as any).battery;
+      battery = batteryInfo ? batteryInfo.level * 100 : null;
+      if (startBattery === null) startBattery = battery;
+    } else {
+      battery = "unknown";
     }
 
     setNavInfo((p) => {
-      if (p.battery !== battery && startBattery !== null && battery !== null) {
+      if (p.battery !== battery && startBattery !== null && battery !== null && typeof battery === "number") {
         const batteryChange = battery - startBattery;
         return { ...p, battery, batteryChange };
       }
@@ -34,12 +40,12 @@ const useAgent = () => {
 
   const getNavigatorInfo = () => {
     //@ts-ignore
-    const platform = window.navigator.userAgentData.platform;
-    const userAgent = window.navigator.userAgent;
-    const hardwareConcurrency = window.navigator.hardwareConcurrency;
+    const platform = window.navigator?.userAgentData?.platform ?? "unknown";
+    const userAgent = window.navigator?.userAgent ?? "unknown";
+    const hardwareConcurrency = window.navigator?.hardwareConcurrency ?? 0;
     //@ts-ignore
-    const deviceMemory = window.navigator.deviceMemory;
-    const availableThreads = hardwareConcurrency * deviceMemory;
+    const deviceMemory = window.navigator?.deviceMemory ?? 0;
+    const availableThreads = hardwareConcurrency && deviceMemory ? hardwareConcurrency * deviceMemory : 0;
 
     setNavInfo((prev) => ({ ...prev, userAgent, platform, hardwareConcurrency, deviceMemory, availableThreads }));
   };
