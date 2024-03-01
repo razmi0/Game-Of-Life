@@ -38,6 +38,9 @@ export type IconNames =
   | "snail"
   | "hare"
   | "stats"
+  | "circle_shape"
+  | "square_shape"
+  | "shape_picker"
   | "painting_tools";
 
 export type IconProps = {
