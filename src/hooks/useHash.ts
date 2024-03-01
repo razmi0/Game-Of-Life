@@ -88,6 +88,24 @@ export default function useHash(
     }
   };
 
+  /**
+   * @description draw a shape at a given position
+   * @param context
+   * @param x
+   * @param y
+   * @param cellSize
+   */
+  const drawShape = (context: CanvasRenderingContext2D, x: number, y: number, cellSize: number) => {
+    const shape = grid.shape.selectedShape;
+    if (shape === "square") {
+      context.fillRect(x, y, cellSize, cellSize);
+    } else {
+      context.beginPath();
+      context.arc(x + cellSize / 2, y + cellSize / 2, cellSize / 2, 0, Math.PI * 2);
+      context.fill();
+    }
+  };
+
   /** draw only changed cells, doesn't read the entire hash (FAST) */
   const drawHash = () => {
     let i = 0;
@@ -99,13 +117,17 @@ export default function useHash(
 
       if (hash[flipIndexes[i]]) {
         context.fillStyle = findColor(i);
-        context.fillRect(x, y, grid.cellSize(), grid.cellSize());
+        drawShape(context, x, y, grid.cellSize());
       } else {
         context.clearRect(x, y, grid.cellSize(), grid.cellSize());
       }
 
       i++;
     }
+  };
+
+  const resetBlankHash = () => {
+    hash = new Uint8Array(grid.nCell()) as Hash8;
   };
 
   /** draw and read the entire hash (SLOW) */
@@ -118,7 +140,7 @@ export default function useHash(
       const [x, y] = getCoordsFromIndex(i, rowSize, grid.cellSize());
       if (hash[i]) {
         context.fillStyle = findColor(i);
-        context.fillRect(x, y, grid.cellSize(), grid.cellSize());
+        drawShape(context, x, y, grid.cellSize());
       } else {
         context.clearRect(x, y, grid.cellSize(), grid.cellSize());
       }
@@ -157,7 +179,8 @@ export default function useHash(
               context.fillStyle = findColor(paintedIndex);
             }
 
-            context.fillRect(x, y, cellSize, cellSize);
+            drawShape(context, x, y, cellSize);
+
             break;
           }
 
@@ -181,5 +204,5 @@ export default function useHash(
     }
   });
 
-  return { updateHash, drawHash, resetHash, paintCell, drawAllHash };
+  return { updateHash, drawHash, resetHash, paintCell, drawAllHash, resetBlankHash };
 }

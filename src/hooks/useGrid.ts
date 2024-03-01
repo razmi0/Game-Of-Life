@@ -2,6 +2,7 @@ import type { Accessor } from "solid-js";
 import { batch, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 import { INITIAL_CELL_SIZE, MAX_CELL_SIZE, MIN_CELL_SIZE } from "../data";
 import { debounce } from "../helpers";
+import { createStore } from "solid-js/store";
 
 const nRowInit = Math.floor(window.innerHeight / INITIAL_CELL_SIZE) + 1;
 const nColInit = Math.floor(window.innerWidth / INITIAL_CELL_SIZE) + 1;
@@ -16,6 +17,12 @@ export type GridHook = {
   cellSize: Accessor<number>;
   changeCellSize: (newSize: number) => void;
   tuneCellSize: (newSize: number) => void;
+  shape: Prettify<{
+    DEFAULT_SHAPES: ["square", "circle"];
+    selectedShape: "square" | "circle";
+    setSquare: () => void;
+    setCircle: () => void;
+  }>;
 };
 export default function useGrid() {
   const [wW, setWW] = createSignal(window.innerWidth);
@@ -24,6 +31,16 @@ export default function useGrid() {
   const [nCol, setnCol] = createSignal(nColInit);
   const [nCell, setnCell] = createSignal(nCellInit);
   const [cellSize, setCellSize] = createSignal(INITIAL_CELL_SIZE);
+  const [shape, setShape] = createStore({
+    DEFAULT_SHAPES: ["square", "circle"],
+    selectedShape: "square",
+    setSquare: () => {
+      setShape("selectedShape", "square");
+    },
+    setCircle: () => {
+      setShape("selectedShape", "circle");
+    },
+  });
 
   const calcnRow = createMemo(() => {
     setnRow(Math.floor(wH() / cellSize()) + 1);
@@ -65,5 +82,5 @@ export default function useGrid() {
     onCleanup(() => window.removeEventListener("resize", updateSizes));
   });
 
-  return { nRow, nCol, nCell, wW, wH, cellSize, changeCellSize, tuneCellSize } as Prettify<GridHook>;
+  return { nRow, nCol, nCell, wW, wH, cellSize, changeCellSize, tuneCellSize, shape } as Prettify<GridHook>;
 }
