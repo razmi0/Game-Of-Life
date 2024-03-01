@@ -6,6 +6,7 @@ type StandardTooltipProps = {
   children?: JSXElement;
   title?: JSXElement;
   class?: string;
+  innerContentClass?: string;
 };
 export type StatsTooltipData = { label: string; value: JSXElement; separator?: boolean };
 type StatsTooltipProps = {
@@ -21,7 +22,7 @@ const StandardTooltip: Component<StandardTooltipProps> = (props) =>
         <Separator class="w-full h-[1px]"/>
       </Show>
       <Show when={!!props.children}>
-      <div class="text-balance">{props.children}</div></Show>
+      <div class={`text-balance h-full w-full ${props.innerContentClass || ""}`}>{props.children}</div></Show>
     </div>;
 
 export const StatsTooltip: Component<StatsTooltipProps> = (props) => {
