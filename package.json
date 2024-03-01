@@ -3,10 +3,11 @@
   "version": "0.0.0",
   "description": "",
   "scripts": {
-    "start": "vite --open --port 42069",
-    "dev": "vite",
+    "start": "vite --port 42069 --open",
+    "dev": "vite --port 42069 --open",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "net": "vite --host"
   },
   "license": "MIT",
   "devDependencies": {
