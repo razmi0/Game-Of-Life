@@ -32,7 +32,7 @@ type ClockQueueTicksMode = "clocked" | "free";
 
 type UserAgentInfo = {
   userAgent: string;
-  battery: number | null;
+  battery: number | null | string;
   batteryChange: number;
   platform: string;
   hardwareConcurrency: number;
