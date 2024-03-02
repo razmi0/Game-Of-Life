@@ -8,6 +8,9 @@ type Hash32 = Prettify<Hash32Type>;
 export type ColorHook = {
   palette: string[];
   backgroundColor: Accessor<string>;
+  seeCorpse: Accessor<boolean>;
+  /** ACTIONS */
+  toggleCorpse: () => void;
   setBackgroundColor: (color: string) => void;
   findColor: (i: number) => string;
   addColor: (color: string) => void;
@@ -19,6 +22,7 @@ export type ColorHook = {
 };
 export default function useColors(nCell: Accessor<number>) {
   const [bgColor, setBgColor] = createSignal("black");
+  const [seeCorpse, setSeeCorpse] = createSignal(false);
   const [palette, setPalette] = createStore({
     randomColors: DEFAULT_PALETTE, // colors
     addColor: (color: string) => {
@@ -40,6 +44,10 @@ export default function useColors(nCell: Accessor<number>) {
       );
     },
   });
+
+  const toggleCorpse = () => {
+    setSeeCorpse((p) => !p);
+  };
 
   /**
    * @description Colors array (Uint32Array grid)
@@ -147,7 +155,10 @@ export default function useColors(nCell: Accessor<number>) {
 
   return {
     palette: palette.randomColors,
+    seeCorpse,
+
     backgroundColor: bgColor,
+    /** ACTIONS */
     findColor,
     addColor: palette.addColor,
     removeColor: palette.removeColor,
@@ -156,5 +167,6 @@ export default function useColors(nCell: Accessor<number>) {
     changeColorAtIndex,
     greyScaledHex,
     setBackgroundColor: setBgColor,
+    toggleCorpse,
   } as Prettify<ColorHook>;
 }

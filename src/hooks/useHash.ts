@@ -115,10 +115,20 @@ export default function useHash(
     while (i < flipIndexes.length) {
       const [x, y] = getCoordsFromIndex(flipIndexes[i], rowSize, grid.cellSize());
 
+      // Check if hash at current index is truthy
       if (hash[flipIndexes[i]]) {
+        // Draw shape with appropriate color
         context.fillStyle = color.findColor(i);
         drawShape(context, x, y, grid.cellSize());
-      } else {
+      }
+      // Check if corpse has to be drawn
+      else if (!color.seeCorpse()) {
+        // Clear the cell if corpse is not visible
+        context.clearRect(x, y, grid.cellSize(), grid.cellSize());
+      }
+      // Default case
+      else {
+        // Clear cell and draw dead color shape
         context.clearRect(x, y, grid.cellSize(), grid.cellSize());
         const deadColor = color.greyScaledHex(flipIndexes[i]);
         context.fillStyle = deadColor;

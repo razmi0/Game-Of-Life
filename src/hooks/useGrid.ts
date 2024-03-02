@@ -15,14 +15,17 @@ export type GridHook = {
   wW: Accessor<number>;
   wH: Accessor<number>;
   cellSize: Accessor<number>;
-  changeCellSize: (newSize: number) => void;
-  tuneCellSize: (newSize: number) => void;
   shape: Prettify<{
     DEFAULT_SHAPES: ["square", "circle"];
     selectedShape: "square" | "circle";
+    /** ACTIONS */
     setSquare: () => void;
     setCircle: () => void;
   }>;
+  seeGrid: Accessor<boolean>;
+  /** ACTIONS */
+  changeCellSize: (newSize: number) => void;
+  tuneCellSize: (newSize: number) => void;
   toggleGrid: () => void;
 };
 export default function useGrid() {
@@ -88,5 +91,18 @@ export default function useGrid() {
     onCleanup(() => window.removeEventListener("resize", updateSizes));
   });
 
-  return { nRow, nCol, nCell, wW, wH, cellSize, changeCellSize, tuneCellSize, shape, toggleGrid } as Prettify<GridHook>;
+  return {
+    nRow,
+    nCol,
+    nCell,
+    wW,
+    wH,
+    cellSize,
+    seeGrid,
+    /** ACTIONS */
+    shape,
+    changeCellSize,
+    tuneCellSize,
+    toggleGrid,
+  } as Prettify<GridHook>;
 }

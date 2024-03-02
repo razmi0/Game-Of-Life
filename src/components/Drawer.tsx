@@ -49,6 +49,8 @@ type DrawerProps = {
   penColor: string;
   backgroundColor: string;
   shape: "square" | "circle";
+  seeGrid: boolean;
+  seeCorpse: boolean;
   /** ACTIONS */
   reset: () => void;
   resetBlank: () => void;
@@ -73,6 +75,8 @@ type DrawerProps = {
   changeBackgroundColor: (color: string) => void;
   setShapeSquare: () => void;
   setShapeCircle: () => void;
+  toggleGrid: () => void;
+  toggleCorpse: () => void;
 };
 
 const { xs, sm, md, lg, xl } = ICON_SIZE;
@@ -312,6 +316,25 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           class="input-color-rounded-full w-6 h-6"
           hiddenLabel
         />
+      </div>
+    );
+  };
+
+  const DeadVisibility = () => {
+    const isVisible = () => props.seeCorpse;
+
+    return (
+      <div class="flex flex-col gap-1 h-full w-full min-w-48 mt-3">
+        <div class="flex flex-row w-full items-center justify-between">
+          <label classList={{ ["text-yellow-400 text-sm "]: isVisible() }}>Colorize</label>
+          <IconButton
+            onClick={props.toggleCorpse}
+            width={md}
+            name="skull"
+            class="hover:bg-dw-300 p-1 rounded-full"
+            classList={{ ["bg-dw-300"]: isVisible() }}
+          />
+        </div>
       </div>
     );
   };
@@ -616,6 +639,9 @@ export default function Drawer(props: Prettify<DrawerProps>) {
                 <p>change the board background color : </p>
                 <BackgroundColor />
               </div>
+              <Separator class="w-full h-[1px] my-3" />
+              <p>Toggle colorizing dead cells : </p>
+              <DeadVisibility />
               <SimpleButton class="bg-dw-300 mt-4 w-full hover:bg-dw-200" handler={props.applyColors}>
                 apply new colors
               </SimpleButton>

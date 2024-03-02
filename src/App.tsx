@@ -114,6 +114,8 @@ const App = () => {
         shape={grid.shape.selectedShape}
         setShapeSquare={grid.shape.setSquare}
         setShapeCircle={grid.shape.setCircle}
+        seeGrid={grid.seeGrid()}
+        toggleGrid={grid.toggleGrid}
         /** gameLoop */
         speed={gameLoop.speed}
         play={gameLoop.play}
@@ -140,6 +142,8 @@ const App = () => {
         applyColors={applyColors}
         backgroundColor={color.backgroundColor()}
         changeBackgroundColor={color.setBackgroundColor}
+        seeCorpse={color.seeCorpse()}
+        toggleCorpse={color.toggleCorpse}
         /** hash & misc */
         reset={reset}
         resetBlank={resetBlank}
