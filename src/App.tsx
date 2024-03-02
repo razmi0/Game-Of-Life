@@ -20,13 +20,12 @@ let canvas: HTMLCanvasElement;
 const App = () => {
   const [ctx, setCtx] = createSignal<CanvasRenderingContext2D>();
   const [hasStarted, setHasStarted] = createSignal(false);
-  const [backgroundColor, setBackgroundColor] = createSignal("black");
 
   const grid = useGrid(); // context candidate
   const boardData = useBoardData();
   const color = useColors(grid.nCell);
 
-  const hash = useHash(grid, boardData, color.findColor, color.changeColorAtIndex, color.greyScaledHex, ctx);
+  const hash = useHash(grid, boardData, color, ctx);
   const painter = usePainter(hash.paintCell);
 
   const run = () => {
@@ -43,7 +42,7 @@ const App = () => {
     if (gameLoop.play) gameLoop.switchPlayPause();
     hash.resetBlankHash();
     color.applyRandomColors();
-    setBackgroundColor("black");
+    color.setBackgroundColor("black");
     boardData.resetGeneration();
   };
 
@@ -139,8 +138,8 @@ const App = () => {
         patchColor={color.patchColor}
         removeColor={color.removeColor}
         applyColors={applyColors}
-        backgroundColor={backgroundColor()}
-        changeBackgroundColor={setBackgroundColor}
+        backgroundColor={color.backgroundColor()}
+        changeBackgroundColor={color.setBackgroundColor}
         /** hash & misc */
         reset={reset}
         resetBlank={resetBlank}
@@ -149,8 +148,7 @@ const App = () => {
         gridInfo={gridInfo()}
       />
       <canvas
-        style={`background-color : ${backgroundColor()}`}
-        class="bg-black"
+        style={`background-color : ${color.backgroundColor()}`}
         width={grid.wW()}
         height={grid.wH()}
         ref={canvas}

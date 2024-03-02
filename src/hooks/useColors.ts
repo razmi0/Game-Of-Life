@@ -1,11 +1,24 @@
-import { Accessor, createEffect } from "solid-js";
+import { Accessor, createEffect, createSignal } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import { DEFAULT_PALETTE, GREY_SCALED_COEF } from "../data";
 
 type Hash32Type = Uint32Array & { [index: number]: number };
 type Hash32 = Prettify<Hash32Type>;
 
+export type ColorHook = {
+  palette: string[];
+  backgroundColor: Accessor<string>;
+  setBackgroundColor: (color: string) => void;
+  findColor: (i: number) => string;
+  addColor: (color: string) => void;
+  removeColor: (index: number) => void;
+  patchColor: (color: string, index: number) => void;
+  applyRandomColors: () => void;
+  changeColorAtIndex: (color: string, index: number) => void;
+  greyScaledHex: (index: number) => string;
+};
 export default function useColors(nCell: Accessor<number>) {
+  const [bgColor, setBgColor] = createSignal("black");
   const [palette, setPalette] = createStore({
     randomColors: DEFAULT_PALETTE, // colors
     addColor: (color: string) => {
@@ -134,6 +147,7 @@ export default function useColors(nCell: Accessor<number>) {
 
   return {
     palette: palette.randomColors,
+    backgroundColor: bgColor,
     findColor,
     addColor: palette.addColor,
     removeColor: palette.removeColor,
@@ -141,5 +155,6 @@ export default function useColors(nCell: Accessor<number>) {
     applyRandomColors: initColors,
     changeColorAtIndex,
     greyScaledHex,
-  };
+    setBackgroundColor: setBgColor,
+  } as Prettify<ColorHook>;
 }

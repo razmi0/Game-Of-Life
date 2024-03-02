@@ -2,6 +2,7 @@ import { batch, createEffect, createMemo } from "solid-js";
 import { getCoordsFromIndex, getIndexFromCoords } from "../helpers";
 import type { Accessor } from "solid-js";
 import type { GridHook } from "./useGrid";
+import type { ColorHook } from "./useColors";
 import type { Tools } from "./usePainter";
 
 type Hash8Type = Uint8Array & { [index: number]: 0 | 1 };
@@ -10,9 +11,7 @@ type Hash8 = Prettify<Hash8Type>;
 export default function useHash(
   grid: GridHook,
   data: Prettify<DataStore>,
-  findColor: (i: number) => string,
-  changeColorAtIndex: (color: string, index: number) => void,
-  greyScaledHex: (index: number) => string,
+  color: ColorHook,
   ctx: Accessor<CanvasRenderingContext2D | undefined>
 ) {
   const initHash = () => new Uint8Array(grid.nCell()).map(() => (data.randomChoice() ? 1 : 0)) as Hash8;
@@ -117,11 +116,11 @@ export default function useHash(
       const [x, y] = getCoordsFromIndex(flipIndexes[i], rowSize, grid.cellSize());
 
       if (hash[flipIndexes[i]]) {
-        context.fillStyle = findColor(i);
+        context.fillStyle = color.findColor(i);
         drawShape(context, x, y, grid.cellSize());
       } else {
         context.clearRect(x, y, grid.cellSize(), grid.cellSize());
-        const deadColor = greyScaledHex(flipIndexes[i]);
+        const deadColor = color.greyScaledHex(flipIndexes[i]);
         context.fillStyle = deadColor;
         drawShape(context, x, y, grid.cellSize());
       }
@@ -143,7 +142,7 @@ export default function useHash(
     while (i < hash.length) {
       const [x, y] = getCoordsFromIndex(i, rowSize, grid.cellSize());
       if (hash[i]) {
-        context.fillStyle = findColor(i);
+        context.fillStyle = color.findColor(i);
         drawShape(context, x, y, grid.cellSize());
       } else {
         context.clearRect(x, y, grid.cellSize(), grid.cellSize());
@@ -178,9 +177,9 @@ export default function useHash(
 
             if (penColor) {
               context.fillStyle = penColor;
-              changeColorAtIndex(penColor, paintedIndex);
+              color.changeColorAtIndex(penColor, paintedIndex);
             } else {
-              context.fillStyle = findColor(paintedIndex);
+              context.fillStyle = color.findColor(paintedIndex);
             }
 
             drawShape(context, x, y, cellSize);
