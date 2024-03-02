@@ -41,21 +41,19 @@ Age => color
 
 - [ ] implement workers ( for resize colors too )
 - [x] implement redraw only flipped ?
-- [ ] _replace SafeArea Rect with safeArea trapezoid svg (left height === item height ; right height === tooltip height)_
 - [x] paint the grid / erase the grid (with size)
-- [ ] add color picker to paint tools
+- [x] add color picker to paint tools
 - [ ] text to grid
 - [ ] img to grid
-- [ ] color picker for cells (alive, dead, background)
+- [x] color picker for cells (alive, dead, background)
 - [ ] shape picker for draw (common shapes + custom + remarquable shapes)
-- [ ] shape picker for cells (circle, square, triangle, hexagon, octogon, star, heart, custom)
+- [x] shape picker for cells (circle, square)
 - [ ] toroidal grid
 - [ ] implement remarquable shapes and add it to grid
 - [x] tortue/escargot lapin icon pour speed range
-- [ ] reset default params
+- [x] reset default params
 - [ ] full HTML for SEO presentation (what ? for what ? why ? how ? when ? )
 - [ ] space between cells (new branch ) and background off cells grey
 - [x] stats => add cell size
 - [ ] implement white theme
 - [ ] add loader animation
-- [ ] tools => zoom on cursor

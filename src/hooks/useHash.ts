@@ -12,6 +12,7 @@ export default function useHash(
   data: Prettify<DataStore>,
   findColor: (i: number) => string,
   changeColorAtIndex: (color: string, index: number) => void,
+  greyScaledHex: (index: number) => string,
   ctx: Accessor<CanvasRenderingContext2D | undefined>
 ) {
   const initHash = () => new Uint8Array(grid.nCell()).map(() => (data.randomChoice() ? 1 : 0)) as Hash8;
@@ -120,6 +121,9 @@ export default function useHash(
         drawShape(context, x, y, grid.cellSize());
       } else {
         context.clearRect(x, y, grid.cellSize(), grid.cellSize());
+        const deadColor = greyScaledHex(flipIndexes[i]);
+        context.fillStyle = deadColor;
+        drawShape(context, x, y, grid.cellSize());
       }
 
       i++;

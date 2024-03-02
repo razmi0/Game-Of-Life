@@ -21,14 +21,23 @@ const App = () => {
 
   const grid = useGrid(); // context candidate
   const boardData = useBoardData();
-  const { findColor, palette, addColor, patchColor, removeColor, applyRandomColors, changeColorAtIndex } = useColors(
-    grid.nCell
-  );
+  const {
+    findColor,
+    palette,
+    addColor,
+    patchColor,
+    removeColor,
+    applyRandomColors,
+    changeColorAtIndex,
+    greyScaledHex,
+  } = useColors(grid.nCell);
+
   const { updateHash, drawHash, resetHash, paintCell, drawAllHash, resetBlankHash } = useHash(
     grid,
     boardData,
     findColor,
     changeColorAtIndex,
+    greyScaledHex,
     ctx
   );
   const painter = usePainter(paintCell);

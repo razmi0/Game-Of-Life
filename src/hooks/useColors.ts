@@ -1,6 +1,6 @@
 import { Accessor, createEffect } from "solid-js";
 import { createStore, produce } from "solid-js/store";
-import { DEFAULT_PALETTE } from "../data";
+import { DEFAULT_PALETTE, GREY_SCALED_COEF } from "../data";
 
 type Hash32Type = Uint32Array & { [index: number]: number };
 type Hash32 = Prettify<Hash32Type>;
@@ -99,6 +99,22 @@ export default function useColors(nCell: Accessor<number>) {
    */
   const findColor = (i: number) => unpackColor(colors[i]);
 
+  const greyScaledHex = (index: number) => {
+    const hex = unpackColor(colors[index]).replace("#", "");
+
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+
+    const grayscale = GREY_SCALED_COEF[0] * r + GREY_SCALED_COEF[1] * g + GREY_SCALED_COEF[2] * b;
+
+    const grayscaleHex = Math.round(grayscale).toString(16).padStart(2, "0");
+
+    const newHex = `#${grayscaleHex}${grayscaleHex}${grayscaleHex}`;
+
+    return newHex;
+  };
+
   /**
    * @description Initialize colors array with random colors
    */
@@ -124,5 +140,6 @@ export default function useColors(nCell: Accessor<number>) {
     patchColor: palette.patchColor,
     applyRandomColors: initColors,
     changeColorAtIndex,
+    greyScaledHex,
   };
 }
