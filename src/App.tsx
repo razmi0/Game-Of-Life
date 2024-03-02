@@ -1,3 +1,6 @@
+// AUTHOR : ANAS ABOU ALAIWI
+// EMAIL : ANAS.ABOUALAIWI at GMAIL dot COM
+
 import { onMount, createSignal, Show, createMemo } from "solid-js";
 import useGrid from "./hooks/useGrid";
 import useHash from "./hooks/useHash";
@@ -21,32 +24,16 @@ const App = () => {
 
   const grid = useGrid(); // context candidate
   const boardData = useBoardData();
-  const {
-    findColor,
-    palette,
-    addColor,
-    patchColor,
-    removeColor,
-    applyRandomColors,
-    changeColorAtIndex,
-    greyScaledHex,
-  } = useColors(grid.nCell);
+  const color = useColors(grid.nCell);
 
-  const { updateHash, drawHash, resetHash, paintCell, drawAllHash, resetBlankHash } = useHash(
-    grid,
-    boardData,
-    findColor,
-    changeColorAtIndex,
-    greyScaledHex,
-    ctx
-  );
-  const painter = usePainter(paintCell);
+  const hash = useHash(grid, boardData, color.findColor, color.changeColorAtIndex, color.greyScaledHex, ctx);
+  const painter = usePainter(hash.paintCell);
 
   const run = () => {
     // app signal + 2 hash methods + 1 boardData method
     if (!hasStarted()) setHasStarted(true);
-    updateHash();
-    drawHash();
+    hash.updateHash();
+    hash.drawHash();
     boardData.incrementGeneration();
   };
 
@@ -54,8 +41,8 @@ const App = () => {
     // 1 app signal + 1 hash method + 1 boardData method + 1 colors method + 1 clock method
     setHasStarted(false);
     if (gameLoop.play) gameLoop.switchPlayPause();
-    resetBlankHash();
-    applyRandomColors();
+    hash.resetBlankHash();
+    color.applyRandomColors();
     setBackgroundColor("black");
     boardData.resetGeneration();
   };
@@ -64,15 +51,15 @@ const App = () => {
 
   const applyColors = () => {
     // 1 color method + 1 hash method
-    applyRandomColors();
-    drawAllHash();
+    color.applyRandomColors();
+    hash.drawAllHash();
   };
 
   const reset = () => {
     // 1 app signal + 1 clock method + 1 hash method +  1 boardData method ##A##
     setHasStarted(false);
     if (gameLoop.play) gameLoop.switchPlayPause();
-    resetHash();
+    hash.resetHash();
     boardData.resetGeneration();
   };
 
@@ -110,7 +97,7 @@ const App = () => {
           >
             log
           </SimpleButton>
-          <SimpleButton handler={() => console.log(unwrap(palette))}>log palette</SimpleButton>
+          <SimpleButton handler={() => console.log(unwrap(color.palette))}>log palette</SimpleButton>
         </DebuggerPanel>
       </Show>
       <Drawer
@@ -147,10 +134,10 @@ const App = () => {
         penColor={painter.penColor()}
         changePenColor={painter.setPenColor}
         /** colors */
-        palette={palette}
-        addColor={addColor}
-        patchColor={patchColor}
-        removeColor={removeColor}
+        palette={color.palette}
+        addColor={color.addColor}
+        patchColor={color.patchColor}
+        removeColor={color.removeColor}
         applyColors={applyColors}
         backgroundColor={backgroundColor()}
         changeBackgroundColor={setBackgroundColor}

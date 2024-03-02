@@ -23,6 +23,7 @@ export type GridHook = {
     setSquare: () => void;
     setCircle: () => void;
   }>;
+  toggleGrid: () => void;
 };
 export default function useGrid() {
   const [wW, setWW] = createSignal(window.innerWidth);
@@ -31,6 +32,7 @@ export default function useGrid() {
   const [nCol, setnCol] = createSignal(nColInit);
   const [nCell, setnCell] = createSignal(nCellInit);
   const [cellSize, setCellSize] = createSignal(INITIAL_CELL_SIZE);
+  const [seeGrid, setSeeGrid] = createSignal(false);
   const [shape, setShape] = createStore({
     DEFAULT_SHAPES: ["square", "circle"],
     selectedShape: "square",
@@ -41,6 +43,10 @@ export default function useGrid() {
       setShape("selectedShape", "circle");
     },
   });
+
+  const toggleGrid = () => {
+    setSeeGrid((p) => !p);
+  };
 
   const calcnRow = createMemo(() => {
     setnRow(Math.floor(wH() / cellSize()) + 1);
@@ -82,5 +88,5 @@ export default function useGrid() {
     onCleanup(() => window.removeEventListener("resize", updateSizes));
   });
 
-  return { nRow, nCol, nCell, wW, wH, cellSize, changeCellSize, tuneCellSize, shape } as Prettify<GridHook>;
+  return { nRow, nCol, nCell, wW, wH, cellSize, changeCellSize, tuneCellSize, shape, toggleGrid } as Prettify<GridHook>;
 }
