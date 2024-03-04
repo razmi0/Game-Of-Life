@@ -14,7 +14,7 @@ export enum Tools {
 }
 
 const usePainter = (work: (data: PaintCellType) => void) => {
-  const [painterState, setPainter] = createSignal(Painter.IDLE);
+  const [painterState, setPainter] = createSignal<Painter>(Painter.IDLE);
   const [userPaint, setUserPaint] = createSignal(false);
   const [tool, setTool] = createSignal<Tools>(Tools.NONE);
   const [penSize, setPenSize] = createSignal(INITIAL_PEN_SIZE);
