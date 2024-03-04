@@ -43,12 +43,12 @@ Age => color
 - [x] implement redraw only flipped ?
 - [x] paint the grid / erase the grid (with size)
 - [x] add color picker to paint tools
-- [ ] text to grid
+- [ ] text to grid (HOW ?????)
 - [ ] img to grid
 - [x] color picker for cells (alive, dead, background)
 - [ ] shape picker for draw (common shapes + custom + remarquable shapes)
 - [x] shape picker for cells (circle, square)
-- [ ] toroidal grid
+- [ ] toroidal grid on X (already done on Y)
 - [ ] implement remarquable shapes and add it to grid
 - [x] tortue/escargot lapin icon pour speed range
 - [x] reset default params
@@ -57,3 +57,5 @@ Age => color
 - [x] stats => add cell size
 - [ ] implement white theme
 - [ ] add loader animation
+- [x] Refactor if Nparam > 2 => use object
+- [x] Refacto resize so extended on the canva plane (currently resize is just working on the array length so past hash is compacted or extended)
