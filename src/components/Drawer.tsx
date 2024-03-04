@@ -656,7 +656,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         <Item
           tooltip={
             <StandardTooltip title={<TooltipTitle title="shape" />}>
-              <p>change the shape of the cells</p>
+              <p>change the shape of the cells and apply it to next generations</p>
               <ShapeTooltip />
             </StandardTooltip>
           }
