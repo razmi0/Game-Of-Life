@@ -1,4 +1,4 @@
-import { batch, createEffect, createMemo } from "solid-js";
+import { batch, createEffect } from "solid-js";
 import { getCoordsFromIndex, getIndexFromCoords } from "../helpers";
 import type { Accessor } from "solid-js";
 import type { GridHook } from "./useGrid";
