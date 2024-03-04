@@ -39,23 +39,26 @@ Age => color
 
 #### TODO
 
-- [ ] implement workers ( for resize colors too )
-- [x] implement redraw only flipped ?
-- [x] paint the grid / erase the grid (with size)
-- [x] add color picker to paint tools
-- [ ] text to grid (HOW ?????)
-- [ ] img to grid
-- [x] color picker for cells (alive, dead, background)
-- [ ] shape picker for draw (common shapes + custom + remarquable shapes)
-- [x] shape picker for cells (circle, square)
-- [ ] toroidal grid on X (already done on Y)
-- [ ] implement remarquable shapes and add it to grid
-- [x] tortue/escargot lapin icon pour speed range
-- [x] reset default params
-- [ ] full HTML for SEO presentation (what ? for what ? why ? how ? when ? )
-- [ ] space between cells (new branch ) and background off cells grey
-- [x] stats => add cell size
-- [ ] implement white theme
-- [ ] add loader animation
-- [x] Refactor if Nparam > 2 => use object
-- [x] Refacto resize so extended on the canva plane (currently resize is just working on the array length so past hash is compacted or extended)
+- [ ] (#1) implement workers ( for resize colors too )
+- [ ] (#4) Replace resetBlank by a resetDefault feat
+- [ ] (#6) text to grid (HOW ?????)
+- [ ] (#7) img to grid
+- [ ] (#9) shape picker for draw (common shapes + custom + remarquable shapes)
+- [ ] (#11) toroidal grid on X (already done on Y)
+- [ ] (#12) implement remarquable shapes and add it to grid
+- [ ] (#14) full HTML for SEO presentation (what ? for what ? why ? how ? when ? )
+- [ ] (#15) space between cells (new branch ) and background off cells grey
+- [ ] (#17) implement white theme
+- [ ] (#18) add loader animation
+- [ ] (#20) Refacto resize so extended on the canva plane (currently resize is just working on the array length so past hash is compacted or extended)
+
+#### DONE
+
+- [x] (#2) implement redraw only flipped ?
+- [x] (#3) paint the grid / erase the grid (with size)
+- [x] (#5) add color picker to paint tools
+- [x] (#8) color picker for cells (alive, dead, background)
+- [x] (#10) shape picker for cells (circle, square)
+- [x] (#13) tortue/escargot lapin icon pour speed range
+- [x] (#16) stats => add cell size
+- [x] (#19) Refactor if Nparam > 2 => use object
