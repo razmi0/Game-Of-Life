@@ -30,6 +30,13 @@ type ClockState = {
 
 type ClockQueueTicksMode = "clocked" | "free";
 
+type DrawShapeType = {
+  context: CanvasRenderingContext2D;
+  x: number;
+  y: number;
+  cellSize: number;
+};
+
 type UserAgentInfo = {
   userAgent: string;
   battery: number | null | string;
@@ -59,26 +66,3 @@ type DataStore = {
   tuneRandom: (value: number) => void;
   changeRandom: (addedRandom: number) => void;
 };
-
-// type GridStoreState = {
-//   grid: GridType;
-//   generation: number;
-//   nAlive: number;
-//   nAliveIncrease: boolean;
-//   nDead: number;
-//   nDeadIncrease: boolean;
-//   randomness: number;
-//   randomChoice: () => boolean;
-//   shuffle: () => void;
-//   build: (random: boolean) => GridType;
-//   draw: () => void;
-//   nextGen: () => void;
-//   reset: () => void;
-//   changeRandomness: (value: number) => void;
-//   initHash: () => Uint8Array;
-//   updateHash: () => void;
-//   // resize: () => void;
-//   countAliveNeighbors: (row: number, col: number) => number;
-//   judgement: (cell: Cell, neighbors: number) => boolean;
-//   nextCycle: () => void;
-// };

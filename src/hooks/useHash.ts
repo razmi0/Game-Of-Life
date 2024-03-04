@@ -3,17 +3,10 @@ import { getCoordsFromIndex, getIndexFromCoords } from "../helpers";
 import type { Accessor } from "solid-js";
 import type { GridHook } from "./useGrid";
 import type { ColorHook } from "./useColors";
-import type { Tools } from "./usePainter";
+import { PaintCellType } from "../sharedTypes";
 
 type Hash8Type = Uint8Array & { [index: number]: 0 | 1 };
 type Hash8 = Prettify<Hash8Type>;
-
-type DrawShapeType = {
-  context: CanvasRenderingContext2D;
-  x: number;
-  y: number;
-  cellSize: number;
-};
 
 export default function useHash(
   grid: GridHook,
@@ -168,7 +161,8 @@ export default function useHash(
     }
   };
 
-  const paintCell = (x: number, y: number, paintSize: number, tool: Tools, penColor: string) => {
+  const paintCell = (data: PaintCellType) => {
+    const { x, y, paintSize, tool, penColor } = data;
     const context = ctx();
     if (!context) return;
 
