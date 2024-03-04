@@ -6,7 +6,7 @@ import useGrid from "./hooks/useGrid";
 import useHash from "./hooks/useHash";
 import useColors from "./hooks/useColors";
 import usePainter from "./hooks/usePainter";
-import useClock from "./hooks/useClock";
+import useTimer from "./hooks/useTimer";
 import useBoardData from "./hooks/useBoardData";
 import useAgent from "./hooks/useAgent";
 import { SimpleButton } from "./components/Buttons";
@@ -46,7 +46,7 @@ const App = () => {
     boardData.resetGeneration();
   };
 
-  const gameLoop = useClock(run);
+  const gameLoop = useTimer(run);
 
   const applyColors = () => {
     // 1 color method + 1 hash method
@@ -64,9 +64,9 @@ const App = () => {
 
   const { navInfo, refreshBatteryInfo } = useAgent();
 
-  const batteryClock = useClock(refreshBatteryInfo);
-  batteryClock.tuneSpeed(BATTERY_REFRESH_INTERVAL);
-  batteryClock.switchPlayPause(); // start the battery checking clock
+  const batteryTimer = useTimer(refreshBatteryInfo);
+  batteryTimer.tuneSpeed(BATTERY_REFRESH_INTERVAL);
+  batteryTimer.switchPlayPause(); // start the battery checking clock
 
   onMount(() => {
     setCtx(canvas.getContext("2d")!);
@@ -84,7 +84,6 @@ const App = () => {
     <>
       <Show when={import.meta.env.DEV && debug}>
         <DebuggerPanel>
-          <SimpleButton handler={batteryClock.switchPlayPause}>battery refresh : {batteryClock.speed}</SimpleButton>
           <SimpleButton handler={run}>run hash</SimpleButton>
           <SimpleButton handler={gameLoop.switchPlayPause}>{gameLoop.play ? "pause" : "play"}</SimpleButton>
           <SimpleButton

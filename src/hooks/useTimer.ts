@@ -1,4 +1,4 @@
-import { type SetStoreFunction, Store, createStore } from "solid-js/store";
+import { createStore } from "solid-js/store";
 import { DEFAULT_SPEED, MAX_DELAY, MIN_DELAY, START_CLOCKED, START_IMMEDIATELY } from "../data";
 
 /**
@@ -6,7 +6,7 @@ import { DEFAULT_SPEED, MAX_DELAY, MIN_DELAY, START_CLOCKED, START_IMMEDIATELY }
  * @returns
  */
 
-export default function useClock(fn: () => void) {
+export default function useTimer(fn: () => void) {
   const [clock, setClock] = createStore({
     play: START_IMMEDIATELY,
     speed: DEFAULT_SPEED /** ms */,
