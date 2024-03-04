@@ -13,7 +13,9 @@ export default function useTimer(fn: () => void) {
     maxSpeed: MAX_DELAY,
     minSpeed: MIN_DELAY,
     tick: 0,
+    /** is there a limiter setup somewhere ? */
     limiter: false,
+    /** queue feat is not implemented yet */
     queue: 0,
     changeMaxSpeed: (speed: number): void => setTimer("maxSpeed", speed),
     changeMinSpeed: (speed: number): void => setTimer("minSpeed", speed),
@@ -21,11 +23,16 @@ export default function useTimer(fn: () => void) {
       setTimer("play", !timer.play);
       timer.run();
     },
+
+    /** wrap given working fn with some effects if needed */
     work: () => {
       fn();
       setTimer("tick", timer.tick + 1);
       timer.queue > 0 && timer.limiter && setTimer("queue", timer.queue - 1);
     },
+
+    /** main feature : recursively call given work fn with given timer usin setTimeout*/
+
     run: () => {
       if (!timer.play) return;
       if (timer.limiter && timer.queue <= 0) {
@@ -38,6 +45,7 @@ export default function useTimer(fn: () => void) {
 
       setTimeout(() => requestAnimationFrame(timer.run), timer.speed);
     },
+    /** not implemented yet in project */
     queueTicks: (ticks: number) => {
       setTimer("queue", ticks + timer.queue);
       setTimer("limiter", true);
