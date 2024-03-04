@@ -5,7 +5,6 @@ export const GREY_SCALED_COEF = [0.2126, 0.7152, 0.0722];
 export const DEFAULT_RANDOMNESS = 100;
 export const DEFAULT_SPEED = 10;
 export const START_IMMEDIATELY = false;
-export const START_CLOCKED = true;
 export const INITIAL_CELL_SIZE = 25;
 export const QUEUE_TICKS_QUANTITY = 25;
 export const INITIAL_PEN_SIZE = 3;

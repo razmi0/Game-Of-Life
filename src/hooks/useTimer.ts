@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import { DEFAULT_SPEED, MAX_DELAY, MIN_DELAY, START_CLOCKED, START_IMMEDIATELY } from "../data";
+import { DEFAULT_SPEED, MAX_DELAY, MIN_DELAY, START_IMMEDIATELY } from "../data";
 
 /**
  * Gen playback controls
@@ -12,7 +12,6 @@ export default function useTimer(fn: () => void) {
     speed: DEFAULT_SPEED /** ms */,
     maxSpeed: MAX_DELAY,
     minSpeed: MIN_DELAY,
-    clocked: START_CLOCKED,
     tick: 0,
     limiter: false,
     queue: 0,
@@ -37,7 +36,7 @@ export default function useTimer(fn: () => void) {
 
       timer.work();
 
-      if (timer.clocked) setTimeout(() => requestAnimationFrame(timer.run), timer.speed);
+      setTimeout(() => requestAnimationFrame(timer.run), timer.speed);
     },
     queueTicks: (ticks: number) => {
       setTimer("queue", ticks + timer.queue);
@@ -53,10 +52,6 @@ export default function useTimer(fn: () => void) {
       const newSpeed = timer.speed + addedSpeed;
       if (newSpeed < timer.minSpeed || newSpeed > timer.maxSpeed) return;
       setTimer("speed", newSpeed);
-    },
-
-    switchclocked: () => {
-      setTimer("clocked", !timer.clocked);
     },
   });
 
