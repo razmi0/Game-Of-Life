@@ -7,7 +7,7 @@ import { DEFAULT_SPEED, MAX_DELAY, MIN_DELAY, START_CLOCKED, START_IMMEDIATELY }
  */
 
 export default function useTimer(fn: () => void) {
-  const [clock, setClock] = createStore({
+  const [timer, setTimer] = createStore({
     play: START_IMMEDIATELY,
     speed: DEFAULT_SPEED /** ms */,
     maxSpeed: MAX_DELAY,
@@ -16,49 +16,49 @@ export default function useTimer(fn: () => void) {
     tick: 0,
     limiter: false,
     queue: 0,
-    changeMaxSpeed: (speed: number): void => setClock("maxSpeed", speed),
-    changeMinSpeed: (speed: number): void => setClock("minSpeed", speed),
+    changeMaxSpeed: (speed: number): void => setTimer("maxSpeed", speed),
+    changeMinSpeed: (speed: number): void => setTimer("minSpeed", speed),
     switchPlayPause: () => {
-      setClock("play", !clock.play);
-      clock.run();
+      setTimer("play", !timer.play);
+      timer.run();
     },
     work: () => {
       fn();
-      setClock("tick", clock.tick + 1);
-      clock.queue > 0 && clock.limiter && setClock("queue", clock.queue - 1);
+      setTimer("tick", timer.tick + 1);
+      timer.queue > 0 && timer.limiter && setTimer("queue", timer.queue - 1);
     },
     run: () => {
-      if (!clock.play) return;
-      if (clock.limiter && clock.queue <= 0) {
-        setClock("limiter", false);
-        clock.switchPlayPause();
+      if (!timer.play) return;
+      if (timer.limiter && timer.queue <= 0) {
+        setTimer("limiter", false);
+        timer.switchPlayPause();
         return;
       }
 
-      clock.work();
+      timer.work();
 
-      if (clock.clocked) setTimeout(() => requestAnimationFrame(clock.run), clock.speed);
+      if (timer.clocked) setTimeout(() => requestAnimationFrame(timer.run), timer.speed);
     },
     queueTicks: (ticks: number) => {
-      setClock("queue", ticks + clock.queue);
-      setClock("limiter", true);
-      clock.play && clock.switchPlayPause();
+      setTimer("queue", ticks + timer.queue);
+      setTimer("limiter", true);
+      timer.play && timer.switchPlayPause();
     },
 
     tuneSpeed: (speed: number) => {
-      setClock("speed", speed);
+      setTimer("speed", speed);
     },
 
     changeSpeed: (addedSpeed: number) => {
-      const newSpeed = clock.speed + addedSpeed;
-      if (newSpeed < clock.minSpeed || newSpeed > clock.maxSpeed) return;
-      setClock("speed", newSpeed);
+      const newSpeed = timer.speed + addedSpeed;
+      if (newSpeed < timer.minSpeed || newSpeed > timer.maxSpeed) return;
+      setTimer("speed", newSpeed);
     },
 
-    switchClocked: () => {
-      setClock("clocked", !clock.clocked);
+    switchclocked: () => {
+      setTimer("clocked", !timer.clocked);
     },
   });
 
-  return clock;
+  return timer;
 }
