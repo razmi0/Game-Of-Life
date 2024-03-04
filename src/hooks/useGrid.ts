@@ -22,7 +22,14 @@ export type GridHook = {
     setSquare: () => void;
     setCircle: () => void;
   }>;
-  seeGrid: Accessor<boolean>;
+  gridSpacing: {
+    seeGrid: boolean;
+    spacing: number;
+    /** ACTIONS */
+    toggleGrid: () => void;
+    tuneSpacing: (newSpacing: number) => void;
+    changeSpacing: (addSpacing: number) => void;
+  };
   /** ACTIONS */
   changeCellSize: (newSize: number) => void;
   tuneCellSize: (newSize: number) => void;
@@ -35,7 +42,21 @@ export default function useGrid() {
   const [nCol, setnCol] = createSignal(nColInit);
   const [nCell, setnCell] = createSignal(nCellInit);
   const [cellSize, setCellSize] = createSignal(INITIAL_CELL_SIZE);
-  const [seeGrid, setSeeGrid] = createSignal(false);
+  const [gridSpacing, setGridSpacing] = createStore({
+    seeGrid: false,
+    spacing: 1,
+    tuneSpacing: (newSpacing: number) => {
+      setGridSpacing("spacing", newSpacing);
+    },
+    changeSpacing: (addSpacing: number) => {
+      const newSpacing = gridSpacing.spacing + addSpacing;
+      if (newSpacing < 1 || newSpacing > 10) return;
+      setGridSpacing("spacing", newSpacing);
+    },
+    toggleGrid: () => {
+      setGridSpacing("seeGrid", !gridSpacing.seeGrid);
+    },
+  });
   const [shape, setShape] = createStore({
     DEFAULT_SHAPES: ["square", "circle"],
     selectedShape: "square",
@@ -46,10 +67,6 @@ export default function useGrid() {
       setShape("selectedShape", "circle");
     },
   });
-
-  const toggleGrid = () => {
-    setSeeGrid((p) => !p);
-  };
 
   const calcnRow = createMemo(() => {
     setnRow(Math.floor(wH() / cellSize()) + 1);
@@ -98,11 +115,10 @@ export default function useGrid() {
     wW,
     wH,
     cellSize,
-    seeGrid,
     /** ACTIONS */
     shape,
+    gridSpacing,
     changeCellSize,
     tuneCellSize,
-    toggleGrid,
   } as Prettify<GridHook>;
 }

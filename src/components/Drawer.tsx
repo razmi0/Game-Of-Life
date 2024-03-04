@@ -50,6 +50,7 @@ type DrawerProps = {
   backgroundColor: string;
   shape: "square" | "circle";
   seeGrid: boolean;
+  cellSpacing: number;
   seeCorpse: boolean;
   /** ACTIONS */
   reset: () => void;
@@ -75,8 +76,10 @@ type DrawerProps = {
   changeBackgroundColor: (color: string) => void;
   setShapeSquare: () => void;
   setShapeCircle: () => void;
-  toggleGrid: () => void;
   toggleCorpse: () => void;
+  toggleGrid: () => void;
+  tuneGridSpacing: (newSpacing: number) => void;
+  changeGridSpacing: (addSpacing: number) => void;
 };
 
 const { xs, sm, md, lg, xl } = ICON_SIZE;

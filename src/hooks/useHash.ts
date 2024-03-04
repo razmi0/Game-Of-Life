@@ -8,6 +8,13 @@ import type { Tools } from "./usePainter";
 type Hash8Type = Uint8Array & { [index: number]: 0 | 1 };
 type Hash8 = Prettify<Hash8Type>;
 
+type DrawShapeType = {
+  context: CanvasRenderingContext2D;
+  x: number;
+  y: number;
+  cellSize: number;
+};
+
 export default function useHash(
   grid: GridHook,
   data: Prettify<DataStore>,
@@ -90,12 +97,9 @@ export default function useHash(
 
   /**
    * @description draw a shape at a given position
-   * @param context
-   * @param x
-   * @param y
-   * @param cellSize
    */
-  const drawShape = (context: CanvasRenderingContext2D, x: number, y: number, cellSize: number) => {
+  const drawShape = (data: DrawShapeType) => {
+    const { context, x, y, cellSize } = data;
     const shape = grid.shape.selectedShape;
     if (shape === "square") {
       context.fillRect(x, y, cellSize, cellSize);
@@ -110,29 +114,30 @@ export default function useHash(
   const drawHash = () => {
     let i = 0;
     const rowSize = grid.nRow();
+    const cellSize = grid.cellSize();
     const context = ctx();
     if (!context) return;
     while (i < flipIndexes.length) {
-      const [x, y] = getCoordsFromIndex(flipIndexes[i], rowSize, grid.cellSize());
+      const [x, y] = getCoordsFromIndex({ index: flipIndexes[i], rowSize: rowSize, cellSize: cellSize }); // flipIndexes[i], rowSize, grid.cellSize()
 
       // Check if hash at current index is truthy
       if (hash[flipIndexes[i]]) {
         // Draw shape with appropriate color
         context.fillStyle = color.findColor(i);
-        drawShape(context, x, y, grid.cellSize());
+        drawShape({ context, x, y, cellSize });
       }
       // Check if corpse has to be drawn
       else if (!color.seeCorpse()) {
         // Clear the cell if corpse is not visible
-        context.clearRect(x, y, grid.cellSize(), grid.cellSize());
+        context.clearRect(x, y, cellSize, cellSize);
       }
       // Default case
       else {
         // Clear cell and draw dead color shape
-        context.clearRect(x, y, grid.cellSize(), grid.cellSize());
+        context.clearRect(x, y, cellSize, cellSize);
         const deadColor = color.greyScaledHex(flipIndexes[i]);
         context.fillStyle = deadColor;
-        drawShape(context, x, y, grid.cellSize());
+        drawShape({ context, x, y, cellSize });
       }
 
       i++;
@@ -145,20 +150,21 @@ export default function useHash(
 
   /** draw and read the entire hash (SLOW) */
   const drawAllHash = () => {
-    let i = 0;
+    let index = 0;
     const rowSize = grid.nRow();
+    const cellSize = grid.cellSize();
     const context = ctx();
     if (!context) return;
-    while (i < hash.length) {
-      const [x, y] = getCoordsFromIndex(i, rowSize, grid.cellSize());
-      if (hash[i]) {
-        context.fillStyle = color.findColor(i);
-        drawShape(context, x, y, grid.cellSize());
+    while (index < hash.length) {
+      const [x, y] = getCoordsFromIndex({ index, rowSize, cellSize });
+      if (hash[index]) {
+        context.fillStyle = color.findColor(index);
+        drawShape({ context, x, y, cellSize });
       } else {
-        context.clearRect(x, y, grid.cellSize(), grid.cellSize());
+        context.clearRect(x, y, cellSize, cellSize);
       }
 
-      i++;
+      index++;
     }
   };
 
@@ -172,7 +178,7 @@ export default function useHash(
     const offsetXPainted = paintSize - 1;
     const offsetYPainted = offsetXPainted * rowSize;
 
-    const index = getIndexFromCoords(x, y, rowSize, cellSize); // center index
+    const index = getIndexFromCoords({ x, y, rowSize, cellSize }); // center index x, y, rowSize, cellSize
 
     for (let row = -offsetYPainted; row <= offsetYPainted; row += rowSize) {
       for (let col = -offsetXPainted; col <= offsetXPainted; col++) {
@@ -183,7 +189,7 @@ export default function useHash(
           case "pen": {
             if (hash[paintedIndex]) continue;
             hash[paintedIndex] = 1;
-            const [x, y] = getCoordsFromIndex(paintedIndex, rowSize, cellSize);
+            const [x, y] = getCoordsFromIndex({ index: paintedIndex, rowSize, cellSize });
 
             if (penColor) {
               context.fillStyle = penColor;
@@ -192,7 +198,7 @@ export default function useHash(
               context.fillStyle = color.findColor(paintedIndex);
             }
 
-            drawShape(context, x, y, cellSize);
+            drawShape({ context, x, y, cellSize });
 
             break;
           }
@@ -200,7 +206,7 @@ export default function useHash(
           case "eraser":
             if (!hash[paintedIndex]) continue;
             hash[paintedIndex] = 0;
-            const [x, y] = getCoordsFromIndex(paintedIndex, rowSize, cellSize);
+            const [x, y] = getCoordsFromIndex({ index: paintedIndex, rowSize, cellSize });
 
             context.clearRect(x, y, cellSize, cellSize);
 
