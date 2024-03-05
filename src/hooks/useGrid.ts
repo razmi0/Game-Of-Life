@@ -1,6 +1,6 @@
 import type { Accessor } from "solid-js";
 import { batch, createMemo, createSignal, onCleanup, onMount } from "solid-js";
-import { INITIAL_CELL_SIZE, MAX_CELL_SIZE, MIN_CELL_SIZE } from "../data";
+import { DEFAULT_SPACING, INITIAL_CELL_SIZE, MAX_CELL_SIZE, MAX_SPACING, MIN_CELL_SIZE, MIN_SPACING } from "../data";
 import { debounce } from "../helpers";
 import { createStore } from "solid-js/store";
 
@@ -23,10 +23,11 @@ export type GridHook = {
     setCircle: () => void;
   }>;
   gridSpacing: {
-    seeGrid: boolean;
+    visibility: boolean;
     spacing: number;
+    gridColor: string;
     /** ACTIONS */
-    toggleGrid: () => void;
+    toggleVisibility: () => void;
     tuneSpacing: (newSpacing: number) => void;
     changeSpacing: (addSpacing: number) => void;
   };
@@ -42,21 +43,24 @@ export default function useGrid() {
   const [nCol, setnCol] = createSignal(nColInit);
   const [nCell, setnCell] = createSignal(nCellInit);
   const [cellSize, setCellSize] = createSignal(INITIAL_CELL_SIZE);
+  /** gridSpacing */
   const [gridSpacing, setGridSpacing] = createStore({
-    seeGrid: false,
-    spacing: 1,
+    visibility: false,
+    spacing: DEFAULT_SPACING,
+    gridColor: "#FFFFFF",
     tuneSpacing: (newSpacing: number) => {
       setGridSpacing("spacing", newSpacing);
     },
     changeSpacing: (addSpacing: number) => {
       const newSpacing = gridSpacing.spacing + addSpacing;
-      if (newSpacing < 1 || newSpacing > 10) return;
+      if (newSpacing < MIN_SPACING || newSpacing > MAX_SPACING) return;
       setGridSpacing("spacing", newSpacing);
     },
-    toggleGrid: () => {
-      setGridSpacing("seeGrid", !gridSpacing.seeGrid);
+    toggleVisibility: () => {
+      setGridSpacing("visibility", !gridSpacing.visibility);
     },
   });
+  /** shape */
   const [shape, setShape] = createStore({
     DEFAULT_SHAPES: ["square", "circle"],
     selectedShape: "square",
@@ -115,7 +119,7 @@ export default function useGrid() {
     wW,
     wH,
     cellSize,
-    /** ACTIONS */
+    /** ACTIONS & STORE */
     shape,
     gridSpacing,
     changeCellSize,
