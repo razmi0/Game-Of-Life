@@ -55,7 +55,7 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
 
   /** gridSpacing */
   const [gridSpacing, setGridSpacing] = createStore({
-    visibility: false,
+    visibility: true,
     spacing: DEFAULT_SPACING,
     gridColor: "#FFFFFF",
     tuneSpacing: (newSpacing: number) => {
@@ -73,9 +73,7 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
 
   const drawGrid = () => {
     const context = ctx();
-    console.log("here");
     if (!context) return;
-    console.log("here2");
     context.beginPath();
     context.lineWidth = gridSpacing.spacing;
     context.strokeStyle = gridSpacing.gridColor;
@@ -103,11 +101,14 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
   });
 
   const calcnRow = createMemo(() => {
-    setnRow(Math.floor(wH() / cellSize()) + 1);
+    // wee add the gridSpacing to the cellSize to avoid a bug where the grid is not drawn
+    setnRow(Math.floor(wH() / cellSize() + gridSpacing.spacing) + 1);
+    // setnRow(Math.floor(wH() / cellSize()) + 1);
   });
 
   const calcnCol = createMemo(() => {
-    setnCol(Math.floor(wW() / cellSize()) + 1);
+    setnCol(Math.floor(wW() / cellSize() + gridSpacing.spacing) + 1);
+    // setnCol(Math.floor(wW() / cellSize()) + 1);
   });
 
   const calcnCell = createMemo(() => {
