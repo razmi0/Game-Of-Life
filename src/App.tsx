@@ -104,7 +104,7 @@ const App = () => {
         tuneRandom={boardData.tuneRandom}
         changeRandom={boardData.changeRandom}
         /** grid */
-        cellSize={grid.cellSize()}
+        cellSize={grid.cellSize}
         tuneCellSize={grid.tuneCellSize}
         changeCellSize={grid.changeCellSize}
         shape={grid.shape.selectedShape}
