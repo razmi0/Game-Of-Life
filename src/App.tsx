@@ -113,11 +113,11 @@ const App = () => {
         shape={grid.shape.selectedShape}
         setShapeSquare={grid.shape.setSquare}
         setShapeCircle={grid.shape.setCircle}
-        seeGrid={grid.gridSpacing.seeGrid}
+        gridVisibility={grid.gridSpacing.visibility}
         cellSpacing={grid.gridSpacing.spacing}
         tuneGridSpacing={grid.gridSpacing.tuneSpacing}
         changeGridSpacing={grid.gridSpacing.changeSpacing}
-        toggleGrid={grid.toggleGrid}
+        toggleGridVisibility={grid.toggleGrid}
         /** gameLoop */
         speed={gameLoop.speed}
         play={gameLoop.play}

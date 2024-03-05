@@ -49,7 +49,7 @@ type DrawerProps = {
   penColor: string;
   backgroundColor: string;
   shape: "square" | "circle";
-  seeGrid: boolean;
+  gridVisibility: boolean;
   cellSpacing: number;
   seeCorpse: boolean;
   /** ACTIONS */
@@ -77,7 +77,7 @@ type DrawerProps = {
   setShapeSquare: () => void;
   setShapeCircle: () => void;
   toggleCorpse: () => void;
-  toggleGrid: () => void;
+  toggleGridVisibility: () => void;
   tuneGridSpacing: (newSpacing: number) => void;
   changeGridSpacing: (addSpacing: number) => void;
 };
