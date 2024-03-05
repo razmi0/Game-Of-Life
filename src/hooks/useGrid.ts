@@ -1,6 +1,14 @@
 import type { Accessor } from "solid-js";
 import { batch, createMemo, createSignal, onCleanup, onMount } from "solid-js";
-import { DEFAULT_SPACING, INITIAL_CELL_SIZE, MAX_CELL_SIZE, MAX_SPACING, MIN_CELL_SIZE, MIN_SPACING } from "../data";
+import {
+  DEBOUNCING_DELAY,
+  DEFAULT_SPACING,
+  INITIAL_CELL_SIZE,
+  MAX_CELL_SIZE,
+  MAX_SPACING,
+  MIN_CELL_SIZE,
+  MIN_SPACING,
+} from "../data";
 import { debounce } from "../helpers";
 import { createStore } from "solid-js/store";
 
@@ -15,6 +23,12 @@ export type GridHook = {
   wW: Accessor<number>;
   wH: Accessor<number>;
   cellSize: Accessor<number>;
+  /** ACTIONS */
+  changeCellSize: (newSize: number) => void;
+  tuneCellSize: (newSize: number) => void;
+  toggleGrid: () => void;
+  drawGrid: () => void;
+  /** STORE */
   shape: Prettify<{
     DEFAULT_SHAPES: ["square", "circle"];
     selectedShape: "square" | "circle";
@@ -26,23 +40,19 @@ export type GridHook = {
     visibility: boolean;
     spacing: number;
     gridColor: string;
-    /** ACTIONS */
     toggleVisibility: () => void;
     tuneSpacing: (newSpacing: number) => void;
     changeSpacing: (addSpacing: number) => void;
   };
-  /** ACTIONS */
-  changeCellSize: (newSize: number) => void;
-  tuneCellSize: (newSize: number) => void;
-  toggleGrid: () => void;
 };
-export default function useGrid() {
+export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefined>) {
   const [wW, setWW] = createSignal(window.innerWidth);
   const [wH, setWH] = createSignal(window.innerHeight);
   const [nRow, setnRow] = createSignal(nRowInit);
   const [nCol, setnCol] = createSignal(nColInit);
   const [nCell, setnCell] = createSignal(nCellInit);
   const [cellSize, setCellSize] = createSignal(INITIAL_CELL_SIZE);
+
   /** gridSpacing */
   const [gridSpacing, setGridSpacing] = createStore({
     visibility: false,
@@ -60,6 +70,26 @@ export default function useGrid() {
       setGridSpacing("visibility", !gridSpacing.visibility);
     },
   });
+
+  const drawGrid = () => {
+    const context = ctx();
+    console.log("here");
+    if (!context) return;
+    console.log("here2");
+    context.beginPath();
+    context.lineWidth = gridSpacing.spacing;
+    context.strokeStyle = gridSpacing.gridColor;
+    for (let i = 0; i < wW(); i += cellSize()) {
+      context.moveTo(i, 0);
+      context.lineTo(i, wH());
+    }
+    for (let i = 0; i < wH(); i += cellSize()) {
+      context.moveTo(0, i);
+      context.lineTo(wW(), i);
+    }
+    context.stroke();
+  };
+
   /** shape */
   const [shape, setShape] = createStore({
     DEFAULT_SHAPES: ["square", "circle"],
@@ -94,7 +124,6 @@ export default function useGrid() {
     setCellSize(newSize);
   };
 
-  const delayDebounce = 80;
   const updateSizes = debounce(() => {
     batch(() => {
       setWW(window.innerWidth);
@@ -105,7 +134,7 @@ export default function useGrid() {
       calcnCol();
       calcnCell();
     });
-  }, delayDebounce);
+  }, DEBOUNCING_DELAY);
 
   onMount(() => {
     window.addEventListener("resize", updateSizes);
@@ -124,5 +153,6 @@ export default function useGrid() {
     gridSpacing,
     changeCellSize,
     tuneCellSize,
+    drawGrid,
   } as Prettify<GridHook>;
 }

@@ -27,6 +27,7 @@ export const CELL_SIZE_STEP = 1 as const;
 export const SHOW_TOOLTIP_DEBUG = false;
 export const BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP = "transparent"; // red
 export const TOOLTIP_SPACING = 17 as const;
+export const DEBOUNCING_DELAY = 80 as const;
 
 export const ICON_SIZE = {
   xs: 15,

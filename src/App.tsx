@@ -21,7 +21,7 @@ const App = () => {
   const [ctx, setCtx] = createSignal<CanvasRenderingContext2D>();
   const [hasStarted, setHasStarted] = createSignal(false);
 
-  const grid = useGrid(); // context candidate
+  const grid = useGrid(ctx); // context candidate
   const boardData = useBoardData();
   const color = useColors(grid.nCell);
 
@@ -29,7 +29,6 @@ const App = () => {
   const painter = usePainter(hash.paintCell);
 
   const run = () => {
-    // app signal + 2 hash methods + 1 boardData method
     if (!hasStarted()) setHasStarted(true);
     hash.updateHash();
     hash.drawHash();
@@ -37,7 +36,6 @@ const App = () => {
   };
 
   const resetBlank = () => {
-    // 1 app signal + 1 hash method + 1 boardData method + 1 colors method + 1 clock method
     setHasStarted(false);
     if (gameLoop.play) gameLoop.switchPlayPause();
     hash.resetBlankHash();
@@ -49,13 +47,11 @@ const App = () => {
   const gameLoop = useTimer(run);
 
   const applyColors = () => {
-    // 1 color method + 1 hash method
     color.applyRandomColors();
     hash.drawAllHash();
   };
 
   const reset = () => {
-    // 1 app signal + 1 clock method + 1 hash method +  1 boardData method ##A##
     setHasStarted(false);
     if (gameLoop.play) gameLoop.switchPlayPause();
     hash.resetHash();
@@ -71,6 +67,7 @@ const App = () => {
   onMount(() => {
     setCtx(canvas.getContext("2d")!);
     painter.setCanvasRef(canvas);
+    grid.drawGrid();
     run();
   });
 

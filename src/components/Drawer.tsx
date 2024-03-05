@@ -573,7 +573,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Separator />
       <Group>
         <Item
-          showTooltipOnClick
           onClick={props.switchPlayPause}
           tooltip={
             <StandardTooltip
@@ -621,7 +620,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Separator />
       <Group>
         <Item
-          showTooltipOnClick
           indicator={props.penSize}
           tooltip={
             <StandardTooltip title="painting tools">
@@ -632,7 +630,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           <Icon width={xl} name="painting_tools" />
         </Item>
         <Item
-          showTooltipOnClick
           tooltip={
             <StandardTooltip title="color palette" class="h-full" innerContentClass="flex flex-col justify-between">
               <p>paint the whole board with an unlimited set of colors : </p>
