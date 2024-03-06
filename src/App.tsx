@@ -35,15 +35,6 @@ const App = () => {
     boardData.incrementGeneration();
   };
 
-  const resetBlank = () => {
-    setHasStarted(false);
-    if (gameLoop.play) gameLoop.switchPlayPause();
-    hash.resetBlankHash();
-    color.applyRandomColors();
-    color.setBackgroundColor("black");
-    boardData.resetGeneration();
-  };
-
   const gameLoop = useTimer(run);
 
   const applyColors = () => {
@@ -75,7 +66,7 @@ const App = () => {
     return { width: grid.wW(), height: grid.wH() };
   });
 
-  const debug = false;
+  const debug = true;
 
   return (
     <>
@@ -104,9 +95,9 @@ const App = () => {
         tuneRandom={boardData.tuneRandom}
         changeRandom={boardData.changeRandom}
         /** grid */
-        cellSize={grid.cellSize}
-        tuneCellSize={grid.tuneCellSize}
-        changeCellSize={grid.changeCellSize}
+        cellSize={grid.sizes.cell}
+        tuneCellSize={grid.sizes.tuneCellSize}
+        changeCellSize={grid.sizes.changeCellSize}
         shape={grid.shape.selectedShape}
         setShapeSquare={grid.shape.setSquare}
         setShapeCircle={grid.shape.setCircle}
@@ -135,6 +126,7 @@ const App = () => {
         changePenColor={painter.setPenColor}
         /** colors */
         palette={color.palette}
+        maxColors={color.maxColors}
         addColor={color.addColor}
         patchColor={color.patchColor}
         removeColor={color.removeColor}
@@ -145,7 +137,6 @@ const App = () => {
         toggleCorpse={color.toggleCorpse}
         /** hash & misc */
         reset={reset}
-        resetBlank={resetBlank}
         hasStarted={hasStarted()}
         navigator={navInfo()}
         gridInfo={gridInfo()}

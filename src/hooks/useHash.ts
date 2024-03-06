@@ -107,7 +107,7 @@ export default function useHash(
   const drawHash = () => {
     let i = 0;
     const rowSize = grid.nRow();
-    const cellSize = grid.cellSize;
+    const cellSize = grid.sizes.cell;
     const context = ctx();
     if (!context) return;
     while (i < flipIndexes.length) {
@@ -145,7 +145,7 @@ export default function useHash(
   const drawAllHash = () => {
     let index = 0;
     const rowSize = grid.nRow();
-    const cellSize = grid.cellSize;
+    const cellSize = grid.sizes.cell;
     const context = ctx();
     if (!context) return;
     while (index < hash.length) {
@@ -167,7 +167,7 @@ export default function useHash(
     if (!context) return;
 
     const rowSize = grid.nRow();
-    const cellSize = grid.cellSize;
+    const cellSize = grid.sizes.cell;
 
     const offsetXPainted = paintSize - 1;
     const offsetYPainted = offsetXPainted * rowSize;

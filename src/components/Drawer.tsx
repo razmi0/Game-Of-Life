@@ -46,6 +46,7 @@ type DrawerProps = {
   paintingState: boolean;
   selectedTool: Tools;
   palette: string[];
+  maxColors: number;
   penColor: string;
   backgroundColor: string;
   shape: "square" | "circle";
@@ -54,7 +55,6 @@ type DrawerProps = {
   seeCorpse: boolean;
   /** ACTIONS */
   reset: () => void;
-  resetBlank: () => void;
   changeSpeed: (newTime: number) => void;
   changeRandom: (newRandom: number) => void;
   changeCellSize: (newSize: number) => void;
@@ -191,7 +191,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     const isPen = () => props.selectedTool === "pen";
 
     return (
-      <div class="flex flex-col gap-2 mt-3 min-w-40">
+      <div class="flex flex-col gap-0 mt-3 min-w-40">
         <div class="flex items-start gap-1">
           <IconButton
             width={md}
@@ -218,8 +218,8 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             />
           </div>
         </div>
-        <p>brush size : </p>
-        <div class="flex gap-2 items-start">
+        <p class="my-1">brush size : </p>
+        <div class="flex gap-0 items-start">
           <IconButton width={md} name="minus_circle" class="mb-5" onClick={() => props.changePenSize(-PEN_SIZE_STEP)} />
           <SimpleRange
             milestones={[MIN_PEN_SIZE, Math.floor((MIN_PEN_SIZE + MAX_PEN_SIZE) / 2), MAX_PEN_SIZE]}
@@ -242,21 +242,19 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   };
 
   const ColorPaletteTooltip = () => {
-    const [newColor, setNewColor] = createSignal("#FFF");
+    const [newColor, setNewColor] = createSignal("FFFFFF");
 
     const ColorSection: ParentComponent = (local) => (
-      <div
-        class="flex flex-col gap-1 max-h-40 flex-wrap "
-        id="section_color"
-        classList={{ ["items-center"]: props.palette.length > 3, ["-translate-x-[5px]"]: props.palette.length > 7 }}
-      >
+      <div class="flex gap-1 w-56 items-center justify-center" id="section_color">
         {local.children}
       </div>
     );
-    const ColorItem: ParentComponent = (local) => <div class="flex flex-row items-center">{local.children}</div>;
+    const ColorItem: ParentComponent = (local) => (
+      <div class="flex flex-col items-center rotate-180">{local.children}</div>
+    );
 
     return (
-      <div class="flex flex-col gap-3 mt-3 min-w-48 justify-between h-full">
+      <div class="flex flex-row gap-3 mt-3 min-w-48 justify-between h-full">
         <ColorSection>
           <For each={props.palette}>
             {(color, i) => {
@@ -270,39 +268,37 @@ export default function Drawer(props: Prettify<DrawerProps>) {
               return (
                 <>
                   <ColorItem>
-                    <InputColor id={id} value={color} label={formatIdToLabel(id)} onChange={changeColor} hiddenLabel />
+                    <InputColor
+                      class="vanilla"
+                      id={id}
+                      value={color ?? "#FFFFFF"}
+                      label={formatIdToLabel(id)}
+                      onChange={changeColor}
+                      hiddenLabel
+                    />
                     <IconButton
                       onClick={() => props.removeColor(i())}
                       width={sm}
                       name="minus_circle"
-                      class="border-[1px] border-dw-100 rounded-e-md hover:bg-dw-300 w-8 h-8 flex items-center justify-center"
+                      class="border-[1px] border-dw-100 rounded-b-md hover:bg-dw-300 w-7 h-7 flex items-center justify-center" //
                     />
                   </ColorItem>
                 </>
               );
             }}
           </For>
-          <ColorItem>
-            <InputColor
-              id="add_color"
-              value={newColor()}
-              label="add color"
-              hiddenLabel
-              onChange={(e) => {
-                const newColor = (e.target as HTMLInputElement).value;
-                setNewColor(newColor);
-              }}
-            />
+          <div class="h-full flex-grow"></div>
+          <Show when={props.palette.length < props.maxColors}>
             <IconButton
               onClick={() => {
                 props.addColor(newColor());
-                setNewColor("");
+                setNewColor(newColor());
               }}
               name="plus_circle"
-              width={sm}
-              class="border-[1px] border-dw-100 rounded-e-md hover:bg-dw-300 w-8 h-8 flex items-center justify-center"
+              width={xl}
+              class="hover:bg-dw-300 rounded-full flex items-center justify-center"
             />
-          </ColorItem>
+          </Show>
         </ColorSection>
       </div>
     );
@@ -368,9 +364,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             classList={{ ["bg-dw-300"]: isCircle() }}
           />
         </div>
-        <SimpleButton class="bg-dw-300 w-full hover:bg-dw-200" handler={props.reset}>
-          reset game
-        </SimpleButton>
       </div>
     );
   };
@@ -393,7 +386,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     };
 
     return (
-      <div class="flex flex-col gap-4 mt-3 min-w-48">
+      <div class="flex flex-col gap-2 mt-3 min-w-48">
         <div class="flex gap-2 items-start">
           <IconButton
             onClick={() => props.changeCellSize(-CELL_SIZE_STEP)}
@@ -422,9 +415,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             {output()}
           </div>
         </div>
-        <SimpleButton class="bg-dw-300 w-full hover:bg-dw-200" handler={props.reset}>
-          reset
-        </SimpleButton>
       </div>
     );
   };
@@ -481,7 +471,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     };
 
     return (
-      <div class="flex flex-col gap-4 mt-3 min-w-48">
+      <div class="flex flex-col gap-2 mt-3 min-w-48">
         <div class="flex gap-2 items-start ">
           <IconButton onClick={() => props.changeRandom(-RANDOM_STEP)} width={md} name="baby" class="mb-5" />
           <SimpleRange
@@ -500,9 +490,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             {output()}
           </div>
         </div>
-        <SimpleButton class="bg-dw-300 w-full hover:bg-dw-200" handler={props.reset}>
-          reset game
-        </SimpleButton>
       </div>
     );
   };
@@ -586,13 +573,10 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         <Item
           tooltip={
             <>
-              <StandardTooltip title={<TooltipTitle title="reset" keyCmd="key R" />}>
-                <p class="min-w-48">reset to a new original fresh random game</p>
-                <div class="flex gap-2 mt-2">
-                  <SimpleButton class="bg-dw-300 w-full hover:bg-dw-200 whitespace-nowrap" handler={props.resetBlank}>
-                    reset blank
-                  </SimpleButton>
-                  <SimpleButton class="bg-dw-300 w-full hover:bg-dw-200  whitespace-nowrap" handler={props.reset}>
+              <StandardTooltip title={<TooltipTitle title="reset" keyCmd="key R" />} class="gap-1">
+                <div class="flex w-full justify-center items-center">
+                  <p class="min-w-48">reset to a new original fresh random game</p>
+                  <SimpleButton class="h-fit" handler={props.reset}>
                     reset game
                   </SimpleButton>
                 </div>
@@ -630,6 +614,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           <Icon width={xl} name="painting_tools" />
         </Item>
         <Item
+          showTooltipOnClick
           tooltip={
             <StandardTooltip title="color palette" class="h-full" innerContentClass="flex flex-col justify-between">
               <p>paint the whole board with an unlimited set of colors : </p>
@@ -676,6 +661,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         </Item>
 
         <Item
+          showTooltipOnClick
           tooltip={
             <StandardTooltip title={<TooltipTitle title="speed" keyCmd="arrow down/up" />}>
               <p>change the delay between two frames thus affecting fps</p>

@@ -1,5 +1,6 @@
 import { JSXElement } from "solid-js";
 import Icon, { type IconProps } from "./Icons";
+import Separator from "./Drawer/Separator";
 
 type IconButtonProps = IconProps & {
   onClick: () => void;
@@ -24,12 +25,14 @@ type SimpleButtonProps = {
 };
 export const SimpleButton = (props: SimpleButtonProps) => {
   return (
-    <button
-      onClick={props.handler}
-      class={`z-50 cursor-pointer w-fit h-fit py-1 px-3 rounded-sm ${props.class || ""}`} // prettier-ignore
-    >
-      {props.children}
-    </button>
+    <>
+      <button
+        onClick={props.handler}
+        class={`cursor-pointer py-1 px-3 whitespace-nowrap rounded-sm bg-dw-300 hover:bg-dw-200 ${props.class || ""}`} // prettier-ignore
+      >
+        {props.children}
+      </button>
+    </>
   );
 };
 

@@ -22,13 +22,15 @@ export type GridHook = {
   nCell: Accessor<number>;
   wW: Accessor<number>;
   wH: Accessor<number>;
-  cellSize: number;
   /** ACTIONS */
-  changeCellSize: (newSize: number) => void;
-  tuneCellSize: (newSize: number) => void;
   toggleGrid: () => void;
   drawGrid: () => void;
   /** STORE */
+  sizes: Prettify<{
+    cell: number;
+    changeCellSize: (addSize: number) => void;
+    tuneCellSize: (newSize: number) => void;
+  }>;
   shape: Prettify<{
     DEFAULT_SHAPES: ["square", "circle"];
     selectedShape: "square" | "circle";
@@ -36,14 +38,14 @@ export type GridHook = {
     setSquare: () => void;
     setCircle: () => void;
   }>;
-  gridSpacing: {
+  gridSpacing: Prettify<{
     visibility: boolean;
     spacing: number;
     gridColor: string;
     toggleVisibility: () => void;
     tuneSpacing: (newSpacing: number) => void;
     changeSpacing: (addSpacing: number) => void;
-  };
+  }>;
 };
 export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefined>) {
   const [wW, setWW] = createSignal(window.innerWidth);
@@ -71,14 +73,14 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
   });
 
   const [sizes, setSizes] = createStore({
-    cell: INITIAL_CELL_SIZE - gridSpacing.spacing,
+    cell: INITIAL_CELL_SIZE,
     changeCellSize: (addSize: number) => {
-      const newSize = sizes.cell + addSize - gridSpacing.spacing;
+      const newSize = sizes.cell + addSize;
       if (newSize < MIN_CELL_SIZE || newSize > MAX_CELL_SIZE) return;
       setSizes("cell", newSize);
     },
     tuneCellSize: (newSize: number) => {
-      setSizes("cell", newSize - gridSpacing.spacing);
+      setSizes("cell", newSize);
     },
   });
 
@@ -159,12 +161,10 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
     nCell,
     wW,
     wH,
-    cellSize: sizes.cell,
     /** ACTIONS & STORE */
+    sizes,
     shape,
     gridSpacing,
-    changeCellSize: sizes.changeCellSize,
-    tuneCellSize: sizes.tuneCellSize,
     drawGrid,
   } as Prettify<GridHook>;
 }

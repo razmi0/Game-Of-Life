@@ -2,6 +2,7 @@
 
 export const DEFAULT_PALETTE = ["#3B82F6", "#6366F1", "#EC4899", "#F59E0B"];
 export const GREY_SCALED_COEF = [0.2126, 0.7152, 0.0722];
+export const MAX_PALETTE_LENGTH = 7;
 export const DEFAULT_RANDOMNESS = 80;
 export const DEFAULT_SPEED = 10;
 export const START_IMMEDIATELY = false;
