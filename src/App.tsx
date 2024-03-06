@@ -60,7 +60,6 @@ const App = () => {
   onMount(() => {
     setCtx(canvas.getContext("2d")!);
     painter.setCanvasRef(canvas);
-    grid.drawGrid();
     run();
   });
 

@@ -10,7 +10,7 @@ type Hash8 = Prettify<Hash8Type>;
 
 export default function useHash(
   grid: GridHook,
-  data: Prettify<DataStore>,
+  data: DataStore,
   color: ColorHook,
   ctx: Accessor<CanvasRenderingContext2D | undefined>
 ) {

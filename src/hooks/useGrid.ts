@@ -24,7 +24,6 @@ export type GridHook = {
   wH: Accessor<number>;
   /** ACTIONS */
   toggleGrid: () => void;
-  drawGrid: () => void;
   /** STORE */
   sizes: Prettify<{
     cell: number;
@@ -83,23 +82,6 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
       setSizes("cell", newSize);
     },
   });
-
-  const drawGrid = () => {
-    const context = ctx();
-    if (!context) return;
-    context.beginPath();
-    context.lineWidth = gridSpacing.spacing;
-    context.strokeStyle = gridSpacing.gridColor;
-    for (let i = 0; i < wW(); i += sizes.cell) {
-      context.moveTo(i, 0);
-      context.lineTo(i, wH());
-    }
-    for (let i = 0; i < wH(); i += sizes.cell) {
-      context.moveTo(0, i);
-      context.lineTo(wW(), i);
-    }
-    context.stroke();
-  };
 
   /** shape */
   const [shape, setShape] = createStore({
@@ -165,6 +147,5 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
     sizes,
     shape,
     gridSpacing,
-    drawGrid,
   } as Prettify<GridHook>;
 }
