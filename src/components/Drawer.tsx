@@ -53,6 +53,7 @@ type DrawerProps = {
   gridVisibility: boolean;
   cellSpacing: number;
   seeCorpse: boolean;
+  isWorkingOnHash: Accessor<boolean>;
   /** ACTIONS */
   reset: () => void;
   changeSpeed: (newTime: number) => void;
@@ -585,7 +586,11 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           }
           onClick={props.reset}
         >
-          <Icon width={xl} name="reset" />
+          <Show when={props.isWorkingOnHash()} fallback={<Icon width={xl} name="reset" />}>
+            <div id="animate" class="animate-spin">
+              <Icon width={xl} name="reset" />
+            </div>
+          </Show>
         </Item>
         <Item
           tooltip={
