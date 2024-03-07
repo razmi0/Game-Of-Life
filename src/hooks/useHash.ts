@@ -1,4 +1,4 @@
-import { batch, createEffect, createSignal } from "solid-js";
+import { batch, createEffect, createSignal, onMount } from "solid-js";
 import { getCoordsFromIndex, getIndexFromCoords } from "../helpers";
 import type { Accessor } from "solid-js";
 import type { GridHook } from "./useGrid";
@@ -93,15 +93,39 @@ export default function useHash(
   /**
    * @description draw a shape at a given position
    */
-  const drawShape = (data: DrawShapeType) => {
-    const { context, x, y, cellSize } = data;
+  const drawShapeWithColor = (data: DrawShapeWithColorType) => {
+    const { context, x, y, cellSize, fillStyle } = data;
+    const spacingAllowed = grid.gridSpacing.visibility;
     const shape = grid.shape.selectedShape;
-    if (shape === "square") {
-      context.fillRect(x, y, cellSize, cellSize);
-    } else {
-      context.beginPath();
-      context.arc(x + cellSize / 2, y + cellSize / 2, cellSize / 2, 0, Math.PI * 2);
-      context.fill();
+    const spacing = grid.gridSpacing.spacing * 2;
+
+    const finalSize = spacingAllowed ? cellSize - spacing : cellSize;
+
+    switch (shape) {
+      case "square": {
+        if (fillStyle.cell) {
+          context.fillStyle = fillStyle.cell;
+          context.fillRect(x, y, finalSize, finalSize);
+        }
+        if (spacingAllowed) {
+          // we draw borders on the rect if spacing is allowed
+          context.strokeStyle = fillStyle.spacing ?? "white";
+          context.lineWidth = spacing;
+
+          context.strokeRect(x, y, finalSize, finalSize);
+
+          // context.fillStyle = fillStyle.spacing ?? "white";
+          // context.fillRect(x, y, finalSize, spacing);
+        }
+        break;
+      }
+
+      case "circle": {
+        context.beginPath();
+        context.arc(x + cellSize / 2, y + cellSize / 2, cellSize / 2, 0, Math.PI * 2);
+        context.fill();
+        break;
+      }
     }
   };
 
@@ -118,21 +142,22 @@ export default function useHash(
       // Check if hash at current index is truthy
       if (hash[flipIndexes[i]]) {
         // Draw shape with appropriate color
-        context.fillStyle = color.findColor(i);
-        drawShape({ context, x, y, cellSize });
+        const fillStyle = { cell: color.findColor(i), spacing: grid.gridSpacing.gridColor };
+        drawShapeWithColor({ context, x, y, cellSize, fillStyle });
       }
       // Check if corpse has to be drawn
       else if (!color.seeCorpse()) {
         // Clear the cell if corpse is not visible
         context.clearRect(x, y, cellSize, cellSize);
+        const fillStyle = { cell: "transparent", spacing: grid.gridSpacing.gridColor };
+        drawShapeWithColor({ context, x, y, cellSize, fillStyle });
       }
       // Default case
       else {
         // Clear cell and draw dead color shape
-        context.clearRect(x, y, cellSize, cellSize);
-        const deadColor = color.greyScaledHex(flipIndexes[i]);
-        context.fillStyle = deadColor;
-        drawShape({ context, x, y, cellSize });
+        // context.clearRect(x, y, cellSize, cellSize);
+        const fillStyle = { cell: color.greyScaledHex(flipIndexes[i]), spacing: grid.gridSpacing.gridColor };
+        drawShapeWithColor({ context, x, y, cellSize, fillStyle });
       }
 
       i++;
@@ -153,10 +178,12 @@ export default function useHash(
     while (index < hash.length) {
       const [x, y] = getCoordsFromIndex({ index, rowSize, cellSize });
       if (hash[index]) {
-        context.fillStyle = color.findColor(index);
-        drawShape({ context, x, y, cellSize });
+        const fillStyle = { cell: color.findColor(index), spacing: grid.gridSpacing.gridColor };
+        drawShapeWithColor({ context, x, y, cellSize, fillStyle });
       } else {
         context.clearRect(x, y, cellSize, cellSize);
+        const fillStyle = { cell: "transparent", spacing: grid.gridSpacing.gridColor };
+        drawShapeWithColor({ context, x, y, cellSize, fillStyle });
       }
 
       index++;
@@ -188,13 +215,13 @@ export default function useHash(
             const [x, y] = getCoordsFromIndex({ index: paintedIndex, rowSize, cellSize });
 
             if (penColor) {
-              context.fillStyle = penColor;
+              const fillStyle = { cell: penColor, spacing: grid.gridSpacing.gridColor };
               color.changeColorAtIndex(penColor, paintedIndex);
+              drawShapeWithColor({ context, x, y, cellSize, fillStyle });
             } else {
-              context.fillStyle = color.findColor(paintedIndex);
+              const fillStyle = { cell: color.findColor(paintedIndex), spacing: grid.gridSpacing.gridColor };
+              drawShapeWithColor({ context, x, y, cellSize, fillStyle });
             }
-
-            drawShape({ context, x, y, cellSize });
 
             break;
           }

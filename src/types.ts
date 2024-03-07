@@ -30,11 +30,15 @@ type ClockState = {
 
 type ClockQueueTicksMode = "clocked" | "free";
 
-type DrawShapeType = {
+type DrawShapeWithColorType = {
   context: CanvasRenderingContext2D;
   x: number;
   y: number;
   cellSize: number;
+  fillStyle: {
+    cell?: string;
+    spacing?: string;
+  };
 };
 
 type UserAgentInfo = {

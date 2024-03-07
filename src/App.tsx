@@ -60,7 +60,7 @@ const App = () => {
   onMount(() => {
     setCtx(canvas.getContext("2d")!);
     painter.setCanvasRef(canvas);
-    run();
+    hash.drawAllHash();
   });
 
   const gridInfo = createMemo(() => {
