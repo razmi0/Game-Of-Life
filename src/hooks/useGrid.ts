@@ -2,6 +2,7 @@ import type { Accessor } from "solid-js";
 import { batch, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 import {
   DEBOUNCING_DELAY,
+  DEFAULT_GRID_COLOR,
   DEFAULT_SPACING,
   INITIAL_CELL_SIZE,
   MAX_CELL_SIZE,
@@ -27,7 +28,7 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
   const [gridSpacing, setGridSpacing] = createStore({
     visibility: true,
     spacing: DEFAULT_SPACING,
-    gridColor: "#FFFFFF",
+    gridColor: DEFAULT_GRID_COLOR,
   });
 
   const tuneSpacing = (newSpacing: number) => {
@@ -82,6 +83,8 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
     const context = ctx();
     if (!context) return;
     context.clearRect(0, 0, wW(), wH());
+    if (!gridSpacing.visibility || gridSpacing.spacing === 0) return;
+
     context.beginPath();
     context.lineWidth = gridSpacing.spacing;
     context.strokeStyle = gridSpacing.gridColor;
