@@ -52,6 +52,7 @@ Age => color
 - [ ] (#18) add loader animation
 - [ ] (#20) Refacto resize so extended on the canva plane (currently resize is just working on the array length so past hash is compacted or extended)
 - [ ] (#21) Find a way to implement loader when hash running
+- [ ] (#22) hook useOnResize ? currently
 
 #### DONE
 
