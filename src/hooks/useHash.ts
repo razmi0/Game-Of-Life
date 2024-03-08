@@ -1,7 +1,6 @@
 import { batch, createEffect, createSignal, onMount } from "solid-js";
 import { getCoordsFromIndex, getIndexFromCoords } from "../helpers";
 import type { Accessor } from "solid-js";
-import type { GridHook } from "./useGrid";
 import type { ColorHook } from "./useColors";
 import { PaintCellType } from "../sharedTypes";
 
@@ -9,7 +8,7 @@ type Hash8Type = Uint8Array & { [index: number]: 0 | 1 };
 type Hash8 = Prettify<Hash8Type>;
 
 export default function useHash(
-  grid: GridHook,
+  grid: ReturnType<typeof import("./useGrid").default>,
   data: DataStore,
   color: ColorHook,
   ctx: Accessor<CanvasRenderingContext2D | undefined>
@@ -212,6 +211,7 @@ export default function useHash(
     }
   };
 
+  // replace with future implementation of useOnResize hook ?
   createEffect(() => {
     if (grid.nCell() !== hash.length) {
       resizeHash();
