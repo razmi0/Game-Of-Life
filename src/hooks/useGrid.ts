@@ -22,6 +22,7 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
   const [nRow, setnRow] = createSignal(nRowInit);
   const [nCol, setnCol] = createSignal(nColInit);
   const [nCell, setnCell] = createSignal(nCellInit);
+  const [cellSize, setCellSize] = createSignal(INITIAL_CELL_SIZE);
 
   const [gridSpacing, setGridSpacing] = createStore({
     visibility: true,
@@ -43,17 +44,15 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
     setGridSpacing("visibility", !gridSpacing.visibility);
   };
 
-  const [sizes, setSizes] = createStore({
-    cell: INITIAL_CELL_SIZE,
-    changeCellSize: (addSize: number) => {
-      const newSize = sizes.cell + addSize;
-      if (newSize < MIN_CELL_SIZE || newSize > MAX_CELL_SIZE) return;
-      setSizes("cell", newSize);
-    },
-    tuneCellSize: (newSize: number) => {
-      setSizes("cell", newSize);
-    },
-  });
+  const changeCellSize = (addSize: number) => {
+    const newSize = cellSize() + addSize;
+    if (newSize < MIN_CELL_SIZE || newSize > MAX_CELL_SIZE) return;
+    setCellSize(newSize);
+  };
+
+  const tuneCellSize = (newSize: number) => {
+    setCellSize(newSize);
+  };
 
   /** shape */
   const [shape, setShape] = createStore({
@@ -68,11 +67,11 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
   });
 
   const calcnRow = createMemo(() => {
-    setnRow(Math.floor(wH() / sizes.cell) + 1);
+    setnRow(Math.floor(wH() / cellSize()) + 1);
   });
 
   const calcnCol = createMemo(() => {
-    setnCol(Math.floor(wW() / sizes.cell) + 1);
+    setnCol(Math.floor(wW() / cellSize()) + 1);
   });
 
   const calcnCell = createMemo(() => {
@@ -86,11 +85,11 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
     context.beginPath();
     context.lineWidth = gridSpacing.spacing;
     context.strokeStyle = gridSpacing.gridColor;
-    for (let i = 0; i < wW(); i += sizes.cell) {
+    for (let i = 0; i < wW(); i += cellSize()) {
       context.moveTo(i, 0);
       context.lineTo(i, wH());
     }
-    for (let i = 0; i < wH(); i += sizes.cell) {
+    for (let i = 0; i < wH(); i += cellSize()) {
       context.moveTo(0, i);
       context.lineTo(wW(), i);
     }
@@ -98,16 +97,12 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
   };
 
   const updateSizes = debounce(() => {
-    batch(() => {
-      setWW(window.innerWidth);
-      setWH(window.innerHeight);
-    });
-    batch(() => {
-      calcnRow();
-      calcnCol();
-      calcnCell();
-      drawGrid();
-    });
+    setWW(window.innerWidth);
+    setWH(window.innerHeight);
+    calcnRow();
+    calcnCol();
+    calcnCell();
+    drawGrid();
   }, DEBOUNCING_DELAY);
 
   onMount(() => {
@@ -121,13 +116,15 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
     nCell,
     wW,
     wH,
+    cellSize,
     /** ACTIONS & STORE */
-    sizes,
     shape,
     gridSpacing,
     drawGrid,
     toggleVisibility,
     tuneSpacing,
     changeSpacing,
-  }; // as Prettify<GridHook>
+    tuneCellSize,
+    changeCellSize,
+  };
 }
