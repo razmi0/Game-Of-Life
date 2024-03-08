@@ -414,13 +414,14 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     );
   };
 
+  const fpsOutputOptions = { showUnit: true, digits: 2 };
   const SpeedTooltip = () => {
-    const [output, setOutput] = createSignal(fps(props.speed));
+    const [output, setOutput] = createSignal(fps(props.speed, fpsOutputOptions));
 
-    createEffect(() => setOutput(fps(props.speed)));
+    createEffect(() => setOutput(fps(props.speed, fpsOutputOptions)));
 
     const handleInputOutput = (e: Event) => {
-      setOutput(fps((e.target as HTMLInputElement).valueAsNumber));
+      setOutput(fps((e.target as HTMLInputElement).valueAsNumber, fpsOutputOptions));
     };
 
     const handleSpeedChange = (e: Event) => {
@@ -428,14 +429,16 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       props.tuneSpeed(newSpeed);
     };
 
+    const fpsMilestonesOptions = { showUnit: false };
+
     return (
       <div class="mt-3 flex items-center min-w-48">
         <IconButton onClick={() => props.changeSpeed(DELAY_STEP)} width={md} name="snail" class="mb-5 me-2" />
         <SimpleRange
           milestones={[
-            fps(MAX_DELAY, false),
-            fps(Math.floor((MIN_DELAY + MAX_DELAY) / 2), false),
-            fps(MIN_DELAY, false),
+            fps(MAX_DELAY, fpsMilestonesOptions),
+            fps(Math.floor((MIN_DELAY + MAX_DELAY) / 2), fpsMilestonesOptions),
+            fps(MIN_DELAY, fpsMilestonesOptions),
           ]}
           onChange={handleSpeedChange}
           onInput={handleInputOutput}
@@ -447,7 +450,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           step={DELAY_STEP}
         />
         <IconButton onClick={() => props.changeSpeed(-DELAY_STEP)} width={md} name="hare" class="mb-5 ms-2" />
-        <div class="whitespace-nowrap text-yellow-400 text-sm font-bold translate-y-[-9px] h-full w-16 tabular-nums text-right">
+        <div class="whitespace-nowrap text-yellow-400 text-sm font-bold translate-y-[-9px] h-full w-20 tabular-nums text-right">
           {output()}
         </div>
       </div>
@@ -505,7 +508,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     },
     {
       label: "delay",
-      value: `${props.speed}ms (${fps(props.speed)})`,
+      value: `${props.speed}ms (${fps(props.speed, { showUnit: true, digits: 1 })})`,
     },
     {
       label: "randomness",
@@ -660,10 +663,9 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         </Item>
 
         <Item
-          showTooltipOnClick
           tooltip={
             <StandardTooltip title={<TooltipTitle title="speed" keyCmd="arrow down/up" />}>
-              <p>change the delay between two frames thus affecting fps</p>
+              <p class="mt-2">change the delay between two frames thus affecting fps : </p>
               <SpeedTooltip />
             </StandardTooltip>
           }

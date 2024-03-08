@@ -31,9 +31,18 @@ export const getIndexFromCoords = (data: IndexFromCoordsData) => {
   return Math.floor(x / cellSize) * rowSize + Math.floor(y / cellSize);
 };
 
-export const fps = (speed: number, showUnit: boolean = true) => {
-  const strShowUnit = showUnit ? " fps" : "";
+type FpsOptionsType = {
+  showUnit?: boolean;
+  digits?: number;
+};
+
+export const fps = (speed: number, options: FpsOptionsType = {}) => {
+  const strShowUnit = options.showUnit ? " fps" : "";
+  const digits = options.digits || 0;
   if (speed === 0) return "max" + strShowUnit;
   const lbl = 1000 / speed;
-  return lbl > 200 ? "> 200" + strShowUnit : Math.floor(lbl) + strShowUnit;
+  if (lbl < 1) return "< 1" + strShowUnit;
+  if (lbl > 200) return "> 200" + strShowUnit;
+  if (digits === 0) return Math.floor(lbl) + strShowUnit;
+  return lbl.toFixed(digits) + strShowUnit;
 };
