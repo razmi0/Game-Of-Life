@@ -216,6 +216,7 @@ export default function useHash(
     if (grid.nCell() !== hash.length) {
       resizeHash();
       drawAllHash();
+      grid.drawGrid();
     }
   });
 
