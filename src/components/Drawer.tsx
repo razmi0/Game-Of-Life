@@ -23,8 +23,8 @@ import Item from "./Drawer/Item";
 import SimpleRange from "./Drawer/Range";
 import Separator from "./Drawer/Separator";
 import { InputColor } from "./Input";
-
 import Icon from "./Icons";
+import { fps } from "../helpers";
 import useShorcuts, { type Shortcut } from "../hooks/useShorcuts";
 import type { Accessor, ParentComponent } from "solid-js";
 import type { Tools } from "../hooks/usePainter";
@@ -88,18 +88,13 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   const [isOpen, setIsOpen] = createSignal(true);
   const trigger = () => setIsOpen((p) => !p);
 
-  const fps = (speed: number) => {
-    if (speed === 0) return "max fps";
-    const lbl = 1000 / speed;
-    return lbl > 200 ? "200 fps" : Math.floor(lbl) + " fps";
-  };
-
   const formatIdToLabel = (label: string) => label.replace(/_/g, " ").replace(/color/, "Color");
 
   const shorcuts: Shortcut[] = [
     {
       key: " ",
       action: () => props.switchPlayPause(),
+      prevented: true,
     },
     {
       key: "r",
@@ -437,7 +432,11 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <div class="mt-3 flex items-center min-w-48">
         <IconButton onClick={() => props.changeSpeed(DELAY_STEP)} width={md} name="snail" class="mb-5 me-2" />
         <SimpleRange
-          milestones={["10", "20", "200"]}
+          milestones={[
+            fps(MAX_DELAY, false),
+            fps(Math.floor((MIN_DELAY + MAX_DELAY) / 2), false),
+            fps(MIN_DELAY, false),
+          ]}
           onChange={handleSpeedChange}
           onInput={handleInputOutput}
           value={props.speed}

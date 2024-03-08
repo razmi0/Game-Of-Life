@@ -30,3 +30,10 @@ export const getIndexFromCoords = (data: IndexFromCoordsData) => {
   const { x, y, rowSize, cellSize } = data;
   return Math.floor(x / cellSize) * rowSize + Math.floor(y / cellSize);
 };
+
+export const fps = (speed: number, showUnit: boolean = true) => {
+  const strShowUnit = showUnit ? " fps" : "";
+  if (speed === 0) return "max" + strShowUnit;
+  const lbl = 1000 / speed;
+  return lbl > 200 ? "> 200" + strShowUnit : Math.floor(lbl) + strShowUnit;
+};
