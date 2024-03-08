@@ -15,17 +15,18 @@ import Drawer from "./components/Drawer";
 import { BATTERY_REFRESH_INTERVAL } from "./data";
 import { unwrap } from "solid-js/store";
 
-let canvas: HTMLCanvasElement;
+let boardRef: HTMLCanvasElement;
+let gridRef: HTMLCanvasElement;
 
 const App = () => {
-  const [ctx, setCtx] = createSignal<CanvasRenderingContext2D>();
+  const [boardCtx, setBoardCtx] = createSignal<CanvasRenderingContext2D>();
+  const [gridCtx, setGridCtx] = createSignal<CanvasRenderingContext2D>();
   const [hasStarted, setHasStarted] = createSignal(false);
 
-  const grid = useGrid(ctx); // context candidate
+  const grid = useGrid(gridCtx);
   const boardData = useBoardData();
   const color = useColors(grid.nCell);
-
-  const hash = useHash(grid, boardData, color, ctx);
+  const hash = useHash(grid, boardData, color, boardCtx);
   const painter = usePainter(hash.paintCell);
 
   const run = () => {
@@ -34,7 +35,6 @@ const App = () => {
     hash.drawHash();
     boardData.incrementGeneration();
   };
-
   const gameLoop = useTimer(run);
 
   const applyColors = () => {
@@ -58,10 +58,11 @@ const App = () => {
   batteryTimer.switchPlayPause(); // start the battery checking clock
 
   onMount(() => {
-    setCtx(canvas.getContext("2d")!);
-    painter.setCanvasRef(canvas);
-    grid.drawGrid();
+    setBoardCtx(boardRef.getContext("2d")!);
+    setGridCtx(gridRef.getContext("2d")!);
+    painter.setCanvasRef(boardRef);
     hash.drawAllHash();
+    grid.drawGrid();
   });
 
   const gridInfo = createMemo(() => {
@@ -84,10 +85,10 @@ const App = () => {
             Draw grid
           </SimpleButton>
           <div class="flex flex-col gap-1">
-            <SimpleButton handler={grid.changeSpacing(1)} class="border-dw-100 border-2 rounded-md">
+            <SimpleButton handler={() => grid.changeSpacing(1)} class="border-dw-100 border-2 rounded-md">
               Add spacing
             </SimpleButton>
-            <SimpleButton handler={grid.changeSpacing(-1)} class="border-dw-100 border-2 rounded-md">
+            <SimpleButton handler={() => grid.changeSpacing(-1)} class="border-dw-100 border-2 rounded-md">
               Remove spacing
             </SimpleButton>
           </div>
@@ -148,11 +149,19 @@ const App = () => {
         navigator={navInfo()}
         gridInfo={gridInfo()}
       />
+      {/* BOARD */}
       <canvas
-        style={`background-color : ${color.backgroundColor()}`}
+        style={`background-color : ${color.backgroundColor()};`}
         width={grid.wW()}
         height={grid.wH()}
-        ref={canvas}
+        ref={boardRef}
+      ></canvas>
+      {/* GRID */}
+      <canvas
+        style={`background-color : transparent; position : absolute;`}
+        width={grid.wW()}
+        height={grid.wH()}
+        ref={gridRef}
       ></canvas>
     </>
   );
