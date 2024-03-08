@@ -42,7 +42,10 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
   };
 
   const toggleVisibility = () => {
-    setGridSpacing("visibility", !gridSpacing.visibility);
+    const newVisibility = !gridSpacing.visibility;
+    setGridSpacing("visibility", newVisibility);
+    newVisibility ? setGridSpacing("gridColor", DEFAULT_GRID_COLOR) : setGridSpacing("gridColor", "transparent");
+    drawGrid();
   };
 
   const changeCellSize = (addSize: number) => {
