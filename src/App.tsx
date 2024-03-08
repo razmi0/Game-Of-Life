@@ -12,8 +12,9 @@ import useAgent from "./hooks/useAgent";
 import { SimpleButton } from "./components/Buttons";
 import DebuggerPanel from "./components/DebuggerPanel";
 import Drawer from "./components/Drawer";
-import { BATTERY_REFRESH_INTERVAL } from "./data";
+import { BATTERY_REFRESH_INTERVAL, STEP_SPACING } from "./data";
 import { unwrap } from "solid-js/store";
+import Separator from "./components/Drawer/Separator";
 
 let boardRef: HTMLCanvasElement;
 let gridRef: HTMLCanvasElement;
@@ -75,9 +76,10 @@ const App = () => {
     <>
       <Show when={import.meta.env.DEV && debug}>
         <DebuggerPanel>
-          <p>
-            Grid color : {grid.gridSpacing.gridColor} Spacing : {grid.gridSpacing.spacing}
-          </p>
+          <div>
+            <p>Grid color : {grid.gridSpacing.gridColor}</p>
+            <p>Spacing : {grid.gridSpacing.spacing} </p>
+          </div>
           <SimpleButton class="border-dw-100 border-2 rounded-md" handler={grid.toggleVisibility}>
             Visibility : {grid.gridSpacing.visibility.toString()}
           </SimpleButton>
@@ -85,10 +87,22 @@ const App = () => {
             Draw grid
           </SimpleButton>
           <div class="flex flex-col gap-1">
-            <SimpleButton handler={() => grid.changeSpacing(1)} class="border-dw-100 border-2 rounded-md">
+            <SimpleButton
+              handler={() => {
+                grid.changeSpacing(STEP_SPACING);
+                grid.drawGrid();
+              }}
+              class="border-dw-100 border-2 rounded-md"
+            >
               Add spacing
             </SimpleButton>
-            <SimpleButton handler={() => grid.changeSpacing(-1)} class="border-dw-100 border-2 rounded-md">
+            <SimpleButton
+              handler={() => {
+                grid.changeSpacing(-STEP_SPACING);
+                grid.drawGrid();
+              }}
+              class="border-dw-100 border-2 rounded-md"
+            >
               Remove spacing
             </SimpleButton>
           </div>
