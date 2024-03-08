@@ -16,36 +16,6 @@ const nRowInit = Math.floor(window.innerHeight / INITIAL_CELL_SIZE) + 1;
 const nColInit = Math.floor(window.innerWidth / INITIAL_CELL_SIZE) + 1;
 const nCellInit = nRowInit * nColInit;
 
-export type GridHook = {
-  nRow: Accessor<number>;
-  nCol: Accessor<number>;
-  nCell: Accessor<number>;
-  wW: Accessor<number>;
-  wH: Accessor<number>;
-  /** ACTIONS */
-  drawGrid: () => void;
-  toggleVisibility: () => void;
-  tuneSpacing: (newSpacing: number) => void;
-  changeSpacing: (addSpacing: number) => void;
-  /** STORE */
-  sizes: Prettify<{
-    cell: number;
-    changeCellSize: (addSize: number) => void;
-    tuneCellSize: (newSize: number) => void;
-  }>;
-  shape: Prettify<{
-    DEFAULT_SHAPES: ["square", "circle"];
-    selectedShape: "square" | "circle";
-    /** ACTIONS */
-    setSquare: () => void;
-    setCircle: () => void;
-  }>;
-  gridSpacing: Prettify<{
-    visibility: boolean;
-    spacing: number;
-    gridColor: string;
-  }>;
-};
 export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefined>) {
   const [wW, setWW] = createSignal(window.innerWidth);
   const [wH, setWH] = createSignal(window.innerHeight);
@@ -53,7 +23,6 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
   const [nCol, setnCol] = createSignal(nColInit);
   const [nCell, setnCell] = createSignal(nCellInit);
 
-  /** gridSpacing */
   const [gridSpacing, setGridSpacing] = createStore({
     visibility: true,
     spacing: DEFAULT_SPACING,
@@ -89,7 +58,7 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
   /** shape */
   const [shape, setShape] = createStore({
     DEFAULT_SHAPES: ["square", "circle"],
-    selectedShape: "square",
+    selectedShape: "square" as "square" | "circle",
     setSquare: () => {
       setShape("selectedShape", "square");
     },
@@ -99,14 +68,11 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
   });
 
   const calcnRow = createMemo(() => {
-    // wee add the gridSpacing to the cellSize to avoid a bug where the grid is not drawn
     setnRow(Math.floor(wH() / sizes.cell) + 1);
-    // setnRow(Math.floor(wH() / cellSize()) + 1);
   });
 
   const calcnCol = createMemo(() => {
     setnCol(Math.floor(wW() / sizes.cell) + 1);
-    // setnCol(Math.floor(wW() / cellSize()) + 1);
   });
 
   const calcnCell = createMemo(() => {
@@ -116,6 +82,7 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
   const drawGrid = () => {
     const context = ctx();
     if (!context) return;
+    context.clearRect(0, 0, wW(), wH());
     context.beginPath();
     context.lineWidth = gridSpacing.spacing;
     context.strokeStyle = gridSpacing.gridColor;
@@ -130,16 +97,6 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
     context.stroke();
   };
 
-  // const changeCellSize = (addSize: number) => {
-  //   const newSize = cellSize() + addSize;
-  //   if (newSize < MIN_CELL_SIZE || newSize > MAX_CELL_SIZE) return;
-  //   setCellSize(newSize);
-  // };
-
-  // const tuneCellSize = (newSize: number) => {
-  //   setCellSize(newSize);
-  // };
-
   const updateSizes = debounce(() => {
     batch(() => {
       setWW(window.innerWidth);
@@ -149,6 +106,7 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
       calcnRow();
       calcnCol();
       calcnCell();
+      drawGrid();
     });
   }, DEBOUNCING_DELAY);
 
@@ -171,5 +129,5 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
     toggleVisibility,
     tuneSpacing,
     changeSpacing,
-  } as Prettify<GridHook>;
+  }; // as Prettify<GridHook>
 }
