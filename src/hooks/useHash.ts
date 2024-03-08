@@ -9,8 +9,8 @@ type Hash8 = Prettify<Hash8Type>;
 
 export default function useHash(
   grid: ReturnType<typeof import("./useGrid").default>,
-  data: DataStore,
-  color: ColorHook,
+  data: ReturnType<typeof import("./useBoardData").default>,
+  color: ReturnType<typeof import("./useColors").default>,
   ctx: Accessor<CanvasRenderingContext2D | undefined>
 ) {
   const [isWorkingOnHash, setIsWorkingOnHash] = createSignal(false);
