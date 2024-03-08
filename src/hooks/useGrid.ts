@@ -23,8 +23,10 @@ export type GridHook = {
   wW: Accessor<number>;
   wH: Accessor<number>;
   /** ACTIONS */
-  toggleGrid: () => void;
   drawGrid: () => void;
+  toggleVisibility: () => void;
+  tuneSpacing: (newSpacing: number) => void;
+  changeSpacing: (addSpacing: number) => void;
   /** STORE */
   sizes: Prettify<{
     cell: number;
@@ -42,9 +44,6 @@ export type GridHook = {
     visibility: boolean;
     spacing: number;
     gridColor: string;
-    toggleVisibility: () => void;
-    tuneSpacing: (newSpacing: number) => void;
-    changeSpacing: (addSpacing: number) => void;
   }>;
 };
 export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefined>) {
@@ -59,18 +58,21 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
     visibility: true,
     spacing: DEFAULT_SPACING,
     gridColor: "#FFFFFF",
-    tuneSpacing: (newSpacing: number) => {
-      setGridSpacing("spacing", newSpacing);
-    },
-    changeSpacing: (addSpacing: number) => {
-      const newSpacing = gridSpacing.spacing + addSpacing;
-      if (newSpacing < MIN_SPACING || newSpacing > MAX_SPACING) return;
-      setGridSpacing("spacing", newSpacing);
-    },
-    toggleVisibility: () => {
-      setGridSpacing("visibility", !gridSpacing.visibility);
-    },
   });
+
+  const tuneSpacing = (newSpacing: number) => {
+    setGridSpacing("spacing", newSpacing);
+  };
+
+  const changeSpacing = (addSpacing: number) => {
+    const newSpacing = gridSpacing.spacing + addSpacing;
+    if (newSpacing < MIN_SPACING || newSpacing > MAX_SPACING) return;
+    setGridSpacing("spacing", newSpacing);
+  };
+
+  const toggleVisibility = () => {
+    setGridSpacing("visibility", !gridSpacing.visibility);
+  };
 
   const [sizes, setSizes] = createStore({
     cell: INITIAL_CELL_SIZE,
@@ -166,5 +168,8 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
     shape,
     gridSpacing,
     drawGrid,
+    toggleVisibility,
+    tuneSpacing,
+    changeSpacing,
   } as Prettify<GridHook>;
 }

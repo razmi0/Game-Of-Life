@@ -59,7 +59,7 @@ const App = () => {
     setCtx(canvas.getContext("2d")!);
     painter.setCanvasRef(canvas);
     grid.drawGrid();
-    run();
+    hash.drawAllHash();
   });
 
   const gridInfo = createMemo(() => {
@@ -72,18 +72,23 @@ const App = () => {
     <>
       <Show when={import.meta.env.DEV && debug}>
         <DebuggerPanel>
-          <SimpleButton handler={run}>run hash</SimpleButton>
-          <SimpleButton handler={gameLoop.switchPlayPause}>{gameLoop.play ? "pause" : "play"}</SimpleButton>
-          <SimpleButton
-            handler={() => {
-              console.log("cells : ", grid.nCell());
-              console.log("rows : ", grid.nRow());
-              console.log("cols : ", grid.nCol());
-            }}
-          >
-            log
+          <p>
+            Grid color : {grid.gridSpacing.gridColor} Spacing : {grid.gridSpacing.spacing}
+          </p>
+          <SimpleButton class="border-dw-100 border-2 rounded-md" handler={grid.toggleVisibility}>
+            Visibility : {grid.gridSpacing.visibility.toString()}
           </SimpleButton>
-          <SimpleButton handler={() => console.log(unwrap(color.palette))}>log palette</SimpleButton>
+          <SimpleButton handler={grid.drawGrid} class="border-dw-100 border-2 rounded-md">
+            Draw grid
+          </SimpleButton>
+          <div class="flex flex-col gap-1">
+            <SimpleButton handler={grid.changeSpacing(1)} class="border-dw-100 border-2 rounded-md">
+              Add spacing
+            </SimpleButton>
+            <SimpleButton handler={grid.changeSpacing(-1)} class="border-dw-100 border-2 rounded-md">
+              Remove spacing
+            </SimpleButton>
+          </div>
         </DebuggerPanel>
       </Show>
       <Drawer
@@ -103,9 +108,9 @@ const App = () => {
         setShapeCircle={grid.shape.setCircle}
         gridVisibility={grid.gridSpacing.visibility}
         cellSpacing={grid.gridSpacing.spacing}
-        tuneGridSpacing={grid.gridSpacing.tuneSpacing}
-        changeGridSpacing={grid.gridSpacing.changeSpacing}
-        toggleGridVisibility={grid.toggleGrid}
+        tuneGridSpacing={grid.tuneSpacing}
+        changeGridSpacing={grid.changeSpacing}
+        toggleGridVisibility={grid.toggleVisibility}
         /** gameLoop */
         speed={gameLoop.speed}
         play={gameLoop.play}
