@@ -147,3 +147,20 @@ input[type="color" i].input-color-rounded-full:focus {
   border: 1px solid transparent;
   border-bottom: 1px solid transparent !important;
 }
+
+.animate-scale {
+  animation: scale 0.2s;
+  animation-iteration-count: 1;
+}
+
+@keyframes scale {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
