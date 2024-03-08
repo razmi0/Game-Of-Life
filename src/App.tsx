@@ -172,7 +172,7 @@ const App = () => {
       ></canvas>
       {/* GRID */}
       <canvas
-        style={`background-color : transparent; position : absolute;`}
+        style={`background-color : transparent; position : absolute; pointer-events : none;`}
         width={grid.wW()}
         height={grid.wH()}
         ref={gridRef}
