@@ -1,4 +1,4 @@
-import { Tools } from "./hooks/usePainter";
+import type { Tools } from "./hooks/usePainter";
 
 export type PaintCellType = {
   x: number;
