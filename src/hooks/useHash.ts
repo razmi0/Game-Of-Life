@@ -1,4 +1,4 @@
-import { batch, createEffect } from "solid-js";
+import { batch, createEffect, createSignal, onMount } from "solid-js";
 import { getCoordsFromIndex, getIndexFromCoords } from "../helpers";
 import type { Accessor } from "solid-js";
 import type { GridHook } from "./useGrid";
@@ -10,10 +10,12 @@ type Hash8 = Prettify<Hash8Type>;
 
 export default function useHash(
   grid: GridHook,
-  data: Prettify<DataStore>,
+  data: DataStore,
   color: ColorHook,
   ctx: Accessor<CanvasRenderingContext2D | undefined>
 ) {
+  const [isWorkingOnHash, setIsWorkingOnHash] = createSignal(false);
+
   const initHash = () => new Uint8Array(grid.nCell()).map(() => (data.randomChoice() ? 1 : 0)) as Hash8;
 
   let hash = initHash();
@@ -217,5 +219,14 @@ export default function useHash(
     }
   });
 
-  return { updateHash, drawHash, resetHash, paintCell, drawAllHash, resetBlankHash };
+  return {
+    updateHash,
+    drawHash,
+    resetHash,
+    paintCell,
+    drawAllHash,
+    resetBlankHash,
+    isWorkingOnHash,
+    setIsWorkingOnHash,
+  };
 }

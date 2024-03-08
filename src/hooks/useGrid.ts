@@ -86,23 +86,6 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
     },
   });
 
-  const drawGrid = () => {
-    const context = ctx();
-    if (!context) return;
-    context.beginPath();
-    context.lineWidth = gridSpacing.spacing;
-    context.strokeStyle = gridSpacing.gridColor;
-    for (let i = 0; i < wW(); i += sizes.cell) {
-      context.moveTo(i, 0);
-      context.lineTo(i, wH());
-    }
-    for (let i = 0; i < wH(); i += sizes.cell) {
-      context.moveTo(0, i);
-      context.lineTo(wW(), i);
-    }
-    context.stroke();
-  };
-
   /** shape */
   const [shape, setShape] = createStore({
     DEFAULT_SHAPES: ["square", "circle"],
@@ -129,6 +112,23 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
   const calcnCell = createMemo(() => {
     setnCell(nRow() * nCol());
   });
+
+  const drawGrid = () => {
+    const context = ctx();
+    if (!context) return;
+    context.beginPath();
+    context.lineWidth = gridSpacing.spacing;
+    context.strokeStyle = gridSpacing.gridColor;
+    for (let i = 0; i < wW(); i += sizes.cell) {
+      context.moveTo(i, 0);
+      context.lineTo(i, wH());
+    }
+    for (let i = 0; i < wH(); i += sizes.cell) {
+      context.moveTo(0, i);
+      context.lineTo(wW(), i);
+    }
+    context.stroke();
+  };
 
   // const changeCellSize = (addSize: number) => {
   //   const newSize = cellSize() + addSize;

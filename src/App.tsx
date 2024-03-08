@@ -1,7 +1,7 @@
 // AUTHOR : ANAS ABOU ALAIWI
 // EMAIL : ANAS.ABOUALAIWI at GMAIL dot COM
 
-import { onMount, createSignal, Show, createMemo } from "solid-js";
+import { onMount, createSignal, Show, createMemo, createEffect } from "solid-js";
 import useGrid from "./hooks/useGrid";
 import useHash from "./hooks/useHash";
 import useColors from "./hooks/useColors";
@@ -44,8 +44,10 @@ const App = () => {
 
   const reset = () => {
     setHasStarted(false);
+    hash.setIsWorkingOnHash(true);
     if (gameLoop.play) gameLoop.switchPlayPause();
     hash.resetHash();
+    hash.setIsWorkingOnHash(false);
     boardData.resetGeneration();
   };
 
