@@ -53,6 +53,8 @@ Age => color
 - [ ] (#20) Refacto resize so extended on the canva plane (currently resize is just working on the array length so past hash is compacted or extended)
 - [ ] (#21) Find a way to implement loader when hash running
 - [ ] (#22) hook useOnResize ? currently
+- [ ] (#23) replace cell size by buttons
+- [ ] (#24) remove randomness to a default value 80% ?
 
 #### DONE
 
@@ -64,3 +66,7 @@ Age => color
 - [x] (#13) tortue/escargot lapin icon pour speed range
 - [x] (#16) stats => add cell size
 - [x] (#19) Refactor if Nparam > 2 => use object
+
+#### RESOURCES
+
+<svg class="pointer-events-none fixed inset-0 bottom-0 left-0 right-0 top-0 -z-50 min-h-full min-w-full overflow-x-hidden overflow-y-hidden bg-white/10 opacity-5"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="4" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter><rect width="100%" height="100%" filter="url(#noise)"></rect></svg>
