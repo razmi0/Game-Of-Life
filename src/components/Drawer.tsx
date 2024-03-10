@@ -27,60 +27,21 @@ import Icon from "./Icons";
 import { fps } from "../helpers";
 import useShorcuts, { type Shortcut } from "../hooks/useShorcuts";
 import type { Accessor, ParentComponent } from "solid-js";
-import type { Tools } from "../hooks/usePainter";
 import type { StatsTooltipData } from "./Drawer/Tooltips";
 
 type DrawerProps = {
-  /** STATES */
-  hasStarted: boolean;
-  play: boolean;
-  speed: number;
-  randomness: number;
-  generation: number;
-  nAlive: number;
-  nDead: number;
-  navigator: UserAgentInfo | null;
-  cellSize: number;
-  gridInfo: { width: number; height: number };
-  penSize: number;
-  paintingState: boolean;
-  selectedTool: Tools;
-  palette: string[];
-  maxColors: number;
-  penColor: string;
-  backgroundColor: string;
-  shape: "square" | "circle";
-  gridVisibility: boolean;
-  cellSpacing: number;
-  seeCorpse: boolean;
-  /** ACTIONS */
+  boardData: ReturnType<typeof import("../hooks/useBoardData").default>;
+  grid: ReturnType<typeof import("../hooks/useGrid").default>;
+  gameLoop: ReturnType<typeof import("../hooks/useTimer").default>;
+  painter: ReturnType<typeof import("../hooks/usePainter").default>;
+  color: ReturnType<typeof import("../hooks/useColors").default>;
+  /** misc */
   reset: () => void;
-  changeSpeed: (newTime: number) => void;
-  changeRandom: (newRandom: number) => void;
-  changeCellSize: (newSize: number) => void;
-  tuneRandom: (newRandom: number) => void;
-  tuneSpeed: (newSpeed: number) => void;
-  tuneCellSize: (newSize: number) => void;
-  switchPlayPause: () => void;
-  switchPainting: () => void;
-  tunePenSize: (newSize: number) => void;
-  changePenSize: (newSize: number) => void;
-  setEraser: () => void;
-  setPen: () => void;
-  unsetTool: () => void;
-  addColor: (color: string) => void;
-  patchColor: (color: string, index: number) => void;
-  removeColor: (index: number) => void;
   applyColors: () => void;
-  changePenColor: (color: string) => void;
-  changeBackgroundColor: (color: string) => void;
-  setShapeSquare: () => void;
-  setShapeCircle: () => void;
-  toggleCorpse: () => void;
-  toggleGridVisibility: () => void;
-  changeGridSpacing: (addSpacing: number) => void;
+  hasStarted: boolean;
+  navigator: UserAgentInfo;
+  gridInfo: { width: number; height: number };
 };
-
 const { xs, sm, md, lg, xl } = ICON_SIZE;
 
 export default function Drawer(props: Prettify<DrawerProps>) {
@@ -92,7 +53,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   const shorcuts: Shortcut[] = [
     {
       key: " ",
-      action: () => props.switchPlayPause(),
+      action: () => props.gameLoop.switchPlayPause(),
       // prevented: true,
     },
     {
@@ -101,27 +62,27 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     },
     {
       key: "z",
-      action: () => props.changeCellSize(CELL_SIZE_STEP),
+      action: () => props.grid.changeCellSize(CELL_SIZE_STEP),
     },
     {
       key: "s",
-      action: () => props.changeCellSize(-CELL_SIZE_STEP),
+      action: () => props.grid.changeCellSize(-CELL_SIZE_STEP),
     },
     {
       key: "ArrowUp",
-      action: () => props.changeSpeed(DELAY_STEP),
+      action: () => props.gameLoop.changeSpeed(DELAY_STEP),
     },
     {
       key: "ArrowDown",
-      action: () => props.changeSpeed(-DELAY_STEP),
+      action: () => props.gameLoop.changeSpeed(-DELAY_STEP),
     },
     {
       key: "ArrowRight",
-      action: () => props.changeRandom(RANDOM_STEP),
+      action: () => props.boardData.changeRandom(RANDOM_STEP),
     },
     {
       key: "ArrowLeft",
-      action: () => props.changeRandom(-RANDOM_STEP),
+      action: () => props.boardData.changeRandom(-RANDOM_STEP),
     },
     {
       key: "a",
@@ -131,17 +92,17 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   ];
   useShorcuts(shorcuts);
 
-  const playPauseText = () => (props.play ? "pause" : "play");
+  const playPauseText = () => (props.gameLoop.play ? "pause" : "play");
   const PlayPauseIcon = () => (
-    <Show when={props.play} fallback={<Icon width={ICON_SIZE.xl} name="play" />}>
+    <Show when={props.gameLoop.play} fallback={<Icon width={ICON_SIZE.xl} name="play" />}>
       <Icon width={ICON_SIZE.xl} name="pause" />
     </Show>
   );
 
   const PaintingTooltip = () => {
-    const [output, setOutput] = createSignal(props.penSize);
+    const [output, setOutput] = createSignal(props.painter.penSize());
 
-    createEffect(() => setOutput(props.penSize));
+    createEffect(() => setOutput(props.painter.penSize()));
 
     const handleInputOutput = (e: Event) => {
       setOutput((e.target as HTMLInputElement).valueAsNumber);
@@ -149,40 +110,40 @@ export default function Drawer(props: Prettify<DrawerProps>) {
 
     const handlePenSizeChange = (e: Event) => {
       const newSize = (e.target as HTMLInputElement).valueAsNumber;
-      props.tunePenSize(newSize);
+      props.painter.tunePenSize(newSize);
     };
 
     const handlePenClick = () => {
       if (isPen()) {
-        props.unsetTool();
+        props.painter.unsetTool();
       } else {
-        props.setPen();
+        props.painter.setPen();
       }
       togglePainting();
     };
 
     const togglePainting = () => {
-      if ((isPen() || isErase()) && !props.paintingState) {
-        props.switchPainting();
+      if ((isPen() || isErase()) && !props.painter.userPaint()) {
+        props.painter.switchPainting();
       }
     };
 
     const handleEraserClick = () => {
       if (isErase()) {
-        props.unsetTool();
+        props.painter.unsetTool();
       } else {
-        props.setEraser();
+        props.painter.setEraser();
       }
       togglePainting();
     };
 
     const handlePenColorChange = (e: Event) => {
       const val = (e.target as HTMLInputElement).value;
-      props.changePenColor(val);
+      props.painter.setPenColor(val);
     };
 
-    const isErase = () => props.selectedTool === "eraser";
-    const isPen = () => props.selectedTool === "pen";
+    const isErase = () => props.painter.tool() === "eraser";
+    const isPen = () => props.painter.tool() === "pen";
 
     return (
       <div class="flex flex-col gap-0 mt-3 min-w-40">
@@ -206,7 +167,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
               id="color_brush"
               label="pen color"
               hiddenLabel
-              value={props.penColor}
+              value={props.painter.penColor()}
               onChange={handlePenColorChange}
               class="input-color-rounded-full w-6 h-6"
             />
@@ -214,19 +175,29 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         </div>
         <p class="my-1">brush size : </p>
         <div class="flex gap-0 items-start">
-          <IconButton width={md} name="minus_circle" class="mb-5" onClick={() => props.changePenSize(-PEN_SIZE_STEP)} />
+          <IconButton
+            width={md}
+            name="minus_circle"
+            class="mb-5"
+            onClick={() => props.painter.changePenSize(-PEN_SIZE_STEP)}
+          />
           <SimpleRange
             milestones={[MIN_PEN_SIZE, Math.floor((MIN_PEN_SIZE + MAX_PEN_SIZE) / 2), MAX_PEN_SIZE]}
             onChange={handlePenSizeChange}
             onInput={handleInputOutput}
-            value={props.penSize}
+            value={props.painter.penSize()}
             min={MIN_PEN_SIZE}
             max={MAX_PEN_SIZE}
             aria="pen-size"
             class="w-56"
             step={PEN_SIZE_STEP}
           />
-          <IconButton width={md} name="plus_circle" class="mb-5" onClick={() => props.changePenSize(PEN_SIZE_STEP)} />
+          <IconButton
+            width={md}
+            name="plus_circle"
+            class="mb-5"
+            onClick={() => props.painter.changePenSize(PEN_SIZE_STEP)}
+          />
           <div class="translate-y-[1px] text-yellow-400 text-sm font-bold h-full w-10 tabular-nums text-right">
             {output()}
           </div>
@@ -250,13 +221,13 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     return (
       <div class="flex flex-row gap-3 mt-3 min-w-48 justify-between h-full">
         <ColorSection>
-          <For each={props.palette}>
+          <For each={props.color.palette}>
             {(color, i) => {
               const id = `color_${i()}`;
 
               const changeColor = (e: Event) => {
                 const newColor = (e.target as HTMLInputElement).value;
-                props.patchColor(newColor, i());
+                props.color.patchColor(newColor, i());
               };
 
               return (
@@ -271,7 +242,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
                       hiddenLabel
                     />
                     <IconButton
-                      onClick={() => props.removeColor(i())}
+                      onClick={() => props.color.removeColor(i())}
                       width={sm}
                       name="minus_circle"
                       class="border-[1px] border-dw-100 rounded-b-md hover:bg-dw-300 w-7 h-7 flex items-center justify-center" //
@@ -282,10 +253,10 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             }}
           </For>
           <div class="h-full flex-grow"></div>
-          <Show when={props.palette.length < props.maxColors}>
+          <Show when={props.color.palette.length < props.color.maxColors}>
             <IconButton
               onClick={() => {
-                props.addColor(newColor());
+                props.color.addColor(newColor());
                 setNewColor(newColor());
               }}
               name="plus_circle"
@@ -304,8 +275,8 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         <InputColor
           id="background_color"
           label="background color"
-          value={props.backgroundColor}
-          onChange={(e) => props.changeBackgroundColor((e.target as HTMLInputElement).value)}
+          value={props.color.backgroundColor()}
+          onChange={(e) => props.color.setBackgroundColor((e.target as HTMLInputElement).value)}
           class="input-color-rounded-full w-6 h-6"
           hiddenLabel
         />
@@ -314,14 +285,14 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   };
 
   const DeadVisibility = () => {
-    const isVisible = () => props.seeCorpse;
+    const isVisible = () => props.color.seeCorpse();
 
     return (
       <div class="flex flex-col gap-1 h-full w-full min-w-48 mt-3">
         <div class="flex flex-row w-full items-center justify-between">
           <label classList={{ ["text-yellow-400 text-sm "]: isVisible() }}>Colorize</label>
           <IconButton
-            onClick={props.toggleCorpse}
+            onClick={props.color.toggleCorpse}
             width={md}
             name="skull"
             class="hover:bg-dw-300 p-1 rounded-full"
@@ -333,15 +304,15 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   };
 
   const ShapeTooltip = () => {
-    const isSquare = () => props.shape === "square";
-    const isCircle = () => props.shape === "circle";
+    const isSquare = () => props.grid.shape.selectedShape === "square";
+    const isCircle = () => props.grid.shape.selectedShape === "circle";
 
     return (
       <div class="flex flex-col gap-1 h-full w-full min-w-48 mt-3">
         <div class="flex flex-row w-full items-center justify-between">
           <span classList={{ ["text-yellow-400 text-sm "]: isSquare() }}>Square</span>
           <IconButton
-            onClick={props.setShapeSquare}
+            onClick={props.grid.setSquare}
             width={md}
             name="square_shape"
             class="hover:bg-dw-300 p-1 rounded-full"
@@ -351,7 +322,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         <div class="flex flex-row w-full items-center justify-between">
           <span classList={{ ["text-yellow-400 text-sm "]: isCircle() }}>Circle</span>
           <IconButton
-            onClick={props.setShapeCircle}
+            onClick={props.grid.setCircle}
             width={md}
             name="circle_shape"
             class="hover:bg-dw-300 p-1 rounded-full"
@@ -363,9 +334,9 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   };
 
   const CellSizeTooltip = () => {
-    const [output, setOutput] = createSignal(props.cellSize + "px");
+    const [output, setOutput] = createSignal(props.grid.cellSize + "px");
 
-    createEffect(() => setOutput(props.cellSize + "px"));
+    createEffect(() => setOutput(props.grid.cellSize + "px"));
 
     /** UI (onInput) */
     const handleInputOutput = (e: Event) => {
@@ -376,14 +347,14 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     /** internal logic (onChange) */
     const handleCellSizeChange = (e: Event) => {
       const newSize = (e.target as HTMLInputElement).valueAsNumber;
-      props.tuneCellSize(newSize);
+      props.grid.tuneCellSize(newSize);
     };
 
     return (
       <div class="flex flex-col gap-2 mt-3 min-w-48">
         <div class="flex gap-2 items-start">
           <IconButton
-            onClick={() => props.changeCellSize(-CELL_SIZE_STEP)}
+            onClick={() => props.grid.changeCellSize(-CELL_SIZE_STEP)}
             width={lg}
             name="two_by_two_squares"
             class="mb-5"
@@ -392,7 +363,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             milestones={[MIN_CELL_SIZE, Math.floor((MIN_CELL_SIZE + MAX_CELL_SIZE) / 2), MAX_CELL_SIZE]}
             onChange={handleCellSizeChange}
             onInput={handleInputOutput}
-            value={props.cellSize}
+            value={props.grid.cellSize()}
             min={MIN_CELL_SIZE}
             max={MAX_CELL_SIZE}
             aria="cell-size"
@@ -400,7 +371,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             step={CELL_SIZE_STEP}
           />
           <IconButton
-            onClick={() => props.changeCellSize(CELL_SIZE_STEP)}
+            onClick={() => props.grid.changeCellSize(CELL_SIZE_STEP)}
             width={lg}
             name="two_by_three_squares"
             class="mb-5 rotate-90"
@@ -415,9 +386,9 @@ export default function Drawer(props: Prettify<DrawerProps>) {
 
   const fpsOutputOptions = { showUnit: true, digits: 2 };
   const SpeedTooltip = () => {
-    const [output, setOutput] = createSignal(fps(props.speed, fpsOutputOptions));
+    const [output, setOutput] = createSignal(fps(props.gameLoop.speed, fpsOutputOptions));
 
-    createEffect(() => setOutput(fps(props.speed, fpsOutputOptions)));
+    createEffect(() => setOutput(fps(props.gameLoop.speed, fpsOutputOptions)));
 
     const handleInputOutput = (e: Event) => {
       setOutput(fps((e.target as HTMLInputElement).valueAsNumber, fpsOutputOptions));
@@ -425,14 +396,14 @@ export default function Drawer(props: Prettify<DrawerProps>) {
 
     const handleSpeedChange = (e: Event) => {
       const newSpeed = (e.target as HTMLInputElement).valueAsNumber;
-      props.tuneSpeed(newSpeed);
+      props.gameLoop.tuneSpeed(newSpeed);
     };
 
     const fpsMilestonesOptions = { showUnit: false };
 
     return (
       <div class="mt-3 flex items-center min-w-48">
-        <IconButton onClick={() => props.changeSpeed(DELAY_STEP)} width={md} name="snail" class="mb-5 me-2" />
+        <IconButton onClick={() => props.gameLoop.changeSpeed(DELAY_STEP)} width={md} name="snail" class="mb-5 me-2" />
         <SimpleRange
           milestones={[
             fps(MAX_DELAY, fpsMilestonesOptions),
@@ -441,14 +412,14 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           ]}
           onChange={handleSpeedChange}
           onInput={handleInputOutput}
-          value={props.speed}
+          value={props.gameLoop.speed}
           max={MAX_DELAY}
           min={MIN_DELAY}
           class="w-56 rotate-180"
           aria="speed"
           step={DELAY_STEP}
         />
-        <IconButton onClick={() => props.changeSpeed(-DELAY_STEP)} width={md} name="hare" class="mb-5 ms-2" />
+        <IconButton onClick={() => props.gameLoop.changeSpeed(-DELAY_STEP)} width={md} name="hare" class="mb-5 ms-2" />
         <div class="whitespace-nowrap text-yellow-400 text-sm font-bold translate-y-[-9px] h-full w-20 tabular-nums text-right">
           {output()}
         </div>
@@ -457,13 +428,13 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   };
 
   const RandomTooltip = () => {
-    const [output, setOutput] = createSignal<string>(props.randomness + " %");
+    const [output, setOutput] = createSignal<string>(props.boardData.randomness + " %");
 
-    createEffect(() => setOutput(props.randomness + " %"));
+    createEffect(() => setOutput(props.boardData.randomness + " %"));
 
     const handleRandomChange = (e: Event) => {
       const newRandom = (e.target as HTMLInputElement).valueAsNumber;
-      props.tuneRandom(newRandom);
+      props.boardData.tuneRandom(newRandom);
     };
 
     const handleInputOutput = (e: Event) => {
@@ -474,19 +445,19 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     return (
       <div class="flex flex-col gap-2 mt-3 min-w-48">
         <div class="flex gap-2 items-start ">
-          <IconButton onClick={() => props.changeRandom(-RANDOM_STEP)} width={md} name="baby" class="mb-5" />
+          <IconButton onClick={() => props.boardData.changeRandom(-RANDOM_STEP)} width={md} name="baby" class="mb-5" />
           <SimpleRange
             milestones={[MIN_ALIVE_RANDOM, Math.floor((MIN_ALIVE_RANDOM + MAX_ALIVE_RANDOM) / 2), MAX_ALIVE_RANDOM]}
             onChange={handleRandomChange}
             onInput={handleInputOutput}
-            value={props.randomness}
+            value={props.boardData.randomness}
             min={MIN_ALIVE_RANDOM}
             max={MAX_ALIVE_RANDOM}
             aria="randomness"
             class="w-56"
             step={RANDOM_STEP}
           />
-          <IconButton onClick={() => props.changeRandom(RANDOM_STEP)} width={md} name="skull" class="mb-5" />
+          <IconButton onClick={() => props.boardData.changeRandom(RANDOM_STEP)} width={md} name="skull" class="mb-5" />
           <div class="translate-y-[1px] text-yellow-400 text-sm font-bold h-full w-10 tabular-nums text-right">
             {output()}
           </div>
@@ -498,29 +469,31 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   const boardStats: Accessor<StatsTooltipData[]> = createMemo(() => [
     {
       label: "generation",
-      value: props.generation,
+      value: props.boardData.generation,
     },
     {
       label: "cell size",
-      value: props.cellSize + "px",
+      value: props.grid.cellSize() + "px",
       separator: true,
     },
     {
       label: "delay",
-      value: `${props.speed}ms (${fps(props.speed, { showUnit: true, digits: 1 })})`,
+      value: `${props.gameLoop.speed}ms (${fps(props.gameLoop.speed, { showUnit: true, digits: 1 })})`,
     },
     {
       label: "randomness",
-      value: props.randomness + " %",
+      value: props.boardData.randomness + " %",
       separator: true,
     },
     {
       label: "total cells",
-      value: props.nAlive + props.nDead,
+      value: props.boardData.nAlive + props.boardData.nDead,
     },
     {
       label: "alive cells",
-      value: `${props.nAlive} (${Math.floor((props.nAlive / (props.nAlive + props.nDead)) * 100)}%)`,
+      value: `${props.boardData.nAlive} (${Math.floor(
+        (props.boardData.nAlive / (props.boardData.nAlive + props.boardData.nDead)) * 100
+      )}%)`,
     },
   ]);
 
@@ -561,7 +534,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Separator />
       <Group>
         <Item
-          onClick={props.switchPlayPause}
+          onClick={props.gameLoop.switchPlayPause}
           tooltip={
             <StandardTooltip
               title={<TooltipTitle title={playPauseText()} keyCmd="spacebar" class="w-fit flex-col" />}
@@ -605,7 +578,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Separator />
       <Group>
         <Item
-          indicator={props.penSize}
+          indicator={props.painter.penSize()}
           tooltip={
             <StandardTooltip title="painting tools">
               <PaintingTooltip />
@@ -650,7 +623,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Separator />
       <Group>
         <Item
-          indicator={props.cellSize}
+          indicator={props.grid.cellSize()}
           tooltip={
             <StandardTooltip title={<TooltipTitle title="cell size" keyCmd="key Z/S" />}>
               <p>change the size of the cells</p>

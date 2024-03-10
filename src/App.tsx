@@ -1,7 +1,4 @@
-// AUTHOR : ANAS ABOU ALAIWI
-// EMAIL : ANAS.ABOUALAIWI at GMAIL dot COM
-
-import { onMount, createSignal, Show, createMemo, createEffect } from "solid-js";
+import { onMount, createSignal, Show, createMemo } from "solid-js";
 import useGrid from "./hooks/useGrid";
 import useHash from "./hooks/useHash";
 import useColors from "./hooks/useColors";
@@ -13,8 +10,6 @@ import { SimpleButton } from "./components/Buttons";
 import DebuggerPanel from "./components/DebuggerPanel";
 import Drawer from "./components/Drawer";
 import { BATTERY_REFRESH_INTERVAL, STEP_SPACING } from "./data";
-import { unwrap } from "solid-js/store";
-import Separator from "./components/Drawer/Separator";
 
 let boardRef: HTMLCanvasElement;
 let gridRef: HTMLCanvasElement;
@@ -109,54 +104,13 @@ const App = () => {
         </DebuggerPanel>
       </Show>
       <Drawer
-        /** boardData */
-        generation={boardData.generation}
-        nAlive={boardData.nAlive}
-        nDead={boardData.nDead}
-        randomness={boardData.randomness}
-        tuneRandom={boardData.tuneRandom}
-        changeRandom={boardData.changeRandom}
-        /** grid */
-        cellSize={grid.cellSize()}
-        tuneCellSize={grid.tuneCellSize}
-        changeCellSize={grid.changeCellSize}
-        shape={grid.shape.selectedShape}
-        setShapeSquare={grid.setSquare}
-        setShapeCircle={grid.setCircle}
-        gridVisibility={grid.gridSpacing.visibility}
-        cellSpacing={grid.gridSpacing.spacing}
-        changeGridSpacing={grid.changeSpacing}
-        toggleGridVisibility={grid.toggleVisibility}
-        /** gameLoop */
-        speed={gameLoop.speed}
-        play={gameLoop.play}
-        tuneSpeed={gameLoop.tuneSpeed}
-        changeSpeed={gameLoop.changeSpeed}
-        switchPlayPause={gameLoop.switchPlayPause}
-        /** painter */
-        selectedTool={painter.tool()}
-        setEraser={painter.setEraser}
-        setPen={painter.setPen}
-        unsetTool={painter.unsetTool}
-        paintingState={painter.userPaint()}
-        switchPainting={painter.switchPainting}
-        penSize={painter.penSize()}
-        tunePenSize={painter.tunePenSize}
-        changePenSize={painter.changePenSize}
-        penColor={painter.penColor()}
-        changePenColor={painter.setPenColor}
-        /** colors */
-        palette={color.palette}
-        maxColors={color.maxColors}
-        addColor={color.addColor}
-        patchColor={color.patchColor}
-        removeColor={color.removeColor}
+        boardData={boardData}
+        grid={grid}
+        gameLoop={gameLoop}
+        painter={painter}
+        color={color}
         applyColors={applyColors}
-        backgroundColor={color.backgroundColor()}
-        changeBackgroundColor={color.setBackgroundColor}
-        seeCorpse={color.seeCorpse()}
-        toggleCorpse={color.toggleCorpse}
-        /** hash & misc */
+        /** misc */
         reset={reset}
         hasStarted={hasStarted()}
         navigator={navInfo()}
