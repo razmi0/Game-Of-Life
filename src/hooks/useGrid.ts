@@ -32,8 +32,10 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
     lastGridColor: DEFAULT_GRID_COLOR,
   });
 
-  const tuneSpacing = (newSpacing: number) => {
-    setGridSpacing("spacing", newSpacing);
+  const chooseGridColor = (color: string) => {
+    setGridSpacing("gridColor", color);
+    setGridSpacing("lastGridColor", color);
+    drawGrid();
   };
 
   const changeSpacing = (addSpacing: number) => {
@@ -59,17 +61,18 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
     setCellSize(newSize);
   };
 
-  /** shape */
   const [shape, setShape] = createStore({
     DEFAULT_SHAPES: ["square", "circle"],
     selectedShape: "square" as "square" | "circle",
-    setSquare: () => {
-      setShape("selectedShape", "square");
-    },
-    setCircle: () => {
-      setShape("selectedShape", "circle");
-    },
   });
+
+  const setSquare = () => {
+    setShape("selectedShape", "square");
+  };
+
+  const setCircle = () => {
+    setShape("selectedShape", "circle");
+  };
 
   const calcnRow = createMemo(() => {
     setnRow(Math.floor(wH() / cellSize()) + 1);
@@ -125,11 +128,13 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
     wH,
     cellSize,
     /** ACTIONS & STORE */
-    shape,
-    gridSpacing,
     drawGrid,
+    shape,
+    setSquare,
+    setCircle,
+    gridSpacing,
+    chooseGridColor,
     toggleVisibility,
-    tuneSpacing,
     changeSpacing,
     tuneCellSize,
     changeCellSize,

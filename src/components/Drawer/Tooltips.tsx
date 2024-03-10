@@ -16,18 +16,17 @@ type StatsTooltipProps = {
 
 const StandardTooltip: Component<StandardTooltipProps> = (props) =>
   // prettier-ignore
-  <div class={`flex h-fit w-fit py-3 px-4 bg-dw-500 flex-col rounded-md ${props.class || ""}`}> 
+  <div class={`flex h-fit w-fit flex-col tooltip pb-3 gap-3 ${props.class || ""}`}> 
       <Show when={!!props.title}>
-        <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-1 text-dw-200">{props.title}</h4>
-        <Separator class="w-full h-[1px]"/>
+        <h4 class="flex items-center justify-between w-full uppercase monserrat tracking-widest text-xs font-bold text-dw-200 border-b border-b-dw-300 min-h-10 px-3">{props.title}</h4>
       </Show>
       <Show when={!!props.children}>
-      <div class={`text-balance h-full w-full ${props.innerContentClass || ""}`}>{props.children}</div></Show>
+      <div class={`text-balance h-full w-full px-3 ${props.innerContentClass || ""}`}>{props.children}</div></Show>
     </div>;
 
 export const StatsTooltip: Component<StatsTooltipProps> = (props) => {
   return (
-    <div class="flex flex-col p-5 w-fit bg-dw-500 min-w-72 rounded-md">
+    <div class="flex flex-col w-fit min-w-72 tooltip">
       <Show when={!!props.title}>
         <div class="flex flex-row justify-between">
           <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>

@@ -36,6 +36,12 @@
   margin: 1rem 0;
 }
 
+.tooltip {
+  @apply bg-dw-500 rounded-md border-[1px] border-dw-300;
+}
+/* border-solid border-dw-100;
+  border-width: 1px; */
+
 span,
 p {
   z-index: 1;

@@ -78,7 +78,6 @@ type DrawerProps = {
   setShapeCircle: () => void;
   toggleCorpse: () => void;
   toggleGridVisibility: () => void;
-  tuneGridSpacing: (newSpacing: number) => void;
   changeGridSpacing: (addSpacing: number) => void;
 };
 
@@ -94,7 +93,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     {
       key: " ",
       action: () => props.switchPlayPause(),
-      prevented: true,
+      // prevented: true,
     },
     {
       key: "r",
@@ -575,7 +574,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         <Item
           tooltip={
             <>
-              <StandardTooltip title={<TooltipTitle title="reset" keyCmd="key R" />} class="gap-1">
+              <StandardTooltip title={<TooltipTitle title="reset" keyCmd="key R" />}>
                 <div class="flex w-full justify-center items-center">
                   <p class="min-w-48">reset to a new original fresh random game</p>
                   <SimpleButton class="h-fit" handler={props.reset}>
