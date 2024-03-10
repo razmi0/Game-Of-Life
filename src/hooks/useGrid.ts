@@ -42,6 +42,7 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
     const newSpacing = gridSpacing.spacing + addSpacing;
     if (newSpacing < MIN_SPACING || newSpacing > MAX_SPACING) return;
     setGridSpacing("spacing", newSpacing);
+    drawGrid();
   };
 
   const toggleVisibility = () => {

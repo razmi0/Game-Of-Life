@@ -81,11 +81,13 @@ const App = () => {
           <SimpleButton handler={grid.drawGrid} class="border-dw-100 border-2 rounded-md">
             Draw grid
           </SimpleButton>
+          <SimpleButton handler={hash.drawAllHash} class="border-dw-100 border-2 rounded-md">
+            drawAllHash
+          </SimpleButton>
           <div class="flex flex-col gap-1">
             <SimpleButton
               handler={() => {
                 grid.changeSpacing(STEP_SPACING);
-                grid.drawGrid();
               }}
               class="border-dw-100 border-2 rounded-md"
             >
@@ -112,6 +114,7 @@ const App = () => {
         applyColors={applyColors}
         /** misc */
         reset={reset}
+        drawAllHash={hash.drawAllHash}
         hasStarted={hasStarted()}
         navigator={navInfo()}
         gridInfo={gridInfo()}

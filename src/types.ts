@@ -2,7 +2,8 @@ type DrawShapeType = {
   context: CanvasRenderingContext2D;
   x: number;
   y: number;
-  cellSize: number;
+  w: number;
+  h: number;
 };
 
 type UserAgentInfo = {

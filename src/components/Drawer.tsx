@@ -38,6 +38,7 @@ type DrawerProps = {
   /** misc */
   reset: () => void;
   applyColors: () => void;
+  drawAllHash: () => void;
   hasStarted: boolean;
   navigator: UserAgentInfo;
   gridInfo: { width: number; height: number };
@@ -307,12 +308,22 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     const isSquare = () => props.grid.shape.selectedShape === "square";
     const isCircle = () => props.grid.shape.selectedShape === "circle";
 
+    const switchToSquare = () => {
+      props.grid.setSquare();
+      props.drawAllHash();
+    };
+
+    const switchToCircle = () => {
+      props.grid.setCircle();
+      props.drawAllHash();
+    };
+
     return (
       <div class="flex flex-col gap-1 h-full w-full min-w-48 mt-3">
         <div class="flex flex-row w-full items-center justify-between">
           <span classList={{ ["text-yellow-400 text-sm "]: isSquare() }}>Square</span>
           <IconButton
-            onClick={props.grid.setSquare}
+            onClick={switchToSquare}
             width={md}
             name="square_shape"
             class="hover:bg-dw-300 p-1 rounded-full"
@@ -322,7 +333,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         <div class="flex flex-row w-full items-center justify-between">
           <span classList={{ ["text-yellow-400 text-sm "]: isCircle() }}>Circle</span>
           <IconButton
-            onClick={props.grid.setCircle}
+            onClick={switchToCircle}
             width={md}
             name="circle_shape"
             class="hover:bg-dw-300 p-1 rounded-full"
@@ -334,9 +345,9 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   };
 
   const CellSizeTooltip = () => {
-    const [output, setOutput] = createSignal(props.grid.cellSize + "px");
+    const [output, setOutput] = createSignal(props.grid.cellSize() + "px");
 
-    createEffect(() => setOutput(props.grid.cellSize + "px"));
+    createEffect(() => setOutput(props.grid.cellSize() + "px"));
 
     /** UI (onInput) */
     const handleInputOutput = (e: Event) => {
