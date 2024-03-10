@@ -14,7 +14,7 @@ type ToolTipTitleProps = {
   class?: string;
 };
 export const TooltipTitle = (props: ToolTipTitleProps) => (
-  <div class={`flex flex-row items-center justify-between translate-y-[5px] ${props.class || ""}`}>
+  <div class={`flex flex-row items-center justify-between w-full ${props.class || ""}`}>
     <div>{props.title}</div>
     <Show when={props.keyCmd}>
       <div class="text-3xs flex text-dw-100 gap-1 items-center">{props.keyCmd}</div>

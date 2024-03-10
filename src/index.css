@@ -36,6 +36,12 @@
   margin: 1rem 0;
 }
 
+.tooltip {
+  @apply bg-dw-500 rounded-md border-[1px] border-dw-300;
+}
+/* border-solid border-dw-100;
+  border-width: 1px; */
+
 span,
 p {
   z-index: 1;
@@ -43,57 +49,57 @@ p {
 }
 
 /** */
-
-input[type="color" i]::-webkit-color-swatch-wrapper {
-  @apply rounded-s-md;
-  padding: 0;
-  border: 1px solid #efeff3;
-  border-right: none;
-}
-
-input[type="color" i]::-webkit-color-swatch-wrapper:hover {
-  border: 1px solid transparent;
-  border-right: none;
-}
-
-input[type="color" i]::-webkit-color-swatch-wrapper:focus {
-  border: 1px solid transparent;
-  border-right: none;
-}
-
-/** */
-
-input[type="color" i]::-webkit-color-swatch {
-  @apply rounded-s-md;
-  border: none;
-}
-input[type="color" i]::-webkit-color-swatch:hover {
-  border: 1px solid transparent;
-  border-right: none;
-}
-input[type="color" i]::-webkit-color-swatch:focus {
-  border: 1px solid transparent;
-  border-right: none;
-}
-
-/** */
-
-input[type="color" i] {
-  @apply rounded-s-md;
+input[type="color" i].vanilla {
+  @apply rounded-t-md;
   appearance: none;
   -webkit-appearance: none;
+  /* border: 1px solid #efeff3; */
+  background-color: #b3b3b7;
+  width: 100%;
+}
+
+input[type="color" i].vanilla:hover {
+  border: 1px solid transparent;
+  border-bottom: none;
+}
+
+input[type="color" i].vanilla:focus {
+  border: 1px solid transparent;
+  border-bottom: none;
+}
+
+input[type="color" i]::-webkit-color-swatch-wrapper.vanilla {
+  @apply rounded-t-md;
+  border: 1px solid #efeff3;
   border: none;
 }
 
-input[type="color" i]:hover {
+input[type="color" i]::-webkit-color-swatch-wrapper.vanilla:hover {
   border: 1px solid transparent;
-  border-right: none;
+  border-bottom: none;
 }
 
-input[type="color" i]:focus {
+input[type="color" i]::-webkit-color-swatch-wrapper.vanilla:focus {
   border: 1px solid transparent;
-  border-right: none;
+  border-bottom: none;
 }
+
+/** */
+
+input[type="color" i]::-webkit-color-swatch.vanilla {
+  @apply rounded-t-md;
+  border: none;
+}
+input[type="color" i]::-webkit-color-swatch.vanilla:hover {
+  border: 1px solid transparent;
+  border-bottom: none;
+}
+input[type="color" i]::-webkit-color-swatch.vanilla:focus {
+  border: 1px solid transparent;
+  border-bottom: none;
+}
+
+/** */
 
 /** ROUNDED-FULL */
 
@@ -101,17 +107,17 @@ input[type="color" i]::-webkit-color-swatch-wrapper.input-color-rounded-full {
   @apply rounded-full;
   padding: 0;
   border: 1px solid #efeff3;
-  border-right: 1px solid #efeff3;
+  border-bottom: 1px solid #efeff3 !important;
 }
 
 input[type="color" i]::-webkit-color-swatch-wrapper.input-color-rounded-full:hover {
   border: 1px solid transparent;
-  border-right: 1px solid transparent;
+  border-bottom: 1px solid transparent !important;
 }
 
 input[type="color" i]::-webkit-color-swatch-wrapper.input-color-rounded-full:focus {
   border: 1px solid transparent;
-  border-right: 1px solid transparent;
+  border-bottom: 1px solid transparent !important;
 }
 
 /** */
@@ -122,11 +128,11 @@ input[type="color" i]::-webkit-color-swatch.input-color-rounded-full {
 }
 input[type="color" i]::-webkit-color-swatch.input-color-rounded-full:hover {
   border: 1px solid transparent;
-  border-right: 1px solid transparent;
+  border-bottom: 1px solid transparent !important;
 }
 input[type="color" i]::-webkit-color-swatch.input-color-rounded-full:focus {
   border: 1px solid transparent;
-  border-right: 1px solid transparent;
+  border-bottom: 1px solid transparent !important;
 }
 
 /** */
@@ -135,16 +141,32 @@ input[type="color" i].input-color-rounded-full {
   @apply rounded-full;
   appearance: none;
   -webkit-appearance: none;
-  border: none;
-  border-right: 1px solid transparent;
+  background-color: #b3b3b7;
 }
 
 input[type="color" i].input-color-rounded-full:hover {
   border: 1px solid transparent;
-  border-right: 1px solid transparent;
+  border-bottom: 1px solid transparent !important;
 }
 
 input[type="color" i].input-color-rounded-full:focus {
   border: 1px solid transparent;
-  border-right: 1px solid transparent;
+  border-bottom: 1px solid transparent !important;
+}
+
+.animate-scale {
+  animation: scale 0.2s;
+  animation-iteration-count: 1;
+}
+
+@keyframes scale {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
 }

@@ -94,7 +94,7 @@ const Tooltip = (props: TooltipProps) => {
 
   return (
     <div
-      class="fixed flex transition-opacity"
+      class="fixed flex transition-opacity "
       style={`transform: translate(${spacing()}px, -${offsetY()}px);`}
       classList={{ ["opacity-0"]: !show(), ["opacity-100"]: show() }}
       onMouseEnter={[setOpen, true]}
@@ -114,9 +114,7 @@ const Tooltip = (props: TooltipProps) => {
         >
           <Icon name="caret" width={30} />
         </div>
-        <div class="w-full bg-dw-500" style={`min-height: ${itemSize.height}px `}>
-          {props.children}
-        </div>
+        {props.children}
       </Show>
     </div>
   );
@@ -163,22 +161,14 @@ type LeftProps = {
   children: JSX.Element;
 };
 const Left = (props: LeftProps) => {
-  return (
-    <Show when={props.show}>
-      <div>{props.children}</div>
-    </Show>
-  );
+  return <Show when={props.show}>{props.children}</Show>;
 };
 type ChildProps = {
   show?: boolean;
   children: JSX.Element;
 };
 const Child = (props: ChildProps) => {
-  return (
-    <Show when={props.show}>
-      <div>{props.children}</div>
-    </Show>
-  );
+  return <Show when={props.show}>{props.children}</Show>;
 };
 
 //#endregion members
