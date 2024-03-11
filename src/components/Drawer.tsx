@@ -413,7 +413,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     return (
       <div class="flex flex-col justify-center w-full gap-2">
         <p>Cell size : </p>
-        <div class="flex items-center">
+        <div class="flex items-center ">
           <IconComponentButton onClick={decreaseCellSize}>
             <MinusCircleIcon
               width={xl}
@@ -431,7 +431,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           </IconComponentButton>
         </div>
         <p>Grid spacing : </p>
-        <div class="flex items-center justify-start">
+        <div class="flex items-center ">
           <IconComponentButton onClick={decreaseGridSpacing}>
             <MinusCircleIcon
               width={xl}
@@ -687,7 +687,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           tooltip={
             <StandardTooltip title={<TooltipTitle title="shape" />}>
               <div class="flex flex-col justify-center">
-                <p class="min-w-32 h-fit mb-2">Cell shape : </p>
+                <p class="h-fit mb-2">Cell shape : </p>
                 <ShapeTooltip />
               </div>
             </StandardTooltip>

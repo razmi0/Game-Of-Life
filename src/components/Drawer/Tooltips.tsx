@@ -16,7 +16,7 @@ type StatsTooltipProps = {
 
 const StandardTooltip: Component<StandardTooltipProps> = (props) =>
   // prettier-ignore
-  <div class={`flex h-fit w-fit flex-col tooltip pb-3 gap-3 ${props.class || ""}`}> 
+  <div class={`flex flex-col tooltip pb-3 gap-3 ${props.class || ""}`}> 
       <Show when={!!props.title}>
         <h4 class="flex items-center justify-between w-full uppercase monserrat tracking-widest text-xs font-bold text-dw-200 border-b border-b-dw-300 min-h-10 px-3">{props.title}</h4>
       </Show>
