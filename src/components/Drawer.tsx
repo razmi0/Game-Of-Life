@@ -396,19 +396,18 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       const newUpperCellSizeBoundary = props.grid.cellSize() + CELL_SIZE_STEP;
       const newLowerCellSizeBoundary = props.grid.cellSize() - CELL_SIZE_STEP;
 
-      setAllowed(
-        "increaseGridSpacing",
-        newUpperSpacingBoundary >= props.grid.cellSize() || newUpperSpacingBoundary > MAX_SPACING ? false : true
-      );
-      setAllowed("decreaseGridSpacing", newLowerSpacingBoundary >= MIN_SPACING ? true : false);
+      const canIncreaseGridSpacing =
+        newUpperSpacingBoundary < props.grid.cellSize() && newUpperSpacingBoundary <= MAX_SPACING;
+      const canDecreaseGridSpacing = newLowerSpacingBoundary >= MIN_SPACING;
 
-      setAllowed(
-        "decreaseCellSize",
-        newLowerCellSizeBoundary <= props.grid.gridSpacing.spacing || newLowerCellSizeBoundary < MIN_CELL_SIZE
-          ? false
-          : true
-      );
-      setAllowed("increaseCellSize", newUpperCellSizeBoundary > MAX_CELL_SIZE ? false : true);
+      const canDecreaseCellSize =
+        newLowerCellSizeBoundary > props.grid.gridSpacing.spacing && newLowerCellSizeBoundary >= MIN_CELL_SIZE;
+      const canIncreaseCellSize = newUpperCellSizeBoundary <= MAX_CELL_SIZE;
+
+      setAllowed("increaseGridSpacing", canIncreaseGridSpacing);
+      setAllowed("decreaseGridSpacing", canDecreaseGridSpacing);
+      setAllowed("decreaseCellSize", canDecreaseCellSize);
+      setAllowed("increaseCellSize", canIncreaseCellSize);
     });
 
     return (
