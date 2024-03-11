@@ -16,6 +16,7 @@ type ItemProps = {
   onHover?: () => void;
   tooltip?: JSX.Element;
   showTooltipOnClick?: boolean;
+  yes?: boolean;
 };
 
 const Item: Component<Prettify<ItemProps>> = (props) => {
@@ -50,7 +51,7 @@ const Item: Component<Prettify<ItemProps>> = (props) => {
         <Child show={hasChildren}>{props.children}</Child>
         <Right show={hasRight}>{props.right}</Right>
 
-        <Tooltip when={hovering() && hasChildren && hasTooltip} itemRef={itemRef!}>
+        <Tooltip yes={props.yes} when={hovering() && hasChildren && hasTooltip} itemRef={itemRef!}>
           {props.tooltip}
         </Tooltip>
       </div>
@@ -65,12 +66,13 @@ type TooltipProps = {
   when: boolean;
   itemRef: HTMLDivElement;
   showCaret?: boolean;
+  yes?: boolean;
 };
 const Tooltip = (props: TooltipProps) => {
   const [open, setOpen] = createSignal(false);
   const [itemSize, setItemSize] = createStore({ width: 0, height: 0 });
   const [tooltipSize, setTooltipSize] = createStore({ width: 0, height: 0 });
-  const show = () => props.when || open();
+  const show = () => props.when || open() || props.yes;
 
   let tooltipRef: HTMLDivElement;
 

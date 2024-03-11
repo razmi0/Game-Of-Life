@@ -50,6 +50,37 @@
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
+/* .animate-wave {
+  box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.1);
+} */
+
+.ant-wave {
+  position: absolute;
+  background: 0 0;
+  pointer-events: none;
+  box-sizing: border-box;
+  color: var(--wave-color, #3e4554);
+  box-shadow: 0 0 0 0 currentColor;
+  opacity: 0.2;
+}
+/* ant-wave wave-motion-appear wave-motion-appear-active wave-motion */
+/* left: -1px; top: -1px; width: 128px; height: 32px; border-radius: 6px; --wave-color: rgb(64, 150, 255); */
+
+.ant-wave.wave-motion-appear {
+  --cb-ease-out: cubic-bezier(0.08, 0.82, 0.17, 1);
+  transition: box-shadow 0.4s cubic-bezier(0.08, 0.82, 0.17, 1), opacity 2s cubic-bezier(0.08, 0.82, 0.17, 1);
+}
+
+.ant-wave.wave-motion-appear-active {
+  box-shadow: 0 0 0 6px currentColor;
+  opacity: 0;
+}
+
+.ant-wave.wave-motion-appear.wave-quick {
+  --cb-ease-in-out: cubic-bezier(0.78, 0.14, 0.15, 0.86)
+  transition: box-shadow 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86), opacity 0.35s cubic-bezier(0.78, 0.14, 0.15, 0.86);
+}
+
 span,
 p {
   z-index: 1;
@@ -160,21 +191,4 @@ input[type="color" i].input-color-rounded-full:hover {
 input[type="color" i].input-color-rounded-full:focus {
   border: 1px solid transparent;
   border-bottom: 1px solid transparent !important;
-}
-
-.animate-scale {
-  animation: scale 0.2s;
-  animation-iteration-count: 1;
-}
-
-@keyframes scale {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(0.9);
-  }
-  100% {
-    transform: scale(1);
-  }
 }

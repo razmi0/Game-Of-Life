@@ -17,7 +17,7 @@ import {
   RANDOM_STEP,
   STEP_SPACING,
 } from "../data";
-import { IconButton, IconComponentButton, SimpleButton } from "./Buttons";
+import { ComposedButton, IconButton, IconComponentButton, SimpleButton } from "./Buttons";
 import Wrapper from "./Drawer/Content";
 import Group from "./Drawer/Group";
 import Header, { TooltipTitle } from "./Drawer/Headers";
@@ -448,13 +448,20 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             />
           </IconComponentButton>
         </div>
-        <SimpleButton handler={toggleVisibility}>
+        <ComposedButton
+          handler={toggleVisibility}
+          left={
+            <Show when={props.grid.gridSpacing.visibility} fallback={<Icon name="eye_closed" width={lg} />}>
+              <Icon name="eye_open" width={lg} />
+            </Show>
+          }
+        >
           <span class="whitespace-nowrap font-bold">
             <Show when={props.grid.gridSpacing.visibility} fallback={"Show grid"}>
               Hide grid
             </Show>
           </span>
-        </SimpleButton>
+        </ComposedButton>
       </div>
     );
   };
@@ -700,6 +707,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Group>
         <Item
           showTooltipOnClick
+          yes
           indicator={props.grid.cellSize()}
           tooltip={
             <StandardTooltip title={<TooltipTitle title="sizes" />}>
