@@ -112,7 +112,7 @@ const Tooltip = (props: TooltipProps) => {
         `}
           class="-z-10 grid items-center"
         >
-          <Icon name="caret" width={30} />
+          {/* <Icon name="caret" width={30} /> */}
         </div>
         {props.children}
       </Show>
