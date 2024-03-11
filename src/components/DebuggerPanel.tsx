@@ -8,7 +8,7 @@ type DebuggerPanelProps = {
 };
 
 const DebuggerPanel = (props: DebuggerPanelProps) => {
-  const [open, setOpen] = createSignal(true);
+  const [open, setOpen] = createSignal(false);
 
   return (
     <div class="absolute top-0 right-0 m-5 z-50">
