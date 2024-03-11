@@ -1,10 +1,7 @@
 import { Show, createSignal, createEffect, onMount } from "solid-js";
-import { BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP, SHOW_TOOLTIP_DEBUG, TOOLTIP_SPACING } from "../../data";
 import { createStore } from "solid-js/store";
-import Icon from "../Icons";
-import type { JSX, Component } from "solid-js";
-import Draggable from "../Draggable/Draggable";
-import { ICON_SIZE } from "../../data/index";
+import { SHOW_TOOLTIP_DEBUG, TOOLTIP_SPACING } from "../../data";
+import type { JSX, Component, JSXElement } from "solid-js";
 
 type ItemProps = {
   children?: JSX.Element;
@@ -76,10 +73,10 @@ const Tooltip = (props: TooltipProps) => {
 
   createEffect(() => {
     if (show()) {
-      if (props.itemRef) {
+      if (props.itemRef && !itemSize.width && !itemSize.height) {
         setItemSize({ width: props.itemRef.offsetWidth, height: props.itemRef.offsetHeight });
       }
-      if (tooltipRef) {
+      if (tooltipRef && !tooltipSize.width && !tooltipSize.height) {
         setTooltipSize({ width: tooltipRef.offsetWidth, height: tooltipRef.offsetHeight });
       }
     }
@@ -102,20 +99,31 @@ const Tooltip = (props: TooltipProps) => {
       ref={(el) => (tooltipRef = el)}
     >
       <Show when={show()}>
-        <div
-          // SAFE AREA
-          style={`
-          height : ${tooltipSize.height}px;
-          width: ${TOOLTIP_SPACING}px;
-          pointer-events: none;
-          background-color: ${BG_COLOR_DEBUG_SAFE_AREA_TOOLTIP};
-        `}
-          class="-z-10 grid items-center"
-        >
-          {/* <Icon name="caret" width={30} /> */}
-        </div>
+        <SafeArea width={TOOLTIP_SPACING} height={tooltipSize.height} />
         {props.children}
       </Show>
+    </div>
+  );
+};
+type SafeAreaProps = {
+  width: number;
+  height: number;
+  color?: string;
+  children?: JSXElement;
+};
+
+const SafeArea = (props: SafeAreaProps) => {
+  return (
+    <div
+      style={`
+          height : ${props.height}px;
+          width: ${props.width}px;
+          background-color: ${props.color ?? "transparent"};
+          pointer-events: none;
+        `}
+      class="-z-10 grid items-center"
+    >
+      {props.children}
     </div>
   );
 };
