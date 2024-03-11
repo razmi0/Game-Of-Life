@@ -11,7 +11,11 @@ type IconButtonProps = IconProps & {
 
 export const IconButton = (props: IconButtonProps) => {
   return (
-    <button onClick={props.onClick} class={"flex gap-2 " + props.class || ""} classList={props.classList || {}}>
+    <button
+      onClick={props.onClick}
+      class={"flex gap-2 cursor-pointer" + props.class || ""}
+      classList={props.classList || {}}
+    >
       <Icon width={props.width} height={props.height} color={props.color} style={props.style} name={props.name} />
       {props.children}
     </button>

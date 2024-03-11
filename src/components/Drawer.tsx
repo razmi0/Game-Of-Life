@@ -13,6 +13,7 @@ import {
   MIN_PEN_SIZE,
   PEN_SIZE_STEP,
   RANDOM_STEP,
+  STEP_SPACING,
 } from "../data";
 import { IconButton, SimpleButton } from "./Buttons";
 import Wrapper from "./Drawer/Content";
@@ -319,7 +320,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     };
 
     return (
-      <div class="flex flex-col gap-1 h-full w-full min-w-48 mt-3">
+      <div class="flex flex-col h-full w-full min-w-32">
         <div class="flex flex-row w-full items-center justify-between">
           <span classList={{ ["text-yellow-400 text-sm "]: isSquare() }}>Square</span>
           <IconButton
@@ -344,53 +345,68 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     );
   };
 
-  const CellSizeTooltip = () => {
-    const [output, setOutput] = createSignal(props.grid.cellSize() + "px");
-
-    createEffect(() => setOutput(props.grid.cellSize() + "px"));
-
-    /** UI (onInput) */
-    const handleInputOutput = (e: Event) => {
-      const newSize = (e.target as HTMLInputElement).valueAsNumber;
-      setOutput(newSize + "px");
+  const SizesTooltip = () => {
+    const drawBothCanvas = () => {
+      props.drawAllHash();
+      props.grid.drawGrid();
     };
 
-    /** internal logic (onChange) */
-    const handleCellSizeChange = (e: Event) => {
-      const newSize = (e.target as HTMLInputElement).valueAsNumber;
-      props.grid.tuneCellSize(newSize);
+    const addSize = () => {
+      props.grid.changeCellSize(CELL_SIZE_STEP);
+      drawBothCanvas();
+    };
+
+    const removeSize = () => {
+      props.grid.changeCellSize(-CELL_SIZE_STEP);
+      drawBothCanvas();
+    };
+
+    const toggleVisibility = () => {
+      props.grid.toggleVisibility();
+      drawBothCanvas();
+    };
+
+    const addSpacing = () => {
+      props.grid.changeSpacing(STEP_SPACING);
+      props.grid.drawGrid();
+    };
+
+    const removeSpacing = () => {
+      props.grid.changeSpacing(-STEP_SPACING);
+      props.grid.drawGrid();
     };
 
     return (
-      <div class="flex flex-col gap-2 mt-3 min-w-48">
-        <div class="flex gap-2 items-start">
-          <IconButton
-            onClick={() => props.grid.changeCellSize(-CELL_SIZE_STEP)}
-            width={lg}
-            name="two_by_two_squares"
-            class="mb-5"
-          />
-          <SimpleRange
-            milestones={[MIN_CELL_SIZE, Math.floor((MIN_CELL_SIZE + MAX_CELL_SIZE) / 2), MAX_CELL_SIZE]}
-            onChange={handleCellSizeChange}
-            onInput={handleInputOutput}
-            value={props.grid.cellSize()}
-            min={MIN_CELL_SIZE}
-            max={MAX_CELL_SIZE}
-            aria="cell-size"
-            class="w-56"
-            step={CELL_SIZE_STEP}
-          />
-          <IconButton
-            onClick={() => props.grid.changeCellSize(CELL_SIZE_STEP)}
-            width={lg}
-            name="two_by_three_squares"
-            class="mb-5 rotate-90"
-          />
-          <div class="translate-y-[1px] text-yellow-400 text-sm font-bold h-full w-16 tabular-nums text-right">
-            {output()}
+      <div class="flex flex-col justify-center w-full gap-2">
+        <p>Cell size : </p>
+        <div class="flex items-center">
+          <IconButton onClick={removeSize} name="minus_circle" width={xl} />
+          <div class="text-yellow-400 text-sm font-bold h-full w-16 tabular-nums whitespace-nowrap text-center">
+            {props.grid.cellSize() + " px"}
           </div>
+          <IconButton onClick={addSize} name="plus_circle" width={xl} />
         </div>
+        <p>Grid spacing : </p>
+        <div class="flex items-center justify-start">
+          <IconButton onClick={removeSpacing} name="minus_circle" width={xl} />
+          <div class="text-yellow-400 text-sm font-bold h-full w-16 tabular-nums text-center whitespace-nowrap">
+            {props.grid.gridSpacing.spacing + " px"}
+          </div>
+          <IconButton onClick={addSpacing} name="plus_circle" width={xl} />
+        </div>
+        <SimpleButton handler={toggleVisibility}>
+          <span
+            class="whitespace-nowrap  font-bold"
+            classList={{
+              ["text-red-500"]: props.grid.gridSpacing.visibility,
+              ["text-green-500"]: !props.grid.gridSpacing.visibility,
+            }}
+          >
+            <Show when={props.grid.gridSpacing.visibility} fallback={"Show grid"}>
+              Hide grid
+            </Show>
+          </span>
+        </SimpleButton>
       </div>
     );
   };
@@ -599,7 +615,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
           <Icon width={xl} name="painting_tools" />
         </Item>
         <Item
-          showTooltipOnClick
           tooltip={
             <StandardTooltip title="color palette" class="h-full" innerContentClass="flex flex-col justify-between">
               <p>paint the whole board with an unlimited set of colors : </p>
@@ -623,8 +638,10 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         <Item
           tooltip={
             <StandardTooltip title={<TooltipTitle title="shape" />}>
-              <p>change the shape of the cells and apply it to next generations</p>
-              <ShapeTooltip />
+              <div class="flex flex-col justify-center">
+                <p class="min-w-32 h-fit mb-2">Cell shape : </p>
+                <ShapeTooltip />
+              </div>
             </StandardTooltip>
           }
         >
@@ -636,9 +653,8 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         <Item
           indicator={props.grid.cellSize()}
           tooltip={
-            <StandardTooltip title={<TooltipTitle title="cell size" keyCmd="key Z/S" />}>
-              <p>change the size of the cells</p>
-              <CellSizeTooltip />
+            <StandardTooltip title={<TooltipTitle title="sizes" />}>
+              <SizesTooltip />
             </StandardTooltip>
           }
         >
