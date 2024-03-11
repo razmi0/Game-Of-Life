@@ -2,6 +2,8 @@ import { Show, createSignal, createEffect, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import { SHOW_TOOLTIP_DEBUG, TOOLTIP_SPACING } from "../../data";
 import type { JSX, Component, JSXElement } from "solid-js";
+import { ICON_SIZE } from "../../data/index";
+import Icon from "../Icons";
 
 type ItemProps = {
   children?: JSX.Element;
@@ -62,6 +64,7 @@ type TooltipProps = {
   children?: JSX.Element;
   when: boolean;
   itemRef: HTMLDivElement;
+  showCaret?: boolean;
 };
 const Tooltip = (props: TooltipProps) => {
   const [open, setOpen] = createSignal(false);
@@ -99,7 +102,11 @@ const Tooltip = (props: TooltipProps) => {
       ref={(el) => (tooltipRef = el)}
     >
       <Show when={show()}>
-        <SafeArea width={TOOLTIP_SPACING} height={tooltipSize.height} />
+        <SafeArea width={TOOLTIP_SPACING} height={tooltipSize.height}>
+          <Show when={props.showCaret}>
+            <Icon name="caret" width={ICON_SIZE.xl} />
+          </Show>
+        </SafeArea>
         {props.children}
       </Show>
     </div>
