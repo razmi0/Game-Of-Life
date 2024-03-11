@@ -17,6 +17,8 @@ export type IconNames =
   | "clock"
   | "screen_gear"
   | "reset"
+  | "eye_open"
+  | "eye_closed"
   | "minus_circle"
   | "plus_circle"
   | "pen"
