@@ -1,5 +1,5 @@
-import { JSXElement, createSignal } from "solid-js";
-import Icon, { type IconProps } from "./Icons";
+import { JSXElement, Show, createSignal } from "solid-js";
+import Icon, { OpCircleIconProps, type IconProps, IconComponentNames } from "./Icons";
 import Separator from "./Drawer/Separator";
 
 type IconButtonProps = IconProps & {
@@ -46,6 +46,27 @@ export const SimpleButton = (props: SimpleButtonProps) => {
         {props.children}
       </button>
     </>
+  );
+};
+
+type IconComponentButton = {
+  onClick: () => void;
+  btnClass?: string;
+  children: JSXElement;
+  left?: JSXElement;
+  right?: JSXElement;
+};
+export const IconComponentButton = (props: IconComponentButton) => {
+  return (
+    <button
+      onClick={props.onClick}
+      type="button"
+      class={`flex flex-row whitespace-nowrap items-center justify-evenly ${props.btnClass || ""}`}
+    >
+      <Show when={props.left}>{props.left}</Show>
+      {props.children}
+      <Show when={props.right}>{props.right}</Show>
+    </button>
   );
 };
 
