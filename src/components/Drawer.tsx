@@ -7,15 +7,17 @@ import {
   MAX_CELL_SIZE,
   MAX_DELAY,
   MAX_PEN_SIZE,
+  MAX_SPACING,
   MIN_ALIVE_RANDOM,
   MIN_CELL_SIZE,
   MIN_DELAY,
   MIN_PEN_SIZE,
+  MIN_SPACING,
   PEN_SIZE_STEP,
   RANDOM_STEP,
   STEP_SPACING,
 } from "../data";
-import { IconButton, SimpleButton } from "./Buttons";
+import { IconButton, IconComponentButton, SimpleButton } from "./Buttons";
 import Wrapper from "./Drawer/Content";
 import Group from "./Drawer/Group";
 import Header, { TooltipTitle } from "./Drawer/Headers";
@@ -24,11 +26,13 @@ import Item from "./Drawer/Item";
 import SimpleRange from "./Drawer/Range";
 import Separator from "./Drawer/Separator";
 import { InputColor } from "./Input";
-import Icon from "./Icons";
+import Icon, { MinusCircleIcon, PlusCircleIcon } from "./Icons";
 import { fps } from "../helpers";
 import useShorcuts, { type Shortcut } from "../hooks/useShorcuts";
 import type { Accessor, ParentComponent } from "solid-js";
 import type { StatsTooltipData } from "./Drawer/Tooltips";
+import { createStore } from "solid-js/store";
+import Output from "./Output";
 
 type DrawerProps = {
   boardData: ReturnType<typeof import("../hooks/useBoardData").default>;
@@ -346,17 +350,25 @@ export default function Drawer(props: Prettify<DrawerProps>) {
   };
 
   const SizesTooltip = () => {
+    const [allowed, setAllowed] = createStore({
+      decreaseCellSize: true,
+      increaseCellSize: true,
+      decreaseGridSpacing: true,
+      increaseGridSpacing: true,
+    });
+
     const drawBothCanvas = () => {
       props.drawAllHash();
       props.grid.drawGrid();
     };
 
-    const addSize = () => {
+    const increaseCellSize = () => {
       props.grid.changeCellSize(CELL_SIZE_STEP);
       drawBothCanvas();
     };
 
-    const removeSize = () => {
+    const decreaseCellSize = () => {
+      if (allowed.decreaseCellSize === false) return;
       props.grid.changeCellSize(-CELL_SIZE_STEP);
       drawBothCanvas();
     };
@@ -366,42 +378,79 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       drawBothCanvas();
     };
 
-    const addSpacing = () => {
+    const increaseGridSpacing = () => {
+      if (allowed.increaseGridSpacing === false) return;
       props.grid.changeSpacing(STEP_SPACING);
       props.grid.drawGrid();
     };
 
-    const removeSpacing = () => {
+    const decreaseGridSpacing = () => {
       props.grid.changeSpacing(-STEP_SPACING);
       props.grid.drawGrid();
     };
+
+    createEffect(() => {
+      const newUpperSpacingBoundary = props.grid.gridSpacing.spacing + STEP_SPACING;
+      const newLowerSpacingBoundary = props.grid.gridSpacing.spacing - STEP_SPACING;
+
+      const newUpperCellSizeBoundary = props.grid.cellSize() + CELL_SIZE_STEP;
+      const newLowerCellSizeBoundary = props.grid.cellSize() - CELL_SIZE_STEP;
+
+      setAllowed(
+        "increaseGridSpacing",
+        newUpperSpacingBoundary >= props.grid.cellSize() || newUpperSpacingBoundary > MAX_SPACING ? false : true
+      );
+      setAllowed("decreaseGridSpacing", newLowerSpacingBoundary >= MIN_SPACING ? true : false);
+
+      setAllowed(
+        "decreaseCellSize",
+        newLowerCellSizeBoundary <= props.grid.gridSpacing.spacing || newLowerCellSizeBoundary < MIN_CELL_SIZE
+          ? false
+          : true
+      );
+      setAllowed("increaseCellSize", newUpperCellSizeBoundary > MAX_CELL_SIZE ? false : true);
+    });
 
     return (
       <div class="flex flex-col justify-center w-full gap-2">
         <p>Cell size : </p>
         <div class="flex items-center">
-          <IconButton onClick={removeSize} name="minus_circle" width={xl} />
-          <div class="text-yellow-400 text-sm font-bold h-full w-16 tabular-nums whitespace-nowrap text-center">
-            {props.grid.cellSize() + " px"}
-          </div>
-          <IconButton onClick={addSize} name="plus_circle" width={xl} />
+          <IconComponentButton onClick={decreaseCellSize}>
+            <MinusCircleIcon
+              width={xl}
+              classList={{ ["cursor-not-allowed"]: !allowed.decreaseCellSize }}
+              color={allowed.decreaseCellSize ? undefined : "#FF0000"}
+            />
+          </IconComponentButton>
+          <Output>{props.grid.cellSize() + " px"}</Output>
+          <IconComponentButton onClick={increaseCellSize}>
+            <PlusCircleIcon
+              width={xl}
+              classList={{ ["cursor-not-allowed"]: !allowed.increaseCellSize }}
+              color={allowed.increaseCellSize ? undefined : "#FF0000"}
+            />
+          </IconComponentButton>
         </div>
         <p>Grid spacing : </p>
         <div class="flex items-center justify-start">
-          <IconButton onClick={removeSpacing} name="minus_circle" width={xl} />
-          <div class="text-yellow-400 text-sm font-bold h-full w-16 tabular-nums text-center whitespace-nowrap">
-            {props.grid.gridSpacing.spacing + " px"}
-          </div>
-          <IconButton onClick={addSpacing} name="plus_circle" width={xl} />
+          <IconComponentButton onClick={decreaseGridSpacing}>
+            <MinusCircleIcon
+              width={xl}
+              classList={{ ["cursor-not-allowed"]: !allowed.decreaseGridSpacing }}
+              color={allowed.decreaseGridSpacing ? undefined : "#FF0000"}
+            />
+          </IconComponentButton>
+          <Output>{props.grid.gridSpacing.spacing + " px"}</Output>
+          <IconComponentButton onClick={increaseGridSpacing}>
+            <PlusCircleIcon
+              width={xl}
+              classList={{ ["cursor-not-allowed"]: !allowed.increaseGridSpacing }}
+              color={allowed.increaseGridSpacing ? undefined : "#FF0000"}
+            />
+          </IconComponentButton>
         </div>
         <SimpleButton handler={toggleVisibility}>
-          <span
-            class="whitespace-nowrap  font-bold"
-            classList={{
-              ["text-red-500"]: props.grid.gridSpacing.visibility,
-              ["text-green-500"]: !props.grid.gridSpacing.visibility,
-            }}
-          >
+          <span class="whitespace-nowrap font-bold">
             <Show when={props.grid.gridSpacing.visibility} fallback={"Show grid"}>
               Hide grid
             </Show>
@@ -651,6 +700,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Separator />
       <Group>
         <Item
+          showTooltipOnClick
           indicator={props.grid.cellSize()}
           tooltip={
             <StandardTooltip title={<TooltipTitle title="sizes" />}>
