@@ -35,21 +35,22 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
   const chooseGridColor = (color: string) => {
     setGridSpacing("gridColor", color);
     setGridSpacing("lastGridColor", color);
-    drawGrid();
   };
 
   const changeSpacing = (addSpacing: number) => {
     const newSpacing = gridSpacing.spacing + addSpacing;
     if (newSpacing < MIN_SPACING || newSpacing > MAX_SPACING) return;
+    if (newSpacing === 0) {
+      setGridSpacing("gridColor", "transparent");
+      if (gridSpacing.visibility) setGridSpacing("visibility", false);
+    }
     setGridSpacing("spacing", newSpacing);
-    drawGrid();
   };
 
   const toggleVisibility = () => {
     const newVisibility = !gridSpacing.visibility;
     setGridSpacing("visibility", newVisibility);
     newVisibility ? setGridSpacing("gridColor", gridSpacing.lastGridColor) : setGridSpacing("gridColor", "transparent");
-    drawGrid();
   };
 
   const changeCellSize = (addSize: number) => {
