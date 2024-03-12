@@ -13,7 +13,7 @@ type IconButtonProps = IconProps & {
 export const IconButton = (props: IconButtonProps) => {
   return (
     <button
-      onClick={props.onClick}
+      onClick={() => props.onClick()}
       class={"flex gap-2 cursor-pointer" + props.class || ""}
       classList={props.classList || {}}
     >
@@ -70,8 +70,8 @@ export const SimpleButton = (props: SimpleButtonProps) => {
             ["wave-motion-appear-active"]: active(),
           }}
           class={`conway-wave wave-motion-appear wave-motion rounded-md`}
-          style={`left: -1px; top: -1px; width: ${btnSize.width}px; height: ${btnSize.height}px; `}
-        ></div>
+          style={{ left: "-1px", top: "-1px", width: `${btnSize.width}px`, height: `${btnSize.height}px` }}
+        />
       </div>
     );
   };
@@ -123,7 +123,7 @@ type IconComponentButton = {
 export const IconComponentButton = (props: IconComponentButton) => {
   return (
     <button
-      onClick={props.onClick}
+      onClick={() => props.onClick()}
       type="button"
       class={`flex flex-row whitespace-nowrap items-center justify-evenly ${props.btnClass || ""}`}
     >
