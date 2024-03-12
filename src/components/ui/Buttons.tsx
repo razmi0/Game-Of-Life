@@ -1,7 +1,6 @@
 import { For, JSXElement, Show, createEffect, createSignal, onMount } from "solid-js";
-import Icon, { OpCircleIconProps, type IconProps, IconComponentNames } from "./Icons";
-import Separator from "./Separator";
 import { createStore, produce } from "solid-js/store";
+import Icon, { type IconProps } from "./Icons";
 
 type IconButtonProps = IconProps & {
   onClick: () => void;

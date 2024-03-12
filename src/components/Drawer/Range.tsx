@@ -1,5 +1,4 @@
-import { Component, For, JSXElement, Show, createSignal } from "solid-js";
-import Separator from "../ui/Separator";
+import { For, Show } from "solid-js";
 
 type Milestones = [string | number, string | number, string | number, string | number];
 type MilestoneIndexes = 2 | 3 | 4;
