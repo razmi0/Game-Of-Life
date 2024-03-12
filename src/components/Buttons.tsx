@@ -96,13 +96,18 @@ type ComposedButtonProps = SimpleButtonProps & {
 };
 export const ComposedButton = (props: ComposedButtonProps) => {
   return (
-    <SimpleButton handler={props.handler} class={`flex items-center gap-2 self-end min-w-36  ${props.class || ""}`}>
+    <SimpleButton
+      handler={props.handler}
+      class={`flex items-center self-end min-w-36 child:flex-grow child:flex child:justify-center child:items-center  ${
+        props.class || ""
+      }`}
+    >
       <Show when={props.left}>
-        <div class="flex-grow flex justify-center items-center">{props.left}</div>
+        <div>{props.left}</div>
       </Show>
-      <div class="flex-grow flex justify-center items-center">{props.children}</div>
+      <div>{props.children}</div>
       <Show when={props.right}>
-        <div class="flex-grow flex justify-center items-center">{props.right}</div>
+        <div>{props.right}</div>
       </Show>
     </SimpleButton>
   );
