@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import eslint from "vite-plugin-eslint";
 import solidPlugin from "vite-plugin-solid";
 // import devtools from 'solid-devtools/vite';
 
@@ -10,6 +11,7 @@ export default defineConfig({
     */
     // devtools(),
     solidPlugin(),
+    eslint(),
   ],
   server: {
     hmr: true,
