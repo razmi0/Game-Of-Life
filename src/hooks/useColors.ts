@@ -1,4 +1,4 @@
-import { Accessor, createEffect, createSignal } from "solid-js";
+import { Accessor, createEffect, createSignal, onMount } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import { DEFAULT_PALETTE, GREY_SCALED_COEF, MAX_PALETTE_LENGTH } from "../data";
 
@@ -27,26 +27,27 @@ export default function useColors(nCell: Accessor<number>) {
   const [palette, setPalette] = createStore({
     randomColors: DEFAULT_PALETTE, // colors
     maxColors: MAX_PALETTE_LENGTH, // max colors
-    addColor: (color: string) => {
-      setPalette(
-        "randomColors",
-        produce((p: string[]) => p.push(color))
-      );
-    },
-    removeColor: (index: number) => {
-      setPalette(
-        "randomColors",
-        produce((p: string[]) => p.splice(index, 1))
-      );
-    },
-    patchColor: (color: string, index: number) => {
-      setPalette(
-        "randomColors",
-        produce((p: string[]) => (p[index] = color))
-      );
-    },
   });
+  const addColor = (color: string) => {
+    setPalette(
+      "randomColors",
+      produce((p: string[]) => p.push(color))
+    );
+  };
 
+  const removeColor = (index: number) => {
+    setPalette(
+      "randomColors",
+      produce((p: string[]) => p.splice(index, 1))
+    );
+  };
+
+  const patchColor = (color: string, index: number) => {
+    setPalette(
+      "randomColors",
+      produce((p: string[]) => (p[index] = color))
+    );
+  };
   const toggleCorpse = () => {
     setSeeCorpse((p) => !p);
   };
@@ -153,19 +154,18 @@ export default function useColors(nCell: Accessor<number>) {
     colors[index] = packColor(color);
   };
 
-  initColors();
+  onMount(() => initColors());
 
   return {
     palette: palette.randomColors,
     maxColors: palette.maxColors,
     seeCorpse,
-
     backgroundColor: bgColor,
     /** ACTIONS */
     findColor,
-    addColor: palette.addColor,
-    removeColor: palette.removeColor,
-    patchColor: palette.patchColor,
+    addColor,
+    removeColor,
+    patchColor,
     applyRandomColors: initColors,
     changeColorAtIndex,
     greyScaledHex,

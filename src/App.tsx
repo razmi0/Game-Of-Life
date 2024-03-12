@@ -121,18 +121,18 @@ const App = () => {
       />
       {/* BOARD */}
       <canvas
-        style={`background-color : ${color.backgroundColor()};`}
+        style={{ "background-color": color.backgroundColor() }}
         width={grid.wW()}
         height={grid.wH()}
         ref={boardRef}
-      ></canvas>
+      />
       {/* GRID */}
       <canvas
-        style={`background-color : transparent; position : absolute; pointer-events : none;`}
+        style={{ "background-color": "transparent", position: "absolute", "pointer-events": "none" }}
         width={grid.wW()}
         height={grid.wH()}
         ref={gridRef}
-      ></canvas>
+      />
     </>
   );
 };
