@@ -34,6 +34,12 @@ const Item: Component<Prettify<ItemProps>> = (props) => {
     props.onClick && props.onClick();
   };
 
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Enter" || event.key === " ") {
+      props.onClick && props.onClick();
+    }
+  };
+
   return (
     <div
       ref={(el) => (itemRef = el)}
@@ -41,6 +47,13 @@ const Item: Component<Prettify<ItemProps>> = (props) => {
       onMouseLeave={props.staticShowOnClick ? () => {} : ([setHovering, false] as const)}
       onClick={props.staticShowOnClick ? () => setHovering((p) => !p) : () => {}}
       class="relative"
+      tabindex="0"
+      role="button"
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          props.staticShowOnClick && setHovering((p) => !p);
+        }
+      }}
     >
       <Indicator show={hasIndicator()} itemRef={itemRef!}>
         {props.indicator}
@@ -51,6 +64,9 @@ const Item: Component<Prettify<ItemProps>> = (props) => {
           (props.classes || "")
         }
         onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        role="button"
+        tabindex="0"
       >
         <Left show={hasLeft()}>{props.left}</Left>
         <Child show={hasChildren()}>{props.children}</Child>
@@ -99,6 +115,8 @@ const Tooltip = (props: TooltipProps) => {
 
   return (
     <div
+      role="button"
+      tabindex="0"
       class="fixed flex transition-opacity "
       style={{ transform: `translate(${spacing()}px, -${offsetY()}px)` }}
       classList={{ ["opacity-0"]: !show(), ["opacity-100"]: show() }}

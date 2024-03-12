@@ -22,7 +22,17 @@ const Group: Component<GroupProps> = (props) => {
 
   const PlusIcon = () => <Icon width={ICON_SIZE.xs} name={open() ? "minus" : "plus"} />;
   const PinIcon = () => (
-    <div classList={{ ["bg-dw-400"]: pin() }} onClick={pinIt}>
+    <div
+      classList={{ ["bg-dw-400"]: pin() }}
+      onClick={pinIt}
+      role="button"
+      tabindex="0"
+      onKeyDown={(e: KeyboardEvent) => {
+        if (e.key === "Enter" || e.key === " ") {
+          pinIt(e);
+        }
+      }}
+    >
       <Icon width={ICON_SIZE.xs} name="pin" />
     </div>
   );

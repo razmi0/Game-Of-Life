@@ -296,7 +296,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     return (
       <div class="flex flex-col gap-1 h-full w-full min-w-48 mt-3">
         <div class="flex flex-row w-full items-center justify-between">
-          <label classList={{ ["text-yellow-400 text-sm "]: isVisible() }}>Colorize</label>
+          <span classList={{ ["text-yellow-400 text-sm "]: isVisible() }}>Colorize</span>
           <IconButton
             onClick={props.color.toggleCorpse}
             width={md}

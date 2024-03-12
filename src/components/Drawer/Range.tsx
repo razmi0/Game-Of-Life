@@ -1,4 +1,5 @@
 import { For, Show } from "solid-js";
+import type { RangeProps } from "../../sharedTypes";
 
 type MilestoneIndexes = 2 | 3 | 4;
 const milestoneLayout = {
@@ -23,6 +24,7 @@ const SimpleRange = (props: RangeProps) => {
 
   return (
     <div class={`relative mb-5`}>
+      {/* eslint jsx-a11y/label-has-associated-control: off */}
       <label for={props.aria} class="sr-only">
         Labels range
       </label>
