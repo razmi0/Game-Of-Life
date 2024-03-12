@@ -1,26 +1,11 @@
-import { Accessor, createEffect, createSignal, onCleanup, onMount } from "solid-js";
+import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import { DEFAULT_PALETTE, GREY_SCALED_COEF, MAX_PALETTE_LENGTH } from "../data";
+import { ColorHook } from "../sharedTypes";
 
 type Hash32Type = Uint32Array & { [index: number]: number };
 type Hash32 = Prettify<Hash32Type>;
 
-export type ColorHook = {
-  palette: () => string[];
-  maxColors: () => number;
-  backgroundColor: Accessor<string>;
-  seeCorpse: Accessor<boolean>;
-  /** ACTIONS */
-  toggleCorpse: () => void;
-  setBackgroundColor: (color: string) => void;
-  findColor: (i: number) => string;
-  addColor: (color: string) => void;
-  removeColor: (index: number) => void;
-  patchColor: (color: string, index: number) => void;
-  applyRandomColors: () => void;
-  changeColorAtIndex: (color: string, index: number) => void;
-  greyScaledHex: (index: number) => string;
-};
 export default function useColors(nCell: number) {
   const [bgColor, setBgColor] = createSignal("black");
   const [seeCorpse, setSeeCorpse] = createSignal(false);

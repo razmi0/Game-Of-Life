@@ -23,7 +23,7 @@ const App = () => {
   const boardData = useBoardData();
   const color = useColors(grid.board.nCell);
   const hash = useHash(grid, boardData, color, boardCtx);
-  const painter = usePainter(hash.paintCell);
+  const painter = usePainter({ work: hash.paintCell });
 
   const run = () => {
     if (!hasStarted()) setHasStarted(true);

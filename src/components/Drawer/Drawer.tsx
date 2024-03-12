@@ -48,7 +48,7 @@ type DrawerProps = {
   navigator: UserAgentInfo;
   gridInfo: { width: number; height: number };
 };
-const { xs, sm, md, lg, xl } = ICON_SIZE;
+const { sm, md, lg, xl } = ICON_SIZE;
 
 export default function Drawer(props: Prettify<DrawerProps>) {
   const [isOpen, setIsOpen] = createSignal(true);

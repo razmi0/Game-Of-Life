@@ -1,6 +1,5 @@
 import { For, Show } from "solid-js";
 
-type Milestones = [string | number, string | number, string | number, string | number];
 type MilestoneIndexes = 2 | 3 | 4;
 const milestoneLayout = {
   4: [
@@ -11,18 +10,6 @@ const milestoneLayout = {
   ],
   3: ["start-0", "start-1/2 -translate-x-1/2 rtl:translate-x-1/2", "end-0"],
   2: ["start-0", "end-0"], // milestoneLayout[2][0] = "start-0"
-};
-
-export type RangeProps = {
-  onChange: (e: Event) => void;
-  onInput?: (e: Event) => void;
-  value?: number;
-  min?: number;
-  max?: number;
-  class?: string;
-  aria?: string;
-  milestones?: boolean | Partial<Milestones>;
-  step?: number;
 };
 
 const SimpleRange = (props: RangeProps) => {

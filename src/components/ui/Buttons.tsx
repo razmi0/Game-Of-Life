@@ -112,14 +112,14 @@ export const ComposedButton = (props: ComposedButtonProps) => {
   );
 };
 
-type IconComponentButton = {
+type IconComponentButtonProps = {
   onClick: () => void;
   btnClass?: string;
   children: JSXElement;
   left?: JSXElement;
   right?: JSXElement;
 };
-export const IconComponentButton = (props: IconComponentButton) => {
+export const IconComponentButton = (props: IconComponentButtonProps) => {
   return (
     <button
       onClick={() => props.onClick()}

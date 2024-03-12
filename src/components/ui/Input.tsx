@@ -1,14 +1,3 @@
-type InputColorProps = {
-  value: string;
-  label: string;
-  disabled?: boolean;
-  id: string;
-  class?: string;
-  hiddenLabel: boolean;
-  onInput?: (e: Event) => void;
-  onChange?: (e: Event) => void;
-  onBlur?: (e: Event) => void;
-};
 export const InputColor = (props: InputColorProps) => {
   return (
     <>
