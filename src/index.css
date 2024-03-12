@@ -3,7 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-::root {
+:root {
   --color: #b3b3b7;
   /** TW custom colors */
   --bg-dw-color-100: #efeff3;
