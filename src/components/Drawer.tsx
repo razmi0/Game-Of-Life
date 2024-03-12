@@ -450,7 +450,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         </div>
         <ComposedButton
           handler={toggleVisibility}
-          left={
+          right={
             <Show when={props.grid.gridSpacing.visibility} fallback={<Icon name="eye_closed" width={lg} />}>
               <Icon name="eye_open" width={lg} />
             </Show>
@@ -540,9 +540,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
             step={RANDOM_STEP}
           />
           <IconButton onClick={() => props.boardData.changeRandom(RANDOM_STEP)} width={md} name="skull" class="mb-5" />
-          <div class="translate-y-[1px] text-yellow-400 text-sm font-bold h-full w-10 tabular-nums text-right">
-            {output()}
-          </div>
+          <Output>{output()}</Output>
         </div>
       </div>
     );
@@ -672,15 +670,15 @@ export default function Drawer(props: Prettify<DrawerProps>) {
         <Item
           tooltip={
             <StandardTooltip title="color palette" class="h-full" innerContentClass="flex flex-col justify-between">
-              <p>paint the whole board with an unlimited set of colors : </p>
+              <p>Cell colors : </p>
               <ColorPaletteTooltip />
               <Separator class="w-full h-[1px] my-3" />
               <div class="flex">
-                <p>change the board background color : </p>
+                <p>Board color : </p>
                 <BackgroundColor />
               </div>
               <Separator class="w-full h-[1px] my-3" />
-              <p>Toggle colorizing dead cells : </p>
+              <p>Colorfull dead cells : </p>
               <DeadVisibility />
               <SimpleButton class="bg-dw-300 mt-4 w-full hover:bg-dw-200" handler={props.applyColors}>
                 apply new colors
