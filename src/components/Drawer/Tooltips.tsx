@@ -1,6 +1,6 @@
-import Separator from "./Separator";
-import { For, Show } from "solid-js";
 import type { Component, JSXElement } from "solid-js";
+import { For, Show } from "solid-js";
+import Separator from "../ui/Separator";
 
 type StandardTooltipProps = {
   children?: JSXElement;

@@ -1,5 +1,6 @@
 import type { Accessor } from "solid-js";
-import { batch, createMemo, createSignal, onCleanup, onMount } from "solid-js";
+import { createMemo, onCleanup, onMount } from "solid-js";
+import { createStore } from "solid-js/store";
 import {
   DEBOUNCING_DELAY,
   DEFAULT_GRID_COLOR,
@@ -11,25 +12,31 @@ import {
   MIN_SPACING,
 } from "../data";
 import { debounce } from "../helpers";
-import { createStore } from "solid-js/store";
 
 const nRowInit = Math.floor(window.innerHeight / INITIAL_CELL_SIZE) + 1;
 const nColInit = Math.floor(window.innerWidth / INITIAL_CELL_SIZE) + 1;
 const nCellInit = nRowInit * nColInit;
 
 export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefined>) {
-  const [wW, setWW] = createSignal(window.innerWidth);
-  const [wH, setWH] = createSignal(window.innerHeight);
-  const [nRow, setnRow] = createSignal(nRowInit);
-  const [nCol, setnCol] = createSignal(nColInit);
-  const [nCell, setnCell] = createSignal(nCellInit);
-  const [cellSize, setCellSize] = createSignal(INITIAL_CELL_SIZE);
+  const [board, setBoard] = createStore({
+    wW: window.innerWidth,
+    wH: window.innerHeight,
+    nRow: nRowInit,
+    nCol: nColInit,
+    nCell: nCellInit,
+    cellSize: INITIAL_CELL_SIZE,
+  });
 
   const [gridSpacing, setGridSpacing] = createStore({
     visibility: true,
     spacing: DEFAULT_SPACING,
     gridColor: DEFAULT_GRID_COLOR,
     lastGridColor: DEFAULT_GRID_COLOR,
+  });
+
+  const [shape, setShape] = createStore({
+    DEFAULT_SHAPES: ["square", "circle"],
+    selectedShape: "square" as "square" | "circle",
   });
 
   const chooseGridColor = (color: string) => {
@@ -54,87 +61,62 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
   };
 
   const changeCellSize = (addSize: number) => {
-    const newSize = cellSize() + addSize;
+    const newSize = board.cellSize + addSize;
     if (newSize < MIN_CELL_SIZE || newSize > MAX_CELL_SIZE) return;
-    setCellSize(newSize);
+    setBoard("cellSize", newSize);
   };
+  const tuneCellSize = (newSize: number) => setBoard("cellSize", newSize);
 
-  const tuneCellSize = (newSize: number) => {
-    setCellSize(newSize);
-  };
+  const setSquare = () => setShape("selectedShape", "square");
+  const setCircle = () => setShape("selectedShape", "circle");
 
-  const [shape, setShape] = createStore({
-    DEFAULT_SHAPES: ["square", "circle"],
-    selectedShape: "square" as "square" | "circle",
-  });
-
-  const setSquare = () => {
-    setShape("selectedShape", "square");
-  };
-
-  const setCircle = () => {
-    setShape("selectedShape", "circle");
-  };
-
-  const calcnRow = createMemo(() => {
-    setnRow(Math.floor(wH() / cellSize()) + 1);
-  });
-
-  const calcnCol = createMemo(() => {
-    setnCol(Math.floor(wW() / cellSize()) + 1);
-  });
-
-  const calcnCell = createMemo(() => {
-    setnCell(nRow() * nCol());
-  });
+  const computeRow = createMemo(() => setBoard("nRow", Math.floor(board.wH / board.cellSize) + 1));
+  const computeCol = createMemo(() => setBoard("nCol", Math.floor(board.wW / board.cellSize) + 1));
+  const computeCell = createMemo(() => setBoard("nCell", board.nRow * board.nCol));
 
   const drawGrid = () => {
     const context = ctx();
     if (!context) return;
-    context.clearRect(0, 0, wW(), wH());
+    context.clearRect(0, 0, board.wW, board.wH);
     if (!gridSpacing.visibility || gridSpacing.spacing === 0) return;
 
     context.beginPath();
     context.lineWidth = gridSpacing.spacing;
     context.strokeStyle = gridSpacing.gridColor;
-    for (let i = 0; i < wW(); i += cellSize()) {
+    for (let i = 0; i < board.wW; i += board.cellSize) {
       context.moveTo(i, 0);
-      context.lineTo(i, wH());
+      context.lineTo(i, board.wH);
     }
-    for (let i = 0; i < wH(); i += cellSize()) {
+    for (let i = 0; i < board.wH; i += board.cellSize) {
       context.moveTo(0, i);
-      context.lineTo(wW(), i);
+      context.lineTo(board.wW, i);
     }
     context.stroke();
   };
 
-  const updateSizes = debounce(() => {
-    setWW(window.innerWidth);
-    setWH(window.innerHeight);
-    calcnRow();
-    calcnCol();
-    calcnCell();
+  const updateSizes = () => {
+    console.log("debounced");
+    setBoard("wW", window.innerWidth);
+    setBoard("wH", window.innerHeight);
+    computeRow();
+    computeCol();
+    computeCell();
     drawGrid();
-  }, DEBOUNCING_DELAY);
+  };
 
   onMount(() => {
-    window.addEventListener("resize", updateSizes);
-    onCleanup(() => window.removeEventListener("resize", updateSizes));
+    const debouncedUpdateSizes = debounce(updateSizes, DEBOUNCING_DELAY);
+    window.addEventListener("resize", debouncedUpdateSizes);
+    onCleanup(() => window.removeEventListener("resize", debouncedUpdateSizes));
   });
 
   return {
-    nRow,
-    nCol,
-    nCell,
-    wW,
-    wH,
-    cellSize,
-    /** ACTIONS & STORE */
-    drawGrid,
+    board,
+    gridSpacing,
     shape,
+    drawGrid,
     setSquare,
     setCircle,
-    gridSpacing,
     chooseGridColor,
     toggleVisibility,
     changeSpacing,

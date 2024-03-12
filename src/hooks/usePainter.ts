@@ -2,28 +2,32 @@ import { createEffect, createSignal, onCleanup } from "solid-js";
 import { DEFAULT_PALETTE, INITIAL_PEN_SIZE, MAX_PEN_SIZE, MIN_PEN_SIZE } from "../data";
 import { PaintCellType } from "../sharedTypes";
 
-enum Painter {
-  IDLE = "idle",
-  PAINTING = "painting",
-}
+type EnumPainterType = "idle" | "painting";
+const EnumPainter = {
+  IDLE: "idle",
+  PAINTING: "painting",
+} as const;
 
-export enum Tools {
-  PEN = "pen",
-  ERASER = "eraser",
-  NONE = "none",
-}
+export type EnumToolsType = "pen" | "eraser" | "none";
+const EnumTools = {
+  PEN: "pen",
+  ERASER: "eraser",
+  NONE: "none",
+} as const;
 
-const usePainter = (work: (data: PaintCellType) => void) => {
-  const [painterState, setPainter] = createSignal<Painter>(Painter.IDLE);
+type RunningPainterCb = { work: FunctionWithParams<PaintCellType> };
+
+const usePainter = (hash: RunningPainterCb) => {
+  const [painterState, setPainter] = createSignal<EnumPainterType>(EnumPainter.IDLE);
   const [userPaint, setUserPaint] = createSignal(false);
-  const [tool, setTool] = createSignal<Tools>(Tools.NONE);
+  const [tool, setTool] = createSignal<EnumToolsType>(EnumTools.NONE);
   const [penSize, setPenSize] = createSignal(INITIAL_PEN_SIZE);
   const [canvasRef, setCanvasRef] = createSignal<HTMLCanvasElement>();
   const [penColor, setPenColor] = createSignal<string>(DEFAULT_PALETTE[0]);
 
-  const setEraser = () => setTool(Tools.ERASER);
-  const setPen = () => setTool(Tools.PEN);
-  const unsetTool = () => setTool(Tools.NONE);
+  const setEraser = () => setTool(EnumTools.ERASER);
+  const setPen = () => setTool(EnumTools.PEN);
+  const unsetTool = () => setTool(EnumTools.NONE);
 
   const tunePenSize = (size: number) => {
     setPenSize(size);
@@ -40,22 +44,22 @@ const usePainter = (work: (data: PaintCellType) => void) => {
   };
 
   const startPainting = () => {
-    if (userPaint()) setPainter(Painter.PAINTING);
+    if (userPaint()) setPainter(EnumPainter.PAINTING);
   };
 
   const paint = (e: MouseEvent) => {
     const canvas = canvasRef();
-    if (painterState() === Painter.PAINTING && canvas) {
+    if (painterState() === EnumPainter.PAINTING && canvas) {
       const x = e.pageX - canvas.offsetLeft;
       const y = e.pageY - canvas.offsetTop;
 
-      work({ x, y, paintSize: penSize(), tool: tool(), penColor: penColor() });
+      hash.work({ x, y, paintSize: penSize(), tool: tool(), penColor: penColor() });
     }
   };
 
   const stopPainting = () => {
-    if (painterState() === Painter.PAINTING) {
-      setPainter(Painter.IDLE);
+    if (painterState() === EnumPainter.PAINTING) {
+      setPainter(EnumPainter.IDLE);
     }
   };
 

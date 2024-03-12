@@ -1,4 +1,4 @@
-import { type JSXElement, children, onCleanup, onMount, createEffect, on } from "solid-js";
+import { children, createEffect, on, onCleanup, onMount, type JSXElement } from "solid-js";
 import { createStore } from "solid-js/store";
 
 type DraggableProps = {
@@ -62,6 +62,7 @@ export default function Draggable(props: DraggableProps): JSXElement {
       setDrag("end", true);
     },
   });
+  //eslint-disable-next-line
   if (!props.children) throw new Error("Draggable component must have children");
   let child: HTMLElement;
   let now = Date.now();

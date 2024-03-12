@@ -1,52 +1,38 @@
-import { Accessor, createEffect, createSignal } from "solid-js";
+import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import { DEFAULT_PALETTE, GREY_SCALED_COEF, MAX_PALETTE_LENGTH } from "../data";
+import { ColorHook } from "../sharedTypes";
 
 type Hash32Type = Uint32Array & { [index: number]: number };
 type Hash32 = Prettify<Hash32Type>;
 
-export type ColorHook = {
-  palette: string[];
-  maxColors: number;
-  backgroundColor: Accessor<string>;
-  seeCorpse: Accessor<boolean>;
-  /** ACTIONS */
-  toggleCorpse: () => void;
-  setBackgroundColor: (color: string) => void;
-  findColor: (i: number) => string;
-  addColor: (color: string) => void;
-  removeColor: (index: number) => void;
-  patchColor: (color: string, index: number) => void;
-  applyRandomColors: () => void;
-  changeColorAtIndex: (color: string, index: number) => void;
-  greyScaledHex: (index: number) => string;
-};
-export default function useColors(nCell: Accessor<number>) {
+export default function useColors(nCell: number) {
   const [bgColor, setBgColor] = createSignal("black");
   const [seeCorpse, setSeeCorpse] = createSignal(false);
   const [palette, setPalette] = createStore({
     randomColors: DEFAULT_PALETTE, // colors
     maxColors: MAX_PALETTE_LENGTH, // max colors
-    addColor: (color: string) => {
-      setPalette(
-        "randomColors",
-        produce((p: string[]) => p.push(color))
-      );
-    },
-    removeColor: (index: number) => {
-      setPalette(
-        "randomColors",
-        produce((p: string[]) => p.splice(index, 1))
-      );
-    },
-    patchColor: (color: string, index: number) => {
-      setPalette(
-        "randomColors",
-        produce((p: string[]) => (p[index] = color))
-      );
-    },
   });
+  const addColor = (color: string) => {
+    setPalette(
+      "randomColors",
+      produce((p: string[]) => p.push(color))
+    );
+  };
 
+  const removeColor = (index: number) => {
+    setPalette(
+      "randomColors",
+      produce((p: string[]) => p.splice(index, 1))
+    );
+  };
+
+  const patchColor = (color: string, index: number) => {
+    setPalette(
+      "randomColors",
+      produce((p: string[]) => (p[index] = color))
+    );
+  };
   const toggleCorpse = () => {
     setSeeCorpse((p) => !p);
   };
@@ -54,13 +40,13 @@ export default function useColors(nCell: Accessor<number>) {
   /**
    * @description Colors array (Uint32Array grid)
    */
-  let colors = new Uint32Array(nCell()) as Hash32;
+  let colors = new Uint32Array(nCell) as Hash32;
 
   /**
    * @description Sync colors array with the new cell size calling resizeColors
    */
   createEffect(() => {
-    if (nCell() !== colors.length) resizeColors();
+    if (nCell !== colors.length) resizeColors();
   });
 
   /**
@@ -68,7 +54,7 @@ export default function useColors(nCell: Accessor<number>) {
    *
    */
   const resizeColors = () => {
-    const newSize = nCell();
+    const newSize = nCell;
     const pastSize = colors.length;
     if (newSize === pastSize) return;
     else if (newSize < pastSize) {
@@ -153,19 +139,19 @@ export default function useColors(nCell: Accessor<number>) {
     colors[index] = packColor(color);
   };
 
-  initColors();
+  onMount(() => initColors());
+  onCleanup(() => (colors = new Uint32Array(0) as Hash32));
 
   return {
-    palette: palette.randomColors,
-    maxColors: palette.maxColors,
+    palette: () => palette.randomColors,
+    maxColors: () => palette.maxColors,
     seeCorpse,
-
     backgroundColor: bgColor,
     /** ACTIONS */
     findColor,
-    addColor: palette.addColor,
-    removeColor: palette.removeColor,
-    patchColor: palette.patchColor,
+    addColor,
+    removeColor,
+    patchColor,
     applyRandomColors: initColors,
     changeColorAtIndex,
     greyScaledHex,

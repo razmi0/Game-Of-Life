@@ -1,7 +1,6 @@
 import { For, JSXElement, Show, createEffect, createSignal, onMount } from "solid-js";
-import Icon, { OpCircleIconProps, type IconProps, IconComponentNames } from "./Icons";
-import Separator from "./Drawer/Separator";
 import { createStore, produce } from "solid-js/store";
+import Icon, { type IconProps } from "./Icons";
 
 type IconButtonProps = IconProps & {
   onClick: () => void;
@@ -13,7 +12,7 @@ type IconButtonProps = IconProps & {
 export const IconButton = (props: IconButtonProps) => {
   return (
     <button
-      onClick={props.onClick}
+      onClick={() => props.onClick()}
       class={"flex gap-2 cursor-pointer" + props.class || ""}
       classList={props.classList || {}}
     >
@@ -70,8 +69,8 @@ export const SimpleButton = (props: SimpleButtonProps) => {
             ["wave-motion-appear-active"]: active(),
           }}
           class={`conway-wave wave-motion-appear wave-motion rounded-md`}
-          style={`left: -1px; top: -1px; width: ${btnSize.width}px; height: ${btnSize.height}px; `}
-        ></div>
+          style={{ left: "-1px", top: "-1px", width: `${btnSize.width}px`, height: `${btnSize.height}px` }}
+        />
       </div>
     );
   };
@@ -113,17 +112,17 @@ export const ComposedButton = (props: ComposedButtonProps) => {
   );
 };
 
-type IconComponentButton = {
+type IconComponentButtonProps = {
   onClick: () => void;
   btnClass?: string;
   children: JSXElement;
   left?: JSXElement;
   right?: JSXElement;
 };
-export const IconComponentButton = (props: IconComponentButton) => {
+export const IconComponentButton = (props: IconComponentButtonProps) => {
   return (
     <button
-      onClick={props.onClick}
+      onClick={() => props.onClick()}
       type="button"
       class={`flex flex-row whitespace-nowrap items-center justify-evenly ${props.btnClass || ""}`}
     >

@@ -1,7 +1,6 @@
-import { batch, createEffect, createSignal, onMount } from "solid-js";
-import { getCoordsFromIndex, getIndexFromCoords } from "../helpers";
 import type { Accessor } from "solid-js";
-import type { ColorHook } from "./useColors";
+import { batch, createEffect, createSignal } from "solid-js";
+import { getCoordsFromIndex, getIndexFromCoords } from "../helpers";
 import { PaintCellType } from "../sharedTypes";
 
 type Hash8Type = Uint8Array & { [index: number]: 0 | 1 };
@@ -15,7 +14,7 @@ export default function useHash(
 ) {
   const [isWorkingOnHash, setIsWorkingOnHash] = createSignal(false);
 
-  const initHash = () => new Uint8Array(grid.nCell()).map(() => (data.randomChoice() ? 1 : 0)) as Hash8;
+  const initHash = () => new Uint8Array(grid.board.nCell).map(() => (data.randomChoice() ? 1 : 0)) as Hash8;
 
   let hash = initHash();
   let flipIndexes: number[] = [];
@@ -29,7 +28,7 @@ export default function useHash(
   /** hash change size if needed (copy) */
   const resizeHash = () => {
     const pastSize = hash.length;
-    const newSize = grid.nCell();
+    const newSize = grid.board.nCell;
     if (newSize === pastSize) return;
     else if (newSize < pastSize) {
       hash = hash.copyWithin(0, newSize);
@@ -48,7 +47,7 @@ export default function useHash(
   const updateHash = () => {
     let i = 0;
     flipIndexes = [];
-    const rowSize = grid.nRow();
+    const rowSize = grid.board.nRow;
     let zeros = 0;
     let ones = 0;
     while (i < hash.length) {
@@ -111,8 +110,8 @@ export default function useHash(
   /** draw only changed cells, doesn't read the entire hash (FAST) */
   const drawHash = () => {
     let i = 0;
-    const rowSize = grid.nRow();
-    const cellSize = grid.cellSize();
+    const rowSize = grid.board.nRow;
+    const cellSize = grid.board.cellSize;
     const context = ctx();
     if (!context) return;
     while (i < flipIndexes.length) {
@@ -143,14 +142,14 @@ export default function useHash(
   };
 
   const resetBlankHash = () => {
-    hash = new Uint8Array(grid.nCell()) as Hash8;
+    hash = new Uint8Array(grid.board.nCell) as Hash8;
   };
 
   /** draw and read the entire hash (SLOW) */
   const drawAllHash = () => {
     let index = 0;
-    const rowSize = grid.nRow();
-    const cellSize = grid.cellSize();
+    const rowSize = grid.board.nRow;
+    const cellSize = grid.board.cellSize;
     const context = ctx();
     if (!context) return;
     while (index < hash.length) {
@@ -177,8 +176,8 @@ export default function useHash(
     const context = ctx();
     if (!context) return;
 
-    const rowSize = grid.nRow();
-    const cellSize = grid.cellSize();
+    const rowSize = grid.board.nRow;
+    const cellSize = grid.board.cellSize;
 
     const offsetXPainted = paintSize - 1;
     const offsetYPainted = offsetXPainted * rowSize;
@@ -223,7 +222,7 @@ export default function useHash(
 
   // replace with future implementation of useOnResize hook ?
   createEffect(() => {
-    if (grid.nCell() !== hash.length) {
+    if (grid.board.nCell !== hash.length) {
       resizeHash();
       drawAllHash();
       // grid.drawGrid();

@@ -1,4 +1,6 @@
+import type { Accessor, ParentComponent } from "solid-js";
 import { For, Show, createEffect, createMemo, createSignal } from "solid-js";
+import { createStore } from "solid-js/store";
 import {
   CELL_SIZE_STEP,
   DELAY_STEP,
@@ -16,30 +18,28 @@ import {
   PEN_SIZE_STEP,
   RANDOM_STEP,
   STEP_SPACING,
-} from "../data";
-import { ComposedButton, IconButton, IconComponentButton, SimpleButton } from "./Buttons";
-import Wrapper from "./Drawer/Content";
-import Group from "./Drawer/Group";
-import Header, { TooltipTitle } from "./Drawer/Headers";
-import StandardTooltip, { StatsTooltip } from "./Drawer/Tooltips";
-import Item from "./Drawer/Item";
-import SimpleRange from "./Drawer/Range";
-import Separator from "./Drawer/Separator";
-import { InputColor } from "./Input";
-import Icon, { MinusCircleIcon, PlusCircleIcon } from "./Icons";
-import { fps } from "../helpers";
-import useShorcuts, { type Shortcut } from "../hooks/useShorcuts";
-import type { Accessor, ParentComponent } from "solid-js";
-import type { StatsTooltipData } from "./Drawer/Tooltips";
-import { createStore } from "solid-js/store";
-import Output from "./Output";
+} from "../../data";
+import { fps } from "../../helpers";
+import useShorcuts, { type Shortcut } from "../../hooks/useShorcuts";
+import { ComposedButton, IconButton, IconComponentButton, SimpleButton } from "../ui/Buttons";
+import Icon, { MinusCircleIcon, PlusCircleIcon } from "../ui/Icons";
+import { InputColor } from "../ui/Input";
+import Output from "../ui/Output";
+import Separator from "../ui/Separator";
+import Wrapper from "./Content";
+import Group from "./Group";
+import Header, { TooltipTitle } from "./Headers";
+import Item from "./Item";
+import SimpleRange from "./Range";
+import type { StatsTooltipData } from "./Tooltips";
+import StandardTooltip, { StatsTooltip } from "./Tooltips";
 
 type DrawerProps = {
-  boardData: ReturnType<typeof import("../hooks/useBoardData").default>;
-  grid: ReturnType<typeof import("../hooks/useGrid").default>;
-  gameLoop: ReturnType<typeof import("../hooks/useTimer").default>;
-  painter: ReturnType<typeof import("../hooks/usePainter").default>;
-  color: ReturnType<typeof import("../hooks/useColors").default>;
+  boardData: ReturnType<typeof import("../../hooks/useBoardData").default>;
+  grid: ReturnType<typeof import("../../hooks/useGrid").default>;
+  gameLoop: ReturnType<typeof import("../../hooks/useTimer").default>;
+  painter: ReturnType<typeof import("../../hooks/usePainter").default>;
+  color: ReturnType<typeof import("../../hooks/useColors").default>;
   /** misc */
   reset: () => void;
   applyColors: () => void;
@@ -48,7 +48,7 @@ type DrawerProps = {
   navigator: UserAgentInfo;
   gridInfo: { width: number; height: number };
 };
-const { xs, sm, md, lg, xl } = ICON_SIZE;
+const { sm, md, lg, xl } = ICON_SIZE;
 
 export default function Drawer(props: Prettify<DrawerProps>) {
   const [isOpen, setIsOpen] = createSignal(true);
@@ -227,9 +227,9 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     return (
       <div class="flex flex-row gap-3 mt-3 min-w-48 justify-between h-full">
         <ColorSection>
-          <For each={props.color.palette}>
+          <For each={props.color.palette()}>
             {(color, i) => {
-              const id = `color_${i()}`;
+              const id = () => `color_${i()}`;
 
               const changeColor = (e: Event) => {
                 const newColor = (e.target as HTMLInputElement).value;
@@ -241,9 +241,9 @@ export default function Drawer(props: Prettify<DrawerProps>) {
                   <ColorItem>
                     <InputColor
                       class="vanilla"
-                      id={id}
+                      id={id()}
                       value={color ?? "#FFFFFF"}
-                      label={formatIdToLabel(id)}
+                      label={formatIdToLabel(id())}
                       onChange={changeColor}
                       hiddenLabel
                     />
@@ -258,8 +258,8 @@ export default function Drawer(props: Prettify<DrawerProps>) {
               );
             }}
           </For>
-          <div class="h-full flex-grow"></div>
-          <Show when={props.color.palette.length < props.color.maxColors}>
+          <div class="h-full flex-grow" />
+          <Show when={props.color.palette.length < props.color.maxColors()}>
             <IconButton
               onClick={() => {
                 props.color.addColor(newColor());
@@ -296,7 +296,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     return (
       <div class="flex flex-col gap-1 h-full w-full min-w-48 mt-3">
         <div class="flex flex-row w-full items-center justify-between">
-          <label classList={{ ["text-yellow-400 text-sm "]: isVisible() }}>Colorize</label>
+          <span classList={{ ["text-yellow-400 text-sm "]: isVisible() }}>Colorize</span>
           <IconButton
             onClick={props.color.toggleCorpse}
             width={md}
@@ -393,11 +393,11 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       const newUpperSpacingBoundary = props.grid.gridSpacing.spacing + STEP_SPACING;
       const newLowerSpacingBoundary = props.grid.gridSpacing.spacing - STEP_SPACING;
 
-      const newUpperCellSizeBoundary = props.grid.cellSize() + CELL_SIZE_STEP;
-      const newLowerCellSizeBoundary = props.grid.cellSize() - CELL_SIZE_STEP;
+      const newUpperCellSizeBoundary = props.grid.board.cellSize + CELL_SIZE_STEP;
+      const newLowerCellSizeBoundary = props.grid.board.cellSize - CELL_SIZE_STEP;
 
       const canIncreaseGridSpacing =
-        newUpperSpacingBoundary < props.grid.cellSize() && newUpperSpacingBoundary <= MAX_SPACING;
+        newUpperSpacingBoundary < props.grid.board.cellSize && newUpperSpacingBoundary <= MAX_SPACING;
       const canDecreaseGridSpacing = newLowerSpacingBoundary >= MIN_SPACING;
 
       const canDecreaseCellSize =
@@ -421,7 +421,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
               color={allowed.decreaseCellSize ? undefined : "#FF0000"}
             />
           </IconComponentButton>
-          <Output>{props.grid.cellSize() + " px"}</Output>
+          <Output>{props.grid.board.cellSize + " px"}</Output>
           <IconComponentButton onClick={increaseCellSize}>
             <PlusCircleIcon
               width={xl}
@@ -553,7 +553,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     },
     {
       label: "cell size",
-      value: props.grid.cellSize() + "px",
+      value: props.grid.board.cellSize + "px",
       separator: true,
     },
     {
@@ -704,7 +704,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Separator />
       <Group>
         <Item
-          indicator={props.grid.cellSize()}
+          indicator={props.grid.board.cellSize}
           tooltip={
             <StandardTooltip title={<TooltipTitle title="sizes" />}>
               <SizesTooltip />

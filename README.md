@@ -52,9 +52,7 @@ Age => color
 - [ ] (#20) Refacto resize so extended on the canva plane (currently resize is just working on the array length so past hash is compacted or extended)
 - [ ] (#21) Find a way to implement loader when hash running
 - [ ] (#22) hook useOnResize ? currently
-- [ ] (#23) replace cell size by buttons
 - [ ] (#24) remove randomness to a default value 80% ?
-- [ ] (#25) grid panel
 
 #### DONE
 
@@ -67,6 +65,9 @@ Age => color
 - [x] (#15) space between cells (new branch ) and background off cells grey
 - [x] (#16) stats => add cell size
 - [x] (#19) Refactor if Nparam > 2 => use object
+- [x] (#23) replace cell size by buttons
+- [x] (#25) grid panel
+- [x] (#26) Install eslint package + configuration + cleaning
 
 #### RESOURCES
 

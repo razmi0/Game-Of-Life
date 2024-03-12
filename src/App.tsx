@@ -1,15 +1,15 @@
-import { onMount, createSignal, Show, createMemo } from "solid-js";
+import { Show, createMemo, createSignal, onMount } from "solid-js";
+import Drawer from "./components/Drawer/Drawer";
+import { SimpleButton } from "./components/ui/Buttons";
+import DebuggerPanel from "./components/ui/DebuggerPanel";
+import { BATTERY_REFRESH_INTERVAL, STEP_SPACING } from "./data";
+import useAgent from "./hooks/useAgent";
+import useBoardData from "./hooks/useBoardData";
+import useColors from "./hooks/useColors";
 import useGrid from "./hooks/useGrid";
 import useHash from "./hooks/useHash";
-import useColors from "./hooks/useColors";
 import usePainter from "./hooks/usePainter";
 import useTimer from "./hooks/useTimer";
-import useBoardData from "./hooks/useBoardData";
-import useAgent from "./hooks/useAgent";
-import { SimpleButton } from "./components/Buttons";
-import DebuggerPanel from "./components/DebuggerPanel";
-import Drawer from "./components/Drawer";
-import { BATTERY_REFRESH_INTERVAL, STEP_SPACING } from "./data";
 
 let boardRef: HTMLCanvasElement;
 let gridRef: HTMLCanvasElement;
@@ -21,9 +21,9 @@ const App = () => {
 
   const grid = useGrid(gridCtx);
   const boardData = useBoardData();
-  const color = useColors(grid.nCell);
+  const color = useColors(grid.board.nCell);
   const hash = useHash(grid, boardData, color, boardCtx);
-  const painter = usePainter(hash.paintCell);
+  const painter = usePainter({ work: hash.paintCell });
 
   const run = () => {
     if (!hasStarted()) setHasStarted(true);
@@ -62,7 +62,7 @@ const App = () => {
   });
 
   const gridInfo = createMemo(() => {
-    return { width: grid.wW(), height: grid.wH() };
+    return { width: grid.board.wW, height: grid.board.wH };
   });
 
   const debug = true;
@@ -71,7 +71,7 @@ const App = () => {
     <>
       <Show when={import.meta.env.DEV && debug}>
         <DebuggerPanel>
-          <div>
+          <div class="w-full">
             <p>Grid color : {grid.gridSpacing.gridColor}</p>
             <p>Spacing : {grid.gridSpacing.spacing} </p>
           </div>
@@ -121,18 +121,18 @@ const App = () => {
       />
       {/* BOARD */}
       <canvas
-        style={`background-color : ${color.backgroundColor()};`}
-        width={grid.wW()}
-        height={grid.wH()}
+        style={{ "background-color": color.backgroundColor() }}
+        width={grid.board.wW}
+        height={grid.board.wH}
         ref={boardRef}
-      ></canvas>
-      {/* GRID */}
+      />
+      {/* GRID.BOARD */}
       <canvas
-        style={`background-color : transparent; position : absolute; pointer-events : none;`}
-        width={grid.wW()}
-        height={grid.wH()}
+        style={{ "background-color": "transparent", position: "absolute", "pointer-events": "none" }}
+        width={grid.board.wW}
+        height={grid.board.wH}
         ref={gridRef}
-      ></canvas>
+      />
     </>
   );
 };
