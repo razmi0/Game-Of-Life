@@ -40,13 +40,14 @@ const Item: Component<Prettify<ItemProps>> = (props) => {
       onMouseEnter={props.staticShowOnClick ? () => {} : ([setHovering, true] as const)}
       onMouseLeave={props.staticShowOnClick ? () => {} : ([setHovering, false] as const)}
       onClick={props.staticShowOnClick ? () => setHovering((p) => !p) : () => {}}
+      class="relative"
     >
       <Indicator show={hasIndicator()} itemRef={itemRef!}>
         {props.indicator}
       </Indicator>
       <div
         class={
-          "flex items-center justify-center text-sm text-dw-150 w-full hover:bg-dw-300 hover:text-dw-100 py-2 " +
+          "relative flex items-center justify-center text-sm text-dw-150 w-full hover:bg-dw-300 hover:text-dw-100 py-2 " +
           (props.classes || "")
         }
         onClick={handleClick}
