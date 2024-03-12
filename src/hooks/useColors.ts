@@ -21,7 +21,7 @@ export type ColorHook = {
   changeColorAtIndex: (color: string, index: number) => void;
   greyScaledHex: (index: number) => string;
 };
-export default function useColors(nCell: Accessor<number>) {
+export default function useColors(nCell: number) {
   const [bgColor, setBgColor] = createSignal("black");
   const [seeCorpse, setSeeCorpse] = createSignal(false);
   const [palette, setPalette] = createStore({
@@ -55,13 +55,13 @@ export default function useColors(nCell: Accessor<number>) {
   /**
    * @description Colors array (Uint32Array grid)
    */
-  let colors = new Uint32Array(nCell()) as Hash32;
+  let colors = new Uint32Array(nCell) as Hash32;
 
   /**
    * @description Sync colors array with the new cell size calling resizeColors
    */
   createEffect(() => {
-    if (nCell() !== colors.length) resizeColors();
+    if (nCell !== colors.length) resizeColors();
   });
 
   /**
@@ -69,7 +69,7 @@ export default function useColors(nCell: Accessor<number>) {
    *
    */
   const resizeColors = () => {
-    const newSize = nCell();
+    const newSize = nCell;
     const pastSize = colors.length;
     if (newSize === pastSize) return;
     else if (newSize < pastSize) {
