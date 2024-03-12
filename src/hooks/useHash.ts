@@ -1,7 +1,6 @@
-import { batch, createEffect, createSignal, onMount } from "solid-js";
-import { getCoordsFromIndex, getIndexFromCoords } from "../helpers";
 import type { Accessor } from "solid-js";
-import type { ColorHook } from "./useColors";
+import { batch, createEffect, createSignal } from "solid-js";
+import { getCoordsFromIndex, getIndexFromCoords } from "../helpers";
 import { PaintCellType } from "../sharedTypes";
 
 type Hash8Type = Uint8Array & { [index: number]: 0 | 1 };

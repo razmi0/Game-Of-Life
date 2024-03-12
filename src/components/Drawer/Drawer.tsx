@@ -1,4 +1,6 @@
+import type { Accessor, ParentComponent } from "solid-js";
 import { For, Show, createEffect, createMemo, createSignal } from "solid-js";
+import { createStore } from "solid-js/store";
 import {
   CELL_SIZE_STEP,
   DELAY_STEP,
@@ -17,22 +19,20 @@ import {
   RANDOM_STEP,
   STEP_SPACING,
 } from "../../data";
+import { fps } from "../../helpers";
+import useShorcuts, { type Shortcut } from "../../hooks/useShorcuts";
 import { ComposedButton, IconButton, IconComponentButton, SimpleButton } from "../ui/Buttons";
+import Icon, { MinusCircleIcon, PlusCircleIcon } from "../ui/Icons";
+import { InputColor } from "../ui/Input";
+import Output from "../ui/Output";
+import Separator from "../ui/Separator";
 import Wrapper from "./Content";
 import Group from "./Group";
 import Header, { TooltipTitle } from "./Headers";
-import StandardTooltip, { StatsTooltip } from "./Tooltips";
 import Item from "./Item";
 import SimpleRange from "./Range";
-import Separator from "../ui/Separator";
-import { InputColor } from "../ui/Input";
-import Icon, { MinusCircleIcon, PlusCircleIcon } from "../ui/Icons";
-import { fps } from "../../helpers";
-import useShorcuts, { type Shortcut } from "../../hooks/useShorcuts";
-import type { Accessor, ParentComponent } from "solid-js";
 import type { StatsTooltipData } from "./Tooltips";
-import { createStore } from "solid-js/store";
-import Output from "../ui/Output";
+import StandardTooltip, { StatsTooltip } from "./Tooltips";
 
 type DrawerProps = {
   boardData: ReturnType<typeof import("../../hooks/useBoardData").default>;

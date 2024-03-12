@@ -1,15 +1,15 @@
-import { onMount, createSignal, Show, createMemo } from "solid-js";
-import useGrid from "./hooks/useGrid";
-import useHash from "./hooks/useHash";
-import useColors from "./hooks/useColors";
-import usePainter from "./hooks/usePainter";
-import useTimer from "./hooks/useTimer";
-import useBoardData from "./hooks/useBoardData";
-import useAgent from "./hooks/useAgent";
+import { Show, createMemo, createSignal, onMount } from "solid-js";
+import Drawer from "./components/Drawer/Drawer";
 import { SimpleButton } from "./components/ui/Buttons";
 import DebuggerPanel from "./components/ui/DebuggerPanel";
-import Drawer from "./components/Drawer/Drawer";
 import { BATTERY_REFRESH_INTERVAL, STEP_SPACING } from "./data";
+import useAgent from "./hooks/useAgent";
+import useBoardData from "./hooks/useBoardData";
+import useColors from "./hooks/useColors";
+import useGrid from "./hooks/useGrid";
+import useHash from "./hooks/useHash";
+import usePainter from "./hooks/usePainter";
+import useTimer from "./hooks/useTimer";
 
 let boardRef: HTMLCanvasElement;
 let gridRef: HTMLCanvasElement;

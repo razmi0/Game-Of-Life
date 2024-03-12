@@ -1,7 +1,6 @@
-import { createSignal, Show, JSXElement } from "solid-js";
-import Separator from "./Separator";
-import Icon from "./Icons";
+import { JSXElement, Show, createSignal } from "solid-js";
 import { ICON_SIZE } from "../../data/index";
+import Icon from "./Icons";
 
 type DebuggerPanelProps = {
   children: JSXElement;

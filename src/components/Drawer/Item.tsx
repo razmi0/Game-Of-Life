@@ -1,7 +1,7 @@
-import { Show, createSignal, createEffect, onMount } from "solid-js";
+import type { Component, JSX, JSXElement } from "solid-js";
+import { Show, createEffect, createSignal, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import { SHOW_TOOLTIP_DEBUG, TOOLTIP_SPACING } from "../../data";
-import type { JSX, Component, JSXElement } from "solid-js";
 import { ICON_SIZE } from "../../data/index";
 import Icon from "../ui/Icons";
 

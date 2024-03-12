@@ -1,5 +1,5 @@
+import type { Component, JSX } from "solid-js";
 import { Show } from "solid-js";
-import type { JSX, Component } from "solid-js";
 
 type HeaderProps = {
   children?: JSX.Element;
@@ -22,10 +22,4 @@ export const TooltipTitle = (props: ToolTipTitleProps) => (
   </div>
 );
 
-// const RandomTitle = () => (
-//   <div class="flex flex-row items-center justify-between translate-y-[5px]">
-//     <div>randomness</div>
-//     <div class="text-3xs flex text-dw-100 gap-1 items-center">arrow left/right</div>
-//   </div>
-// );
 export default Header;

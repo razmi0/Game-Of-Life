@@ -1,5 +1,6 @@
 import type { Accessor } from "solid-js";
 import { createMemo, onCleanup, onMount } from "solid-js";
+import { createStore } from "solid-js/store";
 import {
   DEBOUNCING_DELAY,
   DEFAULT_GRID_COLOR,
@@ -11,7 +12,6 @@ import {
   MIN_SPACING,
 } from "../data";
 import { debounce } from "../helpers";
-import { createStore } from "solid-js/store";
 
 const nRowInit = Math.floor(window.innerHeight / INITIAL_CELL_SIZE) + 1;
 const nColInit = Math.floor(window.innerWidth / INITIAL_CELL_SIZE) + 1;

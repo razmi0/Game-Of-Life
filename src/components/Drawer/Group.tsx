@@ -1,7 +1,7 @@
-import { type Component, createSignal, Show } from "solid-js";
 import type { JSX } from "solid-js";
-import Icon from "../ui/Icons";
+import { Show, createSignal, type Component } from "solid-js";
 import { ICON_SIZE } from "../../data";
+import Icon from "../ui/Icons";
 
 type GroupProps = {
   defaultTitle?: string;
