@@ -8,7 +8,7 @@
     "build": "vite build",
     "serve": "vite preview",
     "net": "vite --host",
-    "lint": "eslint --ext .ts src"
+    "lint": "eslint --ext .ts,.tsx src"
   },
   "license": "MIT",
   "devDependencies": {
