@@ -3,7 +3,7 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: ["plugin:solid/typescript"],
+  extends: ["plugin:solid/typescript", "plugin:jsx-a11y/strict"],
   overrides: [
     {
       env: {
@@ -20,7 +20,7 @@ module.exports = {
     ecmaVersion: "latest",
     sourceType: "module",
   },
-  plugins: ["@typescript-eslint", "solid"],
+  plugins: ["@typescript-eslint", "solid", "jsx-a11y"],
   rules: {
     "no-unused-vars": ["warn"],
     "no-empty": "warn",
