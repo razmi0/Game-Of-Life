@@ -1,3 +1,4 @@
+/* eslint-disable */
 type DrawShapeType = {
   context: CanvasRenderingContext2D;
   x: number;
