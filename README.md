@@ -53,7 +53,6 @@ Age => color
 - [ ] (#21) Find a way to implement loader when hash running
 - [ ] (#22) hook useOnResize ? currently
 - [ ] (#24) remove randomness to a default value 80% ?
-- [ ] (#26) Install eslint package + configuration
 
 #### DONE
 
@@ -68,6 +67,7 @@ Age => color
 - [x] (#19) Refactor if Nparam > 2 => use object
 - [x] (#23) replace cell size by buttons
 - [x] (#25) grid panel
+- [x] (#26) Install eslint package + configuration + cleaning
 
 #### RESOURCES
 
