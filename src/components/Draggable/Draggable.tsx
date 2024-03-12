@@ -62,6 +62,7 @@ export default function Draggable(props: DraggableProps): JSXElement {
       setDrag("end", true);
     },
   });
+  //eslint-disable-next-line
   if (!props.children) throw new Error("Draggable component must have children");
   let child: HTMLElement;
   let now = Date.now();

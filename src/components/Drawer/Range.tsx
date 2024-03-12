@@ -27,13 +27,13 @@ export type RangeProps = {
 };
 
 const SimpleRange = (props: RangeProps) => {
-  const min = props.min === 0 ? 0 : props.min || 10;
-  const max = props.max || 1000;
+  const min = () => (props.min === 0 ? 0 : props.min || 10);
+  const max = () => props.max || 1000;
 
-  const milestoneIsBoolean = typeof props.milestones === "boolean" ? true : false;
-  const milestonesSize = Array.isArray(props.milestones) ? props.milestones.length : 0;
+  const milestoneIsBoolean = () => (typeof props.milestones === "boolean" ? true : false);
+  const milestonesSize = () => (Array.isArray(props.milestones) ? props.milestones.length : 0);
 
-  const handleInput = props.onInput ?? (() => null);
+  const handleInput = () => props.onInput ?? (() => null);
 
   return (
     <div class={`relative mb-5`}>
@@ -45,30 +45,30 @@ const SimpleRange = (props: RangeProps) => {
         id={props.aria}
         type="range"
         value={props.value}
-        min={min}
-        max={max}
+        min={min()}
+        max={max()}
         class={`h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-yellow-400 ${props.class || ""}`} // prettier-ignore
         onChange={(e) => props.onChange(e)}
         aria-label={props.aria}
         onInput={handleInput}
       />
-      <Show when={milestoneIsBoolean && props.milestones}>
+      <Show when={milestoneIsBoolean() && props.milestones}>
         <For each={[min, max]}>
           {(milestone, i) => (
             <>
               <span class={`text-sm text-gray-500 dark:text-gray-400 absolute ${milestoneLayout[2][i()]} -bottom-6`}>
-                {milestone}
+                {milestone()}
               </span>
             </>
           )}
         </For>
       </Show>
-      <Show when={!milestoneIsBoolean && milestonesSize > 1}>
+      <Show when={!milestoneIsBoolean() && milestonesSize() > 1}>
         <For each={props.milestones as Milestones}>
           {(milestone, i) => (
             <>
               <span
-                class={`text-sm text-gray-500 dark:text-gray-400 absolute ${milestoneLayout[milestonesSize as MilestoneIndexes][i()]} -bottom-6`} // prettier-ignore
+                class={`text-sm text-gray-500 dark:text-gray-400 absolute ${milestoneLayout[milestonesSize() as MilestoneIndexes][i()]} -bottom-6`} // prettier-ignore
               >
                 {milestone}
               </span>

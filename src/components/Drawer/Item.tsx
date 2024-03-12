@@ -15,7 +15,7 @@ type ItemProps = {
   hover?: boolean;
   onHover?: () => void;
   tooltip?: JSX.Element;
-  showTooltipOnClick?: boolean;
+  staticShowOnClick?: boolean;
   yes?: boolean;
 };
 
@@ -24,20 +24,24 @@ const Item: Component<Prettify<ItemProps>> = (props) => {
 
   let itemRef: HTMLDivElement;
 
-  const hasIndicator = !!props.indicator;
-  const hasLeft = !!props.left;
-  const hasRight = !!props.right;
-  const hasChildren = !!props.children;
-  const hasTooltip = !!props.tooltip;
-  const withClick = !!props.showTooltipOnClick;
+  const hasIndicator = () => !!props.indicator;
+  const hasLeft = () => !!props.left;
+  const hasRight = () => !!props.right;
+  const hasChildren = () => !!props.children;
+  const hasTooltip = () => !!props.tooltip;
 
-  const onMouseEnter = withClick ? () => {} : ([setHovering, true] as const);
-  const onMouseLeave = withClick ? () => {} : ([setHovering, false] as const);
-  const toggleOnClick = !withClick ? () => {} : () => setHovering((p) => !p);
+  const handleClick = () => {
+    props.onClick && props.onClick();
+  };
 
   return (
-    <div ref={(el) => (itemRef = el)} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onClick={toggleOnClick}>
-      <Indicator show={hasIndicator} itemRef={itemRef!}>
+    <div
+      ref={(el) => (itemRef = el)}
+      onMouseEnter={props.staticShowOnClick ? () => {} : ([setHovering, true] as const)}
+      onMouseLeave={props.staticShowOnClick ? () => {} : ([setHovering, false] as const)}
+      onClick={props.staticShowOnClick ? () => setHovering((p) => !p) : () => {}}
+    >
+      <Indicator show={hasIndicator()} itemRef={itemRef!}>
         {props.indicator}
       </Indicator>
       <div
@@ -45,13 +49,13 @@ const Item: Component<Prettify<ItemProps>> = (props) => {
           "flex items-center justify-center text-sm text-dw-150 w-full hover:bg-dw-300 hover:text-dw-100 py-2 " +
           (props.classes || "")
         }
-        onClick={props.onClick}
+        onClick={handleClick}
       >
-        <Left show={hasLeft}>{props.left}</Left>
-        <Child show={hasChildren}>{props.children}</Child>
-        <Right show={hasRight}>{props.right}</Right>
+        <Left show={hasLeft()}>{props.left}</Left>
+        <Child show={hasChildren()}>{props.children}</Child>
+        <Right show={hasRight()}>{props.right}</Right>
 
-        <Tooltip yes={props.yes} when={hovering() && hasChildren && hasTooltip} itemRef={itemRef!}>
+        <Tooltip yes={props.yes} when={hovering() && hasChildren() && hasTooltip()} itemRef={itemRef!}>
           {props.tooltip}
         </Tooltip>
       </div>
@@ -78,12 +82,10 @@ const Tooltip = (props: TooltipProps) => {
 
   createEffect(() => {
     if (show()) {
-      if (props.itemRef && !itemSize.width && !itemSize.height) {
+      if (props.itemRef && !itemSize.width && !itemSize.height)
         setItemSize({ width: props.itemRef.offsetWidth, height: props.itemRef.offsetHeight });
-      }
-      if (tooltipRef && !tooltipSize.width && !tooltipSize.height) {
+      if (tooltipRef && !tooltipSize.width && !tooltipSize.height)
         setTooltipSize({ width: tooltipRef.offsetWidth, height: tooltipRef.offsetHeight });
-      }
     }
   });
 
@@ -97,7 +99,7 @@ const Tooltip = (props: TooltipProps) => {
   return (
     <div
       class="fixed flex transition-opacity "
-      style={`transform: translate(${spacing()}px, -${offsetY()}px);`}
+      style={{ transform: `translate(${spacing()}px, -${offsetY()}px)` }}
       classList={{ ["opacity-0"]: !show(), ["opacity-100"]: show() }}
       onMouseEnter={[setOpen, true]}
       onMouseLeave={[setOpen, false]}
@@ -124,12 +126,12 @@ type SafeAreaProps = {
 const SafeArea = (props: SafeAreaProps) => {
   return (
     <div
-      style={`
-          height : ${props.height}px;
-          width: ${props.width}px;
-          background-color: ${props.color ?? "transparent"};
-          pointer-events: none;
-        `}
+      style={{
+        height: `${props.height}px`,
+        width: `${props.width}px`,
+        "background-color": props.color ?? "transparent",
+        "pointer-events": "none",
+      }}
       class="-z-10 grid items-center"
     >
       {props.children}
@@ -146,16 +148,14 @@ const Indicator = (props: LabelProps) => {
   const [itemHeight, setItemHeight] = createSignal(0);
 
   onMount(() => {
-    if (props.itemRef && itemHeight() !== props.itemRef.offsetHeight) {
-      setItemHeight(props.itemRef.offsetHeight);
-    }
+    if (props.itemRef && itemHeight() !== props.itemRef.offsetHeight) setItemHeight(props.itemRef.offsetHeight);
   });
 
   return (
     <Show when={props.show}>
       <label
         class="absolute right-0 text-sm text-yellow-400 font-bold"
-        style={`transform: translate(2px,${(itemHeight() + 10) / 2}px);`}
+        style={{ transform: `translate(2px,${(itemHeight() + 10) / 2}px)` }}
       >
         {props.children}
       </label>

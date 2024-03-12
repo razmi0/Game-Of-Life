@@ -1,5 +1,5 @@
 import type { Accessor } from "solid-js";
-import { batch, createMemo, createSignal, onCleanup, onMount } from "solid-js";
+import { createMemo, onCleanup, onMount } from "solid-js";
 import {
   DEBOUNCING_DELAY,
   DEFAULT_GRID_COLOR,
@@ -94,7 +94,7 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
     context.stroke();
   };
 
-  const updateSizes = debounce(() => {
+  const updateSizes = () => {
     console.log("debounced");
     setBoard("wW", window.innerWidth);
     setBoard("wH", window.innerHeight);
@@ -102,12 +102,13 @@ export default function useGrid(ctx: Accessor<CanvasRenderingContext2D | undefin
     computeCol();
     computeCell();
     drawGrid();
-  }, DEBOUNCING_DELAY);
+  };
 
   onMount(() => {
-    window.addEventListener("resize", updateSizes);
+    const debouncedUpdateSizes = debounce(updateSizes, DEBOUNCING_DELAY);
+    window.addEventListener("resize", debouncedUpdateSizes);
+    onCleanup(() => window.removeEventListener("resize", debouncedUpdateSizes));
   });
-  onCleanup(() => window.removeEventListener("resize", updateSizes));
 
   return {
     board,
