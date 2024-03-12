@@ -22,9 +22,9 @@ export const InputColor = (props: InputColorProps) => {
         name={props.id}
         value={props.value}
         disabled={props.disabled ?? false}
-        onInput={props.onInput}
-        onChange={props.onChange}
-        onBlur={props.onBlur}
+        onInput={(e) => props.onInput?.(e)}
+        onChange={(e) => props.onChange?.(e)}
+        onBlur={(e) => props.onBlur?.(e)}
       />
     </>
   );
