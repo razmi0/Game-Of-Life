@@ -21,7 +21,7 @@ const App = () => {
 
   const grid = useGrid(gridCtx);
   const boardData = useBoardData();
-  const color = useColors(grid.nCell);
+  const color = useColors(grid.board.nCell);
   const hash = useHash(grid, boardData, color, boardCtx);
   const painter = usePainter(hash.paintCell);
 
@@ -62,7 +62,7 @@ const App = () => {
   });
 
   const gridInfo = createMemo(() => {
-    return { width: grid.wW(), height: grid.wH() };
+    return { width: grid.board.wW, height: grid.board.wH };
   });
 
   const debug = true;
@@ -122,15 +122,15 @@ const App = () => {
       {/* BOARD */}
       <canvas
         style={{ "background-color": color.backgroundColor() }}
-        width={grid.wW()}
-        height={grid.wH()}
+        width={grid.board.wW}
+        height={grid.board.wH}
         ref={boardRef}
       />
-      {/* GRID */}
+      {/* GRID.BOARD */}
       <canvas
         style={{ "background-color": "transparent", position: "absolute", "pointer-events": "none" }}
-        width={grid.wW()}
-        height={grid.wH()}
+        width={grid.board.wW}
+        height={grid.board.wH}
         ref={gridRef}
       />
     </>
