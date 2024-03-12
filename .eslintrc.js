@@ -3,11 +3,7 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: [
-    // "eslint:recommended",
-    // "plugin:@typescript-eslint/recommended",
-    "plugin:solid/typescript",
-  ],
+  extends: ["plugin:solid/typescript"],
   overrides: [
     {
       env: {
@@ -25,5 +21,8 @@ module.exports = {
     sourceType: "module",
   },
   plugins: ["@typescript-eslint", "solid"],
-  rules: {},
+  rules: {
+    "no-unused-vars": "warn",
+    "no-empty": "warn",
+  },
 };
