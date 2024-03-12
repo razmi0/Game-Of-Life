@@ -54,7 +54,7 @@
   box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.1);
 } */
 
-.ant-wave {
+.conway-wave {
   position: absolute;
   background: 0 0;
   pointer-events: none;
@@ -63,20 +63,20 @@
   box-shadow: 0 0 0 0 currentColor;
   opacity: 0.2;
 }
-/* ant-wave wave-motion-appear wave-motion-appear-active wave-motion */
+/* conway-wave wave-motion-appear wave-motion-appear-active wave-motion */
 /* left: -1px; top: -1px; width: 128px; height: 32px; border-radius: 6px; --wave-color: rgb(64, 150, 255); */
 
-.ant-wave.wave-motion-appear {
+.conway-wave.wave-motion-appear {
   --cb-ease-out: cubic-bezier(0.08, 0.82, 0.17, 1);
   transition: box-shadow 0.4s cubic-bezier(0.08, 0.82, 0.17, 1), opacity 2s cubic-bezier(0.08, 0.82, 0.17, 1);
 }
 
-.ant-wave.wave-motion-appear-active {
+.conway-wave.wave-motion-appear-active {
   box-shadow: 0 0 0 6px currentColor;
   opacity: 0;
 }
 
-.ant-wave.wave-motion-appear.wave-quick {
+.conway-wave.wave-motion-appear.wave-quick {
   --cb-ease-in-out: cubic-bezier(0.78, 0.14, 0.15, 0.86)
   transition: box-shadow 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86), opacity 0.35s cubic-bezier(0.78, 0.14, 0.15, 0.86);
 }
