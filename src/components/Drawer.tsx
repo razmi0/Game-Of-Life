@@ -227,9 +227,9 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     return (
       <div class="flex flex-row gap-3 mt-3 min-w-48 justify-between h-full">
         <ColorSection>
-          <For each={props.color.palette}>
+          <For each={props.color.palette()}>
             {(color, i) => {
-              const id = `color_${i()}`;
+              const id = () => `color_${i()}`;
 
               const changeColor = (e: Event) => {
                 const newColor = (e.target as HTMLInputElement).value;
@@ -241,9 +241,9 @@ export default function Drawer(props: Prettify<DrawerProps>) {
                   <ColorItem>
                     <InputColor
                       class="vanilla"
-                      id={id}
+                      id={id()}
                       value={color ?? "#FFFFFF"}
-                      label={formatIdToLabel(id)}
+                      label={formatIdToLabel(id())}
                       onChange={changeColor}
                       hiddenLabel
                     />
@@ -258,8 +258,8 @@ export default function Drawer(props: Prettify<DrawerProps>) {
               );
             }}
           </For>
-          <div class="h-full flex-grow"></div>
-          <Show when={props.color.palette.length < props.color.maxColors}>
+          <div class="h-full flex-grow" />
+          <Show when={props.color.palette.length < props.color.maxColors()}>
             <IconButton
               onClick={() => {
                 props.color.addColor(newColor());
