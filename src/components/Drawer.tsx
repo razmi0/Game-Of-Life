@@ -706,8 +706,6 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Separator />
       <Group>
         <Item
-          showTooltipOnClick
-          yes
           indicator={props.grid.cellSize()}
           tooltip={
             <StandardTooltip title={<TooltipTitle title="sizes" />}>
