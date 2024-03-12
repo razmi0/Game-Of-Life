@@ -3,7 +3,7 @@ import { createStore } from "solid-js/store";
 import { SHOW_TOOLTIP_DEBUG, TOOLTIP_SPACING } from "../../data";
 import type { JSX, Component, JSXElement } from "solid-js";
 import { ICON_SIZE } from "../../data/index";
-import Icon from "../Icons";
+import Icon from "../ui/Icons";
 
 type ItemProps = {
   children?: JSX.Element;

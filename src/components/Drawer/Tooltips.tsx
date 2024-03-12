@@ -1,4 +1,4 @@
-import Separator from "./Separator";
+import Separator from "../ui/Separator";
 import { For, Show } from "solid-js";
 import type { Component, JSXElement } from "solid-js";
 

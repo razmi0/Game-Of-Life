@@ -1,14 +1,15 @@
 import { type Component, createSignal, Show } from "solid-js";
 import type { JSX } from "solid-js";
-import Icon from "../Icons";
+import Icon from "../ui/Icons";
 import { ICON_SIZE } from "../../data";
 
 type GroupProps = {
-  title?: string;
+  defaultTitle?: string;
   children: JSX.Element;
   left?: JSX.Element;
   classes?: string;
 };
+
 const Group: Component<GroupProps> = (props) => {
   const [open, setOpen] = createSignal(true);
   const [pin, setPin] = createSignal(false);
@@ -26,7 +27,7 @@ const Group: Component<GroupProps> = (props) => {
     </div>
   );
 
-  const hasTitle = !!props.title;
+  const hasTitle = !!props.defaultTitle;
 
   return (
     <div class="my-3 z-50 bg-dw-500">
@@ -41,7 +42,7 @@ const Group: Component<GroupProps> = (props) => {
           left={props.left}
           onClick={trigger}
         >
-          <h4 class="uppercase monserrat tracking-widest text-xs font-bold">{props.title}</h4>
+          <h4 class="uppercase monserrat tracking-widest text-xs font-bold">{props.defaultTitle}</h4>
         </GroupHeader>
       </Show>
       <Show when={open()}>
@@ -59,10 +60,13 @@ type GroupHeaderProps = {
 };
 
 const GroupHeader: Component<GroupHeaderProps> = (props) => {
+  const handler = () => {
+    props.onClick();
+  };
   return (
     <button
       class="gap-2 flex flex-row justify-start w-full items-center text-dw-300 hover:text-dw-200 "
-      onClick={props.onClick}
+      onClick={handler}
     >
       <div class="ps-1 ">{props.left}</div>
       <div>{props.children}</div>
@@ -72,6 +76,6 @@ const GroupHeader: Component<GroupHeaderProps> = (props) => {
   );
 };
 
-const Spacer = () => <div class="flex-grow"></div>;
+const Spacer = () => <div class="flex-grow" />;
 
 export default Group;

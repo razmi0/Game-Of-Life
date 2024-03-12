@@ -16,30 +16,30 @@ import {
   PEN_SIZE_STEP,
   RANDOM_STEP,
   STEP_SPACING,
-} from "../data";
-import { ComposedButton, IconButton, IconComponentButton, SimpleButton } from "./Buttons";
-import Wrapper from "./Drawer/Content";
-import Group from "./Drawer/Group";
-import Header, { TooltipTitle } from "./Drawer/Headers";
-import StandardTooltip, { StatsTooltip } from "./Drawer/Tooltips";
-import Item from "./Drawer/Item";
-import SimpleRange from "./Drawer/Range";
-import Separator from "./Drawer/Separator";
-import { InputColor } from "./Input";
-import Icon, { MinusCircleIcon, PlusCircleIcon } from "./Icons";
-import { fps } from "../helpers";
-import useShorcuts, { type Shortcut } from "../hooks/useShorcuts";
+} from "../../data";
+import { ComposedButton, IconButton, IconComponentButton, SimpleButton } from "../ui/Buttons";
+import Wrapper from "./Content";
+import Group from "./Group";
+import Header, { TooltipTitle } from "./Headers";
+import StandardTooltip, { StatsTooltip } from "./Tooltips";
+import Item from "./Item";
+import SimpleRange from "./Range";
+import Separator from "../ui/Separator";
+import { InputColor } from "../ui/Input";
+import Icon, { MinusCircleIcon, PlusCircleIcon } from "../ui/Icons";
+import { fps } from "../../helpers";
+import useShorcuts, { type Shortcut } from "../../hooks/useShorcuts";
 import type { Accessor, ParentComponent } from "solid-js";
-import type { StatsTooltipData } from "./Drawer/Tooltips";
+import type { StatsTooltipData } from "./Tooltips";
 import { createStore } from "solid-js/store";
-import Output from "./Output";
+import Output from "../ui/Output";
 
 type DrawerProps = {
-  boardData: ReturnType<typeof import("../hooks/useBoardData").default>;
-  grid: ReturnType<typeof import("../hooks/useGrid").default>;
-  gameLoop: ReturnType<typeof import("../hooks/useTimer").default>;
-  painter: ReturnType<typeof import("../hooks/usePainter").default>;
-  color: ReturnType<typeof import("../hooks/useColors").default>;
+  boardData: ReturnType<typeof import("../../hooks/useBoardData").default>;
+  grid: ReturnType<typeof import("../../hooks/useGrid").default>;
+  gameLoop: ReturnType<typeof import("../../hooks/useTimer").default>;
+  painter: ReturnType<typeof import("../../hooks/usePainter").default>;
+  color: ReturnType<typeof import("../../hooks/useColors").default>;
   /** misc */
   reset: () => void;
   applyColors: () => void;
@@ -393,11 +393,11 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       const newUpperSpacingBoundary = props.grid.gridSpacing.spacing + STEP_SPACING;
       const newLowerSpacingBoundary = props.grid.gridSpacing.spacing - STEP_SPACING;
 
-      const newUpperCellSizeBoundary = props.grid.cellSize() + CELL_SIZE_STEP;
-      const newLowerCellSizeBoundary = props.grid.cellSize() - CELL_SIZE_STEP;
+      const newUpperCellSizeBoundary = props.grid.board.cellSize + CELL_SIZE_STEP;
+      const newLowerCellSizeBoundary = props.grid.board.cellSize - CELL_SIZE_STEP;
 
       const canIncreaseGridSpacing =
-        newUpperSpacingBoundary < props.grid.cellSize() && newUpperSpacingBoundary <= MAX_SPACING;
+        newUpperSpacingBoundary < props.grid.board.cellSize && newUpperSpacingBoundary <= MAX_SPACING;
       const canDecreaseGridSpacing = newLowerSpacingBoundary >= MIN_SPACING;
 
       const canDecreaseCellSize =
@@ -421,7 +421,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
               color={allowed.decreaseCellSize ? undefined : "#FF0000"}
             />
           </IconComponentButton>
-          <Output>{props.grid.cellSize() + " px"}</Output>
+          <Output>{props.grid.board.cellSize + " px"}</Output>
           <IconComponentButton onClick={increaseCellSize}>
             <PlusCircleIcon
               width={xl}
@@ -553,7 +553,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
     },
     {
       label: "cell size",
-      value: props.grid.cellSize() + "px",
+      value: props.grid.board.cellSize + "px",
       separator: true,
     },
     {
@@ -704,7 +704,7 @@ export default function Drawer(props: Prettify<DrawerProps>) {
       <Separator />
       <Group>
         <Item
-          indicator={props.grid.cellSize()}
+          indicator={props.grid.board.cellSize}
           tooltip={
             <StandardTooltip title={<TooltipTitle title="sizes" />}>
               <SizesTooltip />

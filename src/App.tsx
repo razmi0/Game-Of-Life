@@ -6,9 +6,9 @@ import usePainter from "./hooks/usePainter";
 import useTimer from "./hooks/useTimer";
 import useBoardData from "./hooks/useBoardData";
 import useAgent from "./hooks/useAgent";
-import { SimpleButton } from "./components/Buttons";
-import DebuggerPanel from "./components/DebuggerPanel";
-import Drawer from "./components/Drawer";
+import { SimpleButton } from "./components/ui/Buttons";
+import DebuggerPanel from "./components/ui/DebuggerPanel";
+import Drawer from "./components/Drawer/Drawer";
 import { BATTERY_REFRESH_INTERVAL, STEP_SPACING } from "./data";
 
 let boardRef: HTMLCanvasElement;
@@ -71,7 +71,7 @@ const App = () => {
     <>
       <Show when={import.meta.env.DEV && debug}>
         <DebuggerPanel>
-          <div>
+          <div class="w-full">
             <p>Grid color : {grid.gridSpacing.gridColor}</p>
             <p>Spacing : {grid.gridSpacing.spacing} </p>
           </div>

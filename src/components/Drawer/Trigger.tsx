@@ -1,5 +1,5 @@
 import type { VoidComponent } from "solid-js";
-import Icon from "../Icons";
+import Icon from "../ui/Icons";
 
 type TriggerProps = {
   trigger: () => void;
