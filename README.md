@@ -39,22 +39,36 @@ Age => color
 
 #### TODO
 
-- [ ] implement workers
-- [x] implement redraw only flipped ?
-- [ ] _replace SafeArea Rect with safeArea trapezoid svg (left height === item height ; right height === tooltip height)_
-- [ ] CURRENT TASK => paint the grid
-- [ ] text to grid
-- [ ] img to grid
-- [ ] color picker for cells
-- [ ] shape picker for draw (common shapes + custom + remarquable shapes)
-- [ ] shape picker for cells (circle, square, triangle, hexagon, octogon, star, heart, custom)
-- [ ] toroidal grid
-- [ ] implement remarquable shapes and add it to grid
-- [x] tortue/escargot lapin icon pour speed range
-- [ ] reset default params
-- [ ] full HTML for SEO presentation (what ? for what ? why ? how ? when ? )
-- [ ] space between cells (new branch ) and background off cells grey
-- [x] stats => add cell size
-- [ ] implement white theme
-- [ ] add loader animation
-- [ ] tools => zoom on cursor
+- [ ] (#1) implement workers ( for resize colors too )
+- [ ] (#4) Replace resetBlank by a resetDefault feat
+- [ ] (#6) text to grid (HOW ?????)
+- [ ] (#7) img to grid
+- [ ] (#9) shape picker for draw (common shapes + custom + remarquable shapes)
+- [ ] (#11) toroidal grid on X (already done on Y)
+- [ ] (#12) implement remarquable shapes and add it to grid
+- [ ] (#14) full HTML for SEO presentation (what ? for what ? why ? how ? when ? )
+- [ ] (#17) implement white theme
+- [ ] (#18) add loader animation
+- [ ] (#20) Refacto resize so extended on the canva plane (currently resize is just working on the array length so past hash is compacted or extended)
+- [ ] (#21) Find a way to implement loader when hash running
+- [ ] (#22) hook useOnResize ? currently
+- [ ] (#24) remove randomness to a default value 80% ?
+
+#### DONE
+
+- [x] (#2) implement redraw only flipped ?
+- [x] (#3) paint the grid / erase the grid (with size)
+- [x] (#5) add color picker to paint tools
+- [x] (#8) color picker for cells (alive, dead, background)
+- [x] (#10) shape picker for cells (circle, square)
+- [x] (#13) tortue/escargot lapin icon pour speed range
+- [x] (#15) space between cells (new branch ) and background off cells grey
+- [x] (#16) stats => add cell size
+- [x] (#19) Refactor if Nparam > 2 => use object
+- [x] (#23) replace cell size by buttons
+- [x] (#25) grid panel
+- [x] (#26) Install eslint package + configuration + cleaning
+
+#### RESOURCES
+
+<svg class="pointer-events-none fixed inset-0 bottom-0 left-0 right-0 top-0 -z-50 min-h-full min-w-full overflow-x-hidden overflow-y-hidden bg-white/10 opacity-5"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="4" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter><rect width="100%" height="100%" filter="url(#noise)"></rect></svg>

@@ -1,11 +1,11 @@
 import { createStore } from "solid-js/store";
 import { DEFAULT_RANDOMNESS, MAX_ALIVE_RANDOM, MIN_ALIVE_RANDOM } from "../data";
 
-export default function useData() {
-  const [data, setData] = createStore({
+export default function useBoardData() {
+  const [boardData, setData] = createStore({
     generation: 0,
     incrementGeneration: () => {
-      setData("generation", data.generation + 1);
+      setData("generation", boardData.generation + 1);
     },
     resetGeneration: () => {
       setData("generation", 0);
@@ -22,18 +22,18 @@ export default function useData() {
     },
 
     randomness: DEFAULT_RANDOMNESS,
-    randomChoice: () => (Math.random() * 100 - data.randomness + 50 > 50 ? true : false),
+    randomChoice: () => (Math.random() * 100 - boardData.randomness + 50 > 50 ? true : false),
 
     tuneRandom: (value: number /** range 0 - 100 */) => {
       setData("randomness", value);
     },
 
     changeRandom: (addedRandom: number) => {
-      const newRandom = data.randomness + addedRandom;
+      const newRandom = boardData.randomness + addedRandom;
       if (newRandom < MIN_ALIVE_RANDOM || newRandom > MAX_ALIVE_RANDOM) return;
       setData("randomness", newRandom);
     },
   });
 
-  return data;
+  return boardData;
 }

@@ -3,7 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-::root {
+:root {
   --color: #b3b3b7;
   /** TW custom colors */
   --bg-dw-color-100: #efeff3;
@@ -15,6 +15,7 @@
 }
 
 #root {
+  @apply antialiased;
   display: flex;
   place-content: center;
   place-items: center;
@@ -36,8 +37,158 @@
   margin: 1rem 0;
 }
 
+.tooltip {
+  @apply bg-dw-500 rounded-lg border-[1px] border-black/40 shadow-inner-shadow-dark-sm;
+}
+/*  */
+
+.shadow-inner-shadow-dark-sm {
+  --tw-shadow: 0px 1px 0px 0px hsla(0, 0%, 100%, 0.02) inset, 0px 0px 0px 1px hsla(0, 0%, 100%, 0.02) inset,
+    0px 0px 0px 1px rgba(0, 0, 0, 0.25);
+  --tw-shadow-colored: inset 0px 1px 0px 0px var(--tw-shadow-color), inset 0px 0px 0px 1px var(--tw-shadow-color),
+    0px 0px 0px 1px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+/* .animate-wave {
+  box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.1);
+} */
+
+.conway-wave {
+  position: absolute;
+  background: 0 0;
+  pointer-events: none;
+  box-sizing: border-box;
+  color: var(--wave-color, #3e4554);
+  box-shadow: 0 0 0 0 currentColor;
+  opacity: 0.2;
+}
+/* conway-wave wave-motion-appear wave-motion-appear-active wave-motion */
+/* left: -1px; top: -1px; width: 128px; height: 32px; border-radius: 6px; --wave-color: rgb(64, 150, 255); */
+
+.conway-wave.wave-motion-appear {
+  --cb-ease-out: cubic-bezier(0.08, 0.82, 0.17, 1);
+  transition: box-shadow 0.4s cubic-bezier(0.08, 0.82, 0.17, 1), opacity 2s cubic-bezier(0.08, 0.82, 0.17, 1);
+}
+
+.conway-wave.wave-motion-appear-active {
+  box-shadow: 0 0 0 6px currentColor;
+  opacity: 0;
+}
+
+.conway-wave.wave-motion-appear.wave-quick {
+  --cb-ease-in-out: cubic-bezier(0.78, 0.14, 0.15, 0.86)
+  transition: box-shadow 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86), opacity 0.35s cubic-bezier(0.78, 0.14, 0.15, 0.86);
+}
+
 span,
 p {
   z-index: 1;
   text-wrap: balance;
+}
+
+/** */
+input[type="color" i].vanilla {
+  @apply rounded-t-md;
+  appearance: none;
+  -webkit-appearance: none;
+  /* border: 1px solid #efeff3; */
+  background-color: #b3b3b7;
+  width: 100%;
+}
+
+input[type="color" i].vanilla:hover {
+  border: 1px solid transparent;
+  border-bottom: none;
+}
+
+input[type="color" i].vanilla:focus {
+  border: 1px solid transparent;
+  border-bottom: none;
+}
+
+input[type="color" i]::-webkit-color-swatch-wrapper.vanilla {
+  @apply rounded-t-md;
+  border: 1px solid #efeff3;
+  border: none;
+}
+
+input[type="color" i]::-webkit-color-swatch-wrapper.vanilla:hover {
+  border: 1px solid transparent;
+  border-bottom: none;
+}
+
+input[type="color" i]::-webkit-color-swatch-wrapper.vanilla:focus {
+  border: 1px solid transparent;
+  border-bottom: none;
+}
+
+/** */
+
+input[type="color" i]::-webkit-color-swatch.vanilla {
+  @apply rounded-t-md;
+  border: none;
+}
+input[type="color" i]::-webkit-color-swatch.vanilla:hover {
+  border: 1px solid transparent;
+  border-bottom: none;
+}
+input[type="color" i]::-webkit-color-swatch.vanilla:focus {
+  border: 1px solid transparent;
+  border-bottom: none;
+}
+
+/** */
+
+/** ROUNDED-FULL */
+
+input[type="color" i]::-webkit-color-swatch-wrapper.input-color-rounded-full {
+  @apply rounded-full;
+  padding: 0;
+  border: 1px solid #efeff3;
+  border-bottom: 1px solid #efeff3 !important;
+}
+
+input[type="color" i]::-webkit-color-swatch-wrapper.input-color-rounded-full:hover {
+  border: 1px solid transparent;
+  border-bottom: 1px solid transparent !important;
+}
+
+input[type="color" i]::-webkit-color-swatch-wrapper.input-color-rounded-full:focus {
+  border: 1px solid transparent;
+  border-bottom: 1px solid transparent !important;
+}
+
+/** */
+
+input[type="color" i]::-webkit-color-swatch.input-color-rounded-full {
+  @apply rounded-full;
+  border: none;
+}
+input[type="color" i]::-webkit-color-swatch.input-color-rounded-full:hover {
+  border: 1px solid transparent;
+  border-bottom: 1px solid transparent !important;
+}
+input[type="color" i]::-webkit-color-swatch.input-color-rounded-full:focus {
+  border: 1px solid transparent;
+  border-bottom: 1px solid transparent !important;
+}
+
+/** */
+
+input[type="color" i].input-color-rounded-full {
+  @apply rounded-full;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: #b3b3b7;
+}
+
+input[type="color" i].input-color-rounded-full:hover {
+  border: 1px solid transparent;
+  border-bottom: 1px solid transparent !important;
+}
+
+input[type="color" i].input-color-rounded-full:focus {
+  border: 1px solid transparent;
+  border-bottom: 1px solid transparent !important;
 }

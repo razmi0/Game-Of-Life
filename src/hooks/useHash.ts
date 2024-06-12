@@ -1,18 +1,20 @@
-import { batch, createEffect, createMemo } from "solid-js";
 import type { Accessor } from "solid-js";
-import type { ScreenHook } from "./useScreen";
+import { batch, createEffect, createSignal } from "solid-js";
+import { getCoordsFromIndex, getIndexFromCoords } from "../helpers";
+import { PaintCellType } from "../sharedTypes";
 
 type Hash8Type = Uint8Array & { [index: number]: 0 | 1 };
 type Hash8 = Prettify<Hash8Type>;
 
 export default function useHash(
-  screen: ScreenHook,
-  data: Prettify<DataStore>,
-  findColor: (i: number) => string,
+  grid: ReturnType<typeof import("./useGrid").default>,
+  data: ReturnType<typeof import("./useBoardData").default>,
+  color: ReturnType<typeof import("./useColors").default>,
   ctx: Accessor<CanvasRenderingContext2D | undefined>
 ) {
-  const initHash = () => new Uint8Array(screen.nCell()).map(() => (data.randomChoice() ? 1 : 0)) as Hash8;
-  // const screen.cellSize()= createMemo(() => screen.cellSize());
+  const [isWorkingOnHash, setIsWorkingOnHash] = createSignal(false);
+
+  const initHash = () => new Uint8Array(grid.board.nCell).map(() => (data.randomChoice() ? 1 : 0)) as Hash8;
 
   let hash = initHash();
   let flipIndexes: number[] = [];
@@ -20,14 +22,13 @@ export default function useHash(
   /** hash is totally regenerated and draw (SLOW) */
   const resetHash = () => {
     hash = initHash();
-    drawHashOnReset();
+    drawAllHash();
   };
 
   /** hash change size if needed (copy) */
-
   const resizeHash = () => {
-    const pastSize = hash.length; // old screen.nCell()
-    const newSize = screen.nCell(); // new screen.nCell()
+    const pastSize = hash.length;
+    const newSize = grid.board.nCell;
     if (newSize === pastSize) return;
     else if (newSize < pastSize) {
       hash = hash.copyWithin(0, newSize);
@@ -46,7 +47,7 @@ export default function useHash(
   const updateHash = () => {
     let i = 0;
     flipIndexes = [];
-    const rowSize = screen.nRow();
+    const rowSize = grid.board.nRow;
     let zeros = 0;
     let ones = 0;
     while (i < hash.length) {
@@ -76,60 +77,166 @@ export default function useHash(
       data.setDead(zeros);
     });
 
-    let j = 0;
-    while (j < flipIndexes.length) {
-      hash[flipIndexes[j]] ^= 1;
-      j++;
+    flipHashAtIndexes(flipIndexes);
+  };
+
+  const flipHashAtIndexes = (indexesArr: number[]) => {
+    let i = 0;
+    while (i < indexesArr.length) {
+      hash[indexesArr[i]] ^= 1;
+      i++;
+    }
+  };
+
+  /**
+   * @description draw a shape at a given position
+   */
+  const drawShape = (data: DrawShapeType) => {
+    const { context, x, y, w, h } = data;
+    const shape = grid.shape.selectedShape;
+    const spacing = grid.gridSpacing.visibility ? grid.gridSpacing.spacing / 2 : 0;
+    if (shape === "square") {
+      context.fillRect(x, y, w, h);
+    } else if (shape === "circle") {
+      const circleX = x + (w - spacing) / 2;
+      const circleY = y + (h - spacing) / 2;
+      const circleRadius = (w - spacing) / 2;
+      context.beginPath();
+      context.arc(circleX, circleY, circleRadius, 0, Math.PI * 2);
+      context.fill();
     }
   };
 
   /** draw only changed cells, doesn't read the entire hash (FAST) */
   const drawHash = () => {
     let i = 0;
-    const rowSize = screen.nRow();
+    const rowSize = grid.board.nRow;
+    const cellSize = grid.board.cellSize;
     const context = ctx();
     if (!context) return;
     while (i < flipIndexes.length) {
-      const x = Math.floor(flipIndexes[i] / rowSize) * screen.cellSize();
-      const y = (flipIndexes[i] % rowSize) * screen.cellSize();
+      const [rawX, rawY] = getCoordsFromIndex({ index: flipIndexes[i], rowSize: rowSize, cellSize: cellSize });
+      const spacing = grid.gridSpacing.visibility ? grid.gridSpacing.spacing / 2 : 0;
+      const x = rawX + spacing;
+      const y = rawY + spacing;
+      const w = cellSize - spacing;
+      const h = cellSize - spacing;
+
       if (hash[flipIndexes[i]]) {
-        context.fillStyle = findColor(i);
-        context.fillRect(x, y, screen.cellSize(), screen.cellSize());
+        context.fillStyle = color.findColor(i);
+        drawShape({ context, x, y, w, h });
+      }
+      // Check if corpse has to be drawn
+      else if (!color.seeCorpse()) {
+        // Clear the cell if corpse is not visible
+        context.clearRect(x, y, cellSize, cellSize);
       } else {
-        context.clearRect(x, y, screen.cellSize(), screen.cellSize());
+        context.clearRect(x, y, cellSize, cellSize);
+        const deadColor = color.greyScaledHex(flipIndexes[i]);
+        context.fillStyle = deadColor;
+        drawShape({ context, x, y, w, h });
       }
 
       i++;
     }
+  };
+
+  const resetBlankHash = () => {
+    hash = new Uint8Array(grid.board.nCell) as Hash8;
   };
 
   /** draw and read the entire hash (SLOW) */
-  const drawHashOnReset = () => {
-    let i = 0;
-    const rowSize = screen.nRow();
+  const drawAllHash = () => {
+    let index = 0;
+    const rowSize = grid.board.nRow;
+    const cellSize = grid.board.cellSize;
     const context = ctx();
     if (!context) return;
-    while (i < hash.length) {
-      const x = Math.floor(i / rowSize) * screen.cellSize();
-      const y = (i % rowSize) * screen.cellSize();
-      if (hash[i]) {
-        context.fillStyle = findColor(i);
-        context.fillRect(x, y, screen.cellSize(), screen.cellSize());
-      } else {
-        context.clearRect(x, y, screen.cellSize(), screen.cellSize());
+    while (index < hash.length) {
+      const [rawX, rawY] = getCoordsFromIndex({ index, rowSize, cellSize });
+      const spacing = grid.gridSpacing.visibility ? grid.gridSpacing.spacing / 2 : 0;
+      const x = rawX + spacing;
+      const y = rawY + spacing;
+      const w = cellSize - spacing;
+      const h = cellSize - spacing;
+
+      context.clearRect(x, y, cellSize, cellSize);
+
+      if (hash[index]) {
+        context.fillStyle = color.findColor(index);
+        drawShape({ context, x, y, w, h });
       }
 
-      i++;
+      index++;
     }
   };
 
+  const paintCell = (data: PaintCellType) => {
+    const { x, y, paintSize, tool, penColor } = data;
+    const context = ctx();
+    if (!context) return;
+
+    const rowSize = grid.board.nRow;
+    const cellSize = grid.board.cellSize;
+
+    const offsetXPainted = paintSize - 1;
+    const offsetYPainted = offsetXPainted * rowSize;
+
+    const index = getIndexFromCoords({ x, y, rowSize, cellSize }); // center index x, y, rowSize, cellSize
+
+    for (let row = -offsetYPainted; row <= offsetYPainted; row += rowSize) {
+      for (let col = -offsetXPainted; col <= offsetXPainted; col++) {
+        const paintedIndex = index + row + col;
+        if (paintedIndex < 0 || paintedIndex > hash.length) return;
+
+        switch (tool) {
+          case "pen": {
+            if (hash[paintedIndex]) continue;
+            hash[paintedIndex] = 1;
+            const [x, y] = getCoordsFromIndex({ index: paintedIndex, rowSize, cellSize });
+
+            if (penColor) {
+              context.fillStyle = penColor;
+              color.changeColorAtIndex(penColor, paintedIndex);
+            } else {
+              context.fillStyle = color.findColor(paintedIndex);
+            }
+
+            drawShape({ context, x, y, w: cellSize, h: cellSize });
+
+            break;
+          }
+
+          case "eraser":
+            if (!hash[paintedIndex]) continue;
+            hash[paintedIndex] = 0;
+            const [x, y] = getCoordsFromIndex({ index: paintedIndex, rowSize, cellSize });
+
+            context.clearRect(x, y, cellSize, cellSize);
+
+            break;
+        }
+      }
+    }
+  };
+
+  // replace with future implementation of useOnResize hook ?
   createEffect(() => {
-    if (screen.nCell()) {
+    if (grid.board.nCell !== hash.length) {
       resizeHash();
-      updateHash();
-      drawHash();
+      drawAllHash();
+      // grid.drawGrid();
     }
   });
 
-  return { updateHash, drawHash, resetHash };
+  return {
+    updateHash,
+    drawHash,
+    resetHash,
+    paintCell,
+    drawAllHash,
+    resetBlankHash,
+    isWorkingOnHash,
+    setIsWorkingOnHash,
+  };
 }

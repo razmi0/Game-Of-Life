@@ -1,105 +1,138 @@
-import { CanvasWrapper } from "./components/Wrappers";
-import { onMount, createSignal, Show, createEffect } from "solid-js";
-import useScreen from "./hooks/useScreen";
-import useHash from "./hooks/useHash";
-import useColors from "./hooks/useColors";
-import useClock from "./hooks/useClock";
-import useData from "./hooks/useData";
+import { Show, createMemo, createSignal, onMount } from "solid-js";
+import Drawer from "./components/Drawer/Drawer";
+import { SimpleButton } from "./components/ui/Buttons";
+import DebuggerPanel from "./components/ui/DebuggerPanel";
+import { BATTERY_REFRESH_INTERVAL, STEP_SPACING } from "./data";
 import useAgent from "./hooks/useAgent";
-import { SimpleButton } from "./components/Buttons";
-import DebuggerPanel from "./components/DebuggerPanel";
-import Drawer from "./components/Drawer";
-import { BATTERY_REFRESH_INTERVAL } from "./data";
+import useBoardData from "./hooks/useBoardData";
+import useColors from "./hooks/useColors";
+import useGrid from "./hooks/useGrid";
+import useHash from "./hooks/useHash";
+import usePainter from "./hooks/usePainter";
+import useTimer from "./hooks/useTimer";
 
-let canvas: HTMLCanvasElement;
+let boardRef: HTMLCanvasElement;
+let gridRef: HTMLCanvasElement;
 
 const App = () => {
-  const [ctx, setCtx] = createSignal<CanvasRenderingContext2D>();
+  const [boardCtx, setBoardCtx] = createSignal<CanvasRenderingContext2D>();
+  const [gridCtx, setGridCtx] = createSignal<CanvasRenderingContext2D>();
   const [hasStarted, setHasStarted] = createSignal(false);
 
-  const screen = useScreen(); // context candidate
-  const data = useData();
-  const { findColor } = useColors(screen.nCell);
-  const { updateHash, drawHash, resetHash } = useHash(screen, data, findColor, ctx);
+  const grid = useGrid(gridCtx);
+  const boardData = useBoardData();
+  const color = useColors(grid.board.nCell);
+  const hash = useHash(grid, boardData, color, boardCtx);
+  const painter = usePainter({ work: hash.paintCell });
 
   const run = () => {
     if (!hasStarted()) setHasStarted(true);
-    updateHash();
-    drawHash();
-    data.incrementGeneration();
+    hash.updateHash();
+    hash.drawHash();
+    boardData.incrementGeneration();
+  };
+  const gameLoop = useTimer(run);
+
+  const applyColors = () => {
+    color.applyRandomColors();
+    hash.drawAllHash();
   };
 
   const reset = () => {
     setHasStarted(false);
+    hash.setIsWorkingOnHash(true);
     if (gameLoop.play) gameLoop.switchPlayPause();
-    resetHash();
-    data.resetGeneration();
-  };
-
-  const changeCellSizeAndReset = (newSize: number) => {
-    screen.changeCellSize(newSize);
-    reset();
+    hash.resetHash();
+    hash.setIsWorkingOnHash(false);
+    boardData.resetGeneration();
   };
 
   const { navInfo, refreshBatteryInfo } = useAgent();
 
-  const batteryClock = useClock(refreshBatteryInfo);
-  batteryClock.tuneSpeed(BATTERY_REFRESH_INTERVAL);
-  batteryClock.switchPlayPause(); // start the battery checking clock
-
-  const gameLoop = useClock(run);
+  const batteryTimer = useTimer(refreshBatteryInfo);
+  batteryTimer.tuneSpeed(BATTERY_REFRESH_INTERVAL);
+  batteryTimer.switchPlayPause(); // start the battery checking clock
 
   onMount(() => {
-    setCtx(canvas.getContext("2d")!);
-    run();
+    setBoardCtx(boardRef.getContext("2d")!);
+    setGridCtx(gridRef.getContext("2d")!);
+    painter.setCanvasRef(boardRef);
+    hash.drawAllHash();
+    grid.drawGrid();
   });
 
-  const debug = false;
+  const gridInfo = createMemo(() => {
+    return { width: grid.board.wW, height: grid.board.wH };
+  });
+
+  const debug = true;
 
   return (
     <>
       <Show when={import.meta.env.DEV && debug}>
         <DebuggerPanel>
-          <SimpleButton handler={batteryClock.switchPlayPause}>battery refresh : {batteryClock.speed}</SimpleButton>
-          <SimpleButton handler={run}>run hash</SimpleButton>
-          <SimpleButton handler={gameLoop.switchPlayPause}>{gameLoop.play ? "pause" : "play"}</SimpleButton>
-          <SimpleButton
-            handler={() => {
-              console.log("cells : ", screen.nCell());
-              console.log("rows : ", screen.nRow());
-              console.log("cols : ", screen.nCol());
-            }}
-          >
-            log
+          <div class="w-full">
+            <p>Grid color : {grid.gridSpacing.gridColor}</p>
+            <p>Spacing : {grid.gridSpacing.spacing} </p>
+          </div>
+          <SimpleButton class="border-dw-100 border-2 rounded-md" handler={grid.toggleVisibility}>
+            Visibility : {grid.gridSpacing.visibility.toString()}
           </SimpleButton>
+          <SimpleButton handler={grid.drawGrid} class="border-dw-100 border-2 rounded-md">
+            Draw grid
+          </SimpleButton>
+          <SimpleButton handler={hash.drawAllHash} class="border-dw-100 border-2 rounded-md">
+            drawAllHash
+          </SimpleButton>
+          <div class="flex flex-col gap-1">
+            <SimpleButton
+              handler={() => {
+                grid.changeSpacing(STEP_SPACING);
+              }}
+              class="border-dw-100 border-2 rounded-md"
+            >
+              Add spacing
+            </SimpleButton>
+            <SimpleButton
+              handler={() => {
+                grid.changeSpacing(-STEP_SPACING);
+                grid.drawGrid();
+              }}
+              class="border-dw-100 border-2 rounded-md"
+            >
+              Remove spacing
+            </SimpleButton>
+          </div>
         </DebuggerPanel>
       </Show>
       <Drawer
-        /** data */
-        generation={data.generation}
-        nAlive={data.nAlive}
-        nDead={data.nDead}
-        randomness={data.randomness}
-        tuneRandom={data.tuneRandom}
-        changeRandom={data.changeRandom}
-        /** screen */
-        cellSize={screen.cellSize()}
-        tuneCellSize={screen.tuneCellSize}
-        changeCellSize={changeCellSizeAndReset}
-        /** gameLoop */
-        speed={gameLoop.speed}
-        play={gameLoop.play}
-        tuneSpeed={gameLoop.tuneSpeed}
-        changeSpeed={gameLoop.changeSpeed}
-        switchPlayPause={gameLoop.switchPlayPause}
-        /** hash & misc */
+        boardData={boardData}
+        grid={grid}
+        gameLoop={gameLoop}
+        painter={painter}
+        color={color}
+        applyColors={applyColors}
+        /** misc */
         reset={reset}
+        drawAllHash={hash.drawAllHash}
         hasStarted={hasStarted()}
         navigator={navInfo()}
+        gridInfo={gridInfo()}
       />
-      <CanvasWrapper>
-        <canvas class="bg-black" width={screen.wW()} height={screen.wH()} ref={canvas}></canvas>
-      </CanvasWrapper>
+      {/* BOARD */}
+      <canvas
+        style={{ "background-color": color.backgroundColor() }}
+        width={grid.board.wW}
+        height={grid.board.wH}
+        ref={boardRef}
+      />
+      {/* GRID.BOARD */}
+      <canvas
+        style={{ "background-color": "transparent", position: "absolute", "pointer-events": "none" }}
+        width={grid.board.wW}
+        height={grid.board.wH}
+        ref={gridRef}
+      />
     </>
   );
 };
