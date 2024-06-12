@@ -21,12 +21,15 @@ const StandardTooltip: Component<StandardTooltipProps> = (props) =>
         <h4 class="flex items-center justify-between w-full uppercase monserrat tracking-widest text-xs font-bold text-dw-200 border-b border-b-dw-300 min-h-10 px-3">{props.title}</h4>
       </Show>
       <Show when={!!props.children}>
-      <div class={`text-balance h-full w-full px-3 ${props.innerContentClass || ""}`}>{props.children}</div></Show>
+      <div class={`text-balance h-full w-full px-3 ${props.innerContentClass || ""}`}>
+        {props.children}
+        </div>
+        </Show>
     </div>;
 
 export const StatsTooltip: Component<StatsTooltipProps> = (props) => {
   return (
-    <div class="flex flex-col w-fit min-w-72 tooltip">
+    <div class="flex flex-col w-fit min-w-72 tooltip p-5">
       <Show when={!!props.title}>
         <div class="flex flex-row justify-between">
           <h4 class="uppercase monserrat tracking-widest text-xs font-bold mb-2 text-dw-200">{props.title}</h4>
