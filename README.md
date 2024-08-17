@@ -30,9 +30,7 @@ param
 range Add to Queue (x) => button to add x to queue
 
 save file ?
-paint the grid?
 typology open closed wrap
-group => remarquable shapes + add it to grid
 
 Cells :
 Age => color
@@ -47,12 +45,9 @@ Age => color
 - [ ] (#11) toroidal grid on X (already done on Y)
 - [ ] (#12) implement remarquable shapes and add it to grid
 - [ ] (#14) full HTML for SEO presentation (what ? for what ? why ? how ? when ? )
-- [ ] (#17) implement white theme
-- [ ] (#18) add loader animation
 - [ ] (#20) Refacto resize so extended on the canva plane (currently resize is just working on the array length so past hash is compacted or extended)
-- [ ] (#21) Find a way to implement loader when hash running
-- [ ] (#22) hook useOnResize ? currently
-- [ ] (#24) remove randomness to a default value 80% ?
+- [ ] (#27) Add save and load board
+- [ ] (#28) Map sharing ( can replace or add complexity to #27) 
 
 #### DONE
 
@@ -64,8 +59,10 @@ Age => color
 - [x] (#13) tortue/escargot lapin icon pour speed range
 - [x] (#15) space between cells (new branch ) and background off cells grey
 - [x] (#16) stats => add cell size
+- [x] (#17) implement white theme
 - [x] (#19) Refactor if Nparam > 2 => use object
 - [x] (#23) replace cell size by buttons
+- [x] (#24) remove randomness to a default value 80% ?
 - [x] (#25) grid panel
 - [x] (#26) Install eslint package + configuration + cleaning
 
